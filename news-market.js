@@ -1,4 +1,4 @@
-﻿const marketNewsDateLabel = document.getElementById('marketNewsDateLabel');
+const marketNewsDateLabel = document.getElementById('marketNewsDateLabel');
 const marketNewsResult = document.getElementById('marketNewsResult');
 
 function fmtPct(v, digits = 2) {
@@ -62,7 +62,7 @@ async function loadMarketNews() {
       }
       throw new Error('Market news response was not valid JSON.');
     };
-    const data = await readJsonWithFallback('/api/news/market', '/data/news-market.json');
+    const data = await readJsonWithFallback('./api/news/market', './data/news-market.json');
 
     marketNewsDateLabel.textContent = `Date: ${esc(data?.asOfDate || '')}`;
     marketNewsResult.innerHTML = `
@@ -83,4 +83,7 @@ async function loadMarketNews() {
 }
 
 loadMarketNews();
+
+
+
 

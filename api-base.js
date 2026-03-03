@@ -75,7 +75,171 @@
     AVGO: 'Broadcom Inc.',
     AMD: 'Advanced Micro Devices, Inc.',
     SMH: 'VanEck Semiconductor ETF',
-    'BRK-B': 'Berkshire Hathaway Inc. Class B'
+    'BRK-B': 'Berkshire Hathaway Inc. Class B',
+    GOOGL: 'Alphabet Inc. Class A',
+    GOOG: 'Alphabet Inc. Class C',
+    NFLX: 'Netflix, Inc.',
+    ORCL: 'Oracle Corporation',
+    NKE: 'NIKE, Inc.',
+    DIS: 'The Walt Disney Company',
+    WMT: 'Walmart Inc.',
+    COST: 'Costco Wholesale Corporation',
+    IBM: 'International Business Machines Corporation',
+    BABA: 'Alibaba Group Holding Limited ADR',
+    TSM: 'Taiwan Semiconductor Manufacturing Company ADR',
+    SAP: 'SAP SE ADR',
+    'RDSA.AS': 'Shell plc',
+    'NESN.SW': 'Nestle S.A.',
+    '7203.T': 'Toyota Motor Corporation',
+    '6758.T': 'Sony Group Corporation',
+    '9984.T': 'SoftBank Group Corp.',
+    '0700.HK': 'Tencent Holdings Limited',
+    '9988.HK': 'Alibaba Group Holding Limited',
+    '0005.HK': 'HSBC Holdings plc',
+    'RELIANCE.NS': 'Reliance Industries Limited',
+    'TCS.NS': 'Tata Consultancy Services Limited',
+    'INFY.NS': 'Infosys Limited',
+    'HDFCBANK.NS': 'HDFC Bank Limited',
+    '005930.KS': 'Samsung Electronics Co., Ltd.',
+    '000660.KS': 'SK hynix Inc.',
+    '035420.KS': 'NAVER Corporation',
+    '051910.KS': 'LG Chem, Ltd.',
+    'SHOP.TO': 'Shopify Inc.',
+    'RY.TO': 'Royal Bank of Canada',
+    'BNS.TO': 'Bank of Nova Scotia',
+    'SHEL.L': 'Shell plc',
+    'AZN.L': 'AstraZeneca plc',
+    'HSBA.L': 'HSBC Holdings plc',
+    ETHU: '2x Ether ETF',
+    TQQQ: 'ProShares UltraPro QQQ',
+    SQQQ: 'ProShares UltraPro Short QQQ',
+    UPRO: 'ProShares UltraPro S&P 500',
+    SPXL: 'Direxion Daily S&P 500 Bull 3X Shares',
+    SPXS: 'Direxion Daily S&P 500 Bear 3X Shares',
+    SOXS: 'Direxion Daily Semiconductor Bear 3X Shares',
+    TECL: 'Direxion Daily Technology Bull 3X Shares',
+    TECS: 'Direxion Daily Technology Bear 3X Shares',
+    FAS: 'Direxion Daily Financial Bull 3X Shares',
+    FAZ: 'Direxion Daily Financial Bear 3X Shares',
+    LABU: 'Direxion Daily S&P Biotech Bull 3X Shares',
+    LABD: 'Direxion Daily S&P Biotech Bear 3X Shares',
+    NAIL: 'Direxion Daily Homebuilders & Supplies Bull 3X Shares',
+    WEBL: 'Direxion Daily Dow Jones Internet Bull 3X Shares',
+    CURE: 'Direxion Daily Healthcare Bull 3X Shares',
+    YINN: 'Direxion Daily FTSE China Bull 3X Shares',
+    YANG: 'Direxion Daily FTSE China Bear 3X Shares',
+    UVXY: 'ProShares Ultra VIX Short-Term Futures ETF',
+    SVXY: 'ProShares Short VIX Short-Term Futures ETF',
+    BOIL: 'ProShares Ultra Bloomberg Natural Gas',
+    KOLD: 'ProShares UltraShort Bloomberg Natural Gas',
+    UCO: 'ProShares Ultra Bloomberg Crude Oil',
+    SCO: 'ProShares UltraShort Bloomberg Crude Oil',
+    DAX: 'DAX Index',
+    '^FTSE': 'FTSE 100 Index'
+  };
+  const SYMBOL_MARKET_META = {
+    SPY: { exchange: 'NYSEARCA', quoteType: 'ETF' },
+    QQQ: { exchange: 'NASDAQ', quoteType: 'ETF' },
+    VOO: { exchange: 'NYSEARCA', quoteType: 'ETF' },
+    VTI: { exchange: 'NYSEARCA', quoteType: 'ETF' },
+    IVV: { exchange: 'NYSEARCA', quoteType: 'ETF' },
+    VXUS: { exchange: 'NASDAQ', quoteType: 'ETF' },
+    BND: { exchange: 'NASDAQ', quoteType: 'ETF' },
+    AGG: { exchange: 'NYSEARCA', quoteType: 'ETF' },
+    TLT: { exchange: 'NASDAQ', quoteType: 'ETF' },
+    GLD: { exchange: 'NYSEARCA', quoteType: 'ETF' },
+    SCHD: { exchange: 'NYSEARCA', quoteType: 'ETF' },
+    VNQ: { exchange: 'NYSEARCA', quoteType: 'ETF' },
+    SHV: { exchange: 'NASDAQ', quoteType: 'ETF' },
+    IWM: { exchange: 'NYSEARCA', quoteType: 'ETF' },
+    DIA: { exchange: 'NYSEARCA', quoteType: 'ETF' },
+    XLF: { exchange: 'NYSEARCA', quoteType: 'ETF' },
+    XLE: { exchange: 'NYSEARCA', quoteType: 'ETF' },
+    XLV: { exchange: 'NYSEARCA', quoteType: 'ETF' },
+    XLP: { exchange: 'NYSEARCA', quoteType: 'ETF' },
+    XLU: { exchange: 'NYSEARCA', quoteType: 'ETF' },
+    SMH: { exchange: 'NASDAQ', quoteType: 'ETF' },
+    VIG: { exchange: 'NYSEARCA', quoteType: 'ETF' },
+    TIP: { exchange: 'NYSEARCA', quoteType: 'ETF' },
+    SOXL: { exchange: 'NYSEARCA', quoteType: 'ETF' },
+    AAPL: { exchange: 'NASDAQ', quoteType: 'EQUITY' },
+    MSFT: { exchange: 'NASDAQ', quoteType: 'EQUITY' },
+    NVDA: { exchange: 'NASDAQ', quoteType: 'EQUITY' },
+    AMZN: { exchange: 'NASDAQ', quoteType: 'EQUITY' },
+    META: { exchange: 'NASDAQ', quoteType: 'EQUITY' },
+    TSLA: { exchange: 'NASDAQ', quoteType: 'EQUITY' },
+    GOOGL: { exchange: 'NASDAQ', quoteType: 'EQUITY' },
+    GOOG: { exchange: 'NASDAQ', quoteType: 'EQUITY' },
+    AVGO: { exchange: 'NASDAQ', quoteType: 'EQUITY' },
+    AMD: { exchange: 'NASDAQ', quoteType: 'EQUITY' },
+    NFLX: { exchange: 'NASDAQ', quoteType: 'EQUITY' },
+    ORCL: { exchange: 'NYSE', quoteType: 'EQUITY' },
+    NKE: { exchange: 'NYSE', quoteType: 'EQUITY' },
+    DIS: { exchange: 'NYSE', quoteType: 'EQUITY' },
+    WMT: { exchange: 'NYSE', quoteType: 'EQUITY' },
+    COST: { exchange: 'NASDAQ', quoteType: 'EQUITY' },
+    IBM: { exchange: 'NYSE', quoteType: 'EQUITY' },
+    JPM: { exchange: 'NYSE', quoteType: 'EQUITY' },
+    XOM: { exchange: 'NYSE', quoteType: 'EQUITY' },
+    JNJ: { exchange: 'NYSE', quoteType: 'EQUITY' },
+    PG: { exchange: 'NYSE', quoteType: 'EQUITY' },
+    KO: { exchange: 'NYSE', quoteType: 'EQUITY' },
+    PLTR: { exchange: 'NASDAQ', quoteType: 'EQUITY' },
+    COIN: { exchange: 'NASDAQ', quoteType: 'EQUITY' },
+    MSTR: { exchange: 'NASDAQ', quoteType: 'EQUITY' },
+    'BRK-B': { exchange: 'NYSE', quoteType: 'EQUITY' },
+    BABA: { exchange: 'NYSE', quoteType: 'EQUITY' },
+    TSM: { exchange: 'NYSE', quoteType: 'EQUITY' },
+    SAP: { exchange: 'NYSE', quoteType: 'EQUITY' },
+    '7203.T': { exchange: 'TSE', quoteType: 'EQUITY' },
+    '6758.T': { exchange: 'TSE', quoteType: 'EQUITY' },
+    '9984.T': { exchange: 'TSE', quoteType: 'EQUITY' },
+    '0700.HK': { exchange: 'HKEX', quoteType: 'EQUITY' },
+    '9988.HK': { exchange: 'HKEX', quoteType: 'EQUITY' },
+    '0005.HK': { exchange: 'HKEX', quoteType: 'EQUITY' },
+    'RELIANCE.NS': { exchange: 'NSE', quoteType: 'EQUITY' },
+    'TCS.NS': { exchange: 'NSE', quoteType: 'EQUITY' },
+    'INFY.NS': { exchange: 'NSE', quoteType: 'EQUITY' },
+    'HDFCBANK.NS': { exchange: 'NSE', quoteType: 'EQUITY' },
+    'SHOP.TO': { exchange: 'TSX', quoteType: 'EQUITY' },
+    'RY.TO': { exchange: 'TSX', quoteType: 'EQUITY' },
+    'BNS.TO': { exchange: 'TSX', quoteType: 'EQUITY' },
+    'SHEL.L': { exchange: 'LSE', quoteType: 'EQUITY' },
+    'AZN.L': { exchange: 'LSE', quoteType: 'EQUITY' },
+    'HSBA.L': { exchange: 'LSE', quoteType: 'EQUITY' },
+    'RDSA.AS': { exchange: 'Euronext', quoteType: 'EQUITY' },
+    'NESN.SW': { exchange: 'SIX', quoteType: 'EQUITY' },
+    'BTC-USD': { exchange: 'CRYPTO', quoteType: 'CRYPTO' },
+    'ETH-USD': { exchange: 'CRYPTO', quoteType: 'CRYPTO' }
+    ,
+    ETHU: { exchange: 'NYSEARCA', quoteType: 'ETF' },
+    TQQQ: { exchange: 'NASDAQ', quoteType: 'ETF' },
+    SQQQ: { exchange: 'NASDAQ', quoteType: 'ETF' },
+    UPRO: { exchange: 'NYSEARCA', quoteType: 'ETF' },
+    SPXL: { exchange: 'NYSEARCA', quoteType: 'ETF' },
+    SPXS: { exchange: 'NYSEARCA', quoteType: 'ETF' },
+    SOXS: { exchange: 'NYSEARCA', quoteType: 'ETF' },
+    TECL: { exchange: 'NYSEARCA', quoteType: 'ETF' },
+    TECS: { exchange: 'NYSEARCA', quoteType: 'ETF' },
+    FAS: { exchange: 'NYSEARCA', quoteType: 'ETF' },
+    FAZ: { exchange: 'NYSEARCA', quoteType: 'ETF' },
+    LABU: { exchange: 'NYSEARCA', quoteType: 'ETF' },
+    LABD: { exchange: 'NYSEARCA', quoteType: 'ETF' },
+    NAIL: { exchange: 'NYSEARCA', quoteType: 'ETF' },
+    WEBL: { exchange: 'NYSEARCA', quoteType: 'ETF' },
+    CURE: { exchange: 'NYSEARCA', quoteType: 'ETF' },
+    YINN: { exchange: 'NYSEARCA', quoteType: 'ETF' },
+    YANG: { exchange: 'NYSEARCA', quoteType: 'ETF' },
+    UVXY: { exchange: 'BATS', quoteType: 'ETF' },
+    SVXY: { exchange: 'BATS', quoteType: 'ETF' },
+    BOIL: { exchange: 'NYSEARCA', quoteType: 'ETF' },
+    KOLD: { exchange: 'NYSEARCA', quoteType: 'ETF' },
+    UCO: { exchange: 'NYSEARCA', quoteType: 'ETF' },
+    SCO: { exchange: 'NYSEARCA', quoteType: 'ETF' },
+    '005930.KS': { exchange: 'KRX', quoteType: 'EQUITY' },
+    '000660.KS': { exchange: 'KRX', quoteType: 'EQUITY' },
+    '035420.KS': { exchange: 'KRX', quoteType: 'EQUITY' },
+    '051910.KS': { exchange: 'KRX', quoteType: 'EQUITY' }
   };
   const POPULAR_SYMBOL_RANK = new Map(
     [
@@ -101,52 +265,7 @@
       'ETH-USD'
     ].map((symbol, idx) => [symbol, idx])
   );
-  const SEARCH_UNIVERSE = [
-    'SPY',
-    'QQQ',
-    'VOO',
-    'VTI',
-    'IVV',
-    'AAPL',
-    'MSFT',
-    'NVDA',
-    'AMZN',
-    'GOOGL',
-    'META',
-    'TSLA',
-    'BRK-B',
-    'JPM',
-    'XOM',
-    'BND',
-    'AGG',
-    'TLT',
-    'GLD',
-    'SHV',
-    'VXUS',
-    'SCHD',
-    'VNQ',
-    'IWM',
-    'DIA',
-    'XLF',
-    'XLE',
-    'XLV',
-    'XLP',
-    'XLU',
-    'BTC-USD',
-    'ETH-USD',
-    'COIN',
-    'MSTR',
-    'SOXL',
-    'PLTR',
-    'JNJ',
-    'PG',
-    'KO',
-    'VIG',
-    'TIP',
-    'AVGO',
-    'AMD',
-    'SMH'
-  ];
+  const SEARCH_UNIVERSE = Array.from(new Set([...Object.keys(SYMBOL_MARKET_META), ...Object.keys(SYMBOL_FULL_NAMES)]));
 
   window.__INVESTOLAB_API_BASE = '';
   const rawFetch = window.fetch.bind(window);
@@ -166,6 +285,29 @@
   function fullNameForSymbol(symbol) {
     const key = normalizeSymbol(symbol);
     return SYMBOL_FULL_NAMES[key] || key;
+  }
+
+  function marketMetaForSymbol(symbol) {
+    const key = normalizeSymbol(symbol);
+    return SYMBOL_MARKET_META[key] || { exchange: 'GLOBAL', quoteType: 'EQUITY' };
+  }
+
+  function isKnownSearchSymbolLocal(symbol) {
+    const key = normalizeSymbol(symbol);
+    return SEARCH_UNIVERSE.includes(key);
+  }
+
+  async function isKnownSearchSymbol(symbol) {
+    const key = normalizeSymbol(symbol);
+    if (!key) return false;
+    if (isKnownSearchSymbolLocal(key)) return true;
+    try {
+      const search = await yahooSearch(key, 30, 0);
+      const quotes = Array.isArray(search?.quotes) ? search.quotes : [];
+      return quotes.some((q) => normalizeSymbol(q?.symbol) === key);
+    } catch (_error) {
+      return false;
+    }
   }
 
   function popularityRank(symbol) {
@@ -197,18 +339,35 @@
     return jsonResponse({ error: message }, status);
   }
 
-  function mapApiToStaticData(url) {
+  function normalizeApiPath(url) {
     if (typeof url !== 'string') return null;
-    if (url.startsWith('/api/news/market')) return '/data/news-market.json';
-    if (url.startsWith('/api/news/tailored')) return '/data/news-tailored.json';
-    if (url.startsWith('/api/news/investment-of-day')) {
-      const periodMatch = url.match(/[?&]period=([^&]+)/i);
+    let parsed;
+    try {
+      parsed = new URL(url, window.location.origin);
+    } catch (_error) {
+      return url;
+    }
+    const path = String(parsed.pathname || '');
+    const query = String(parsed.search || '');
+    const idx = path.toLowerCase().indexOf('/api/');
+    if (idx >= 0) return `${path.slice(idx)}${query}`;
+    if (path.startsWith('api/')) return `/${path}${query}`;
+    return `${path}${query}`;
+  }
+
+  function mapApiToStaticData(url) {
+    const apiPath = normalizeApiPath(url);
+    if (!apiPath) return null;
+    if (apiPath.startsWith('/api/news/market')) return './data/news-market.json';
+    if (apiPath.startsWith('/api/news/tailored')) return './data/news-tailored.json';
+    if (apiPath.startsWith('/api/news/investment-of-day')) {
+      const periodMatch = apiPath.match(/[?&]period=([^&]+)/i);
       const periodRaw = periodMatch ? decodeURIComponent(periodMatch[1] || '') : '';
       const period = String(periodRaw || 'day').toLowerCase();
-      if (period === 'week') return '/data/news-investment-week.json';
-      if (period === 'month') return '/data/news-investment-month.json';
-      if (period === 'year') return '/data/news-investment-year.json';
-      return '/data/news-investment-day.json';
+      if (period === 'week') return './data/news-investment-week.json';
+      if (period === 'month') return './data/news-investment-month.json';
+      if (period === 'year') return './data/news-investment-year.json';
+      return './data/news-investment-day.json';
     }
     return null;
   }
@@ -260,14 +419,52 @@
   async function yahooSearch(query, _quotesCount = 10, _newsCount = 0) {
     const q = String(query || '').trim().toUpperCase();
     if (!q) return { quotes: [], news: [] };
+    try {
+      const remoteUrl = `https://query1.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(
+        q
+      )}&quotesCount=100&newsCount=0`;
+      const remoteRes = await rawFetch(remoteUrl);
+      const ct = String(remoteRes.headers.get('content-type') || '').toLowerCase();
+      if (remoteRes.ok && ct.includes('application/json')) {
+        const remoteData = await remoteRes.json();
+        const remoteQuotes = Array.isArray(remoteData?.quotes) ? remoteData.quotes : [];
+        const cleaned = remoteQuotes
+          .filter((row) => row && row.symbol)
+          .map((row) => {
+            const symbol = normalizeSymbol(row.symbol);
+            const longname = String(row.longname || row.shortname || fullNameForSymbol(symbol));
+            return {
+              symbol,
+              shortname: String(row.shortname || longname),
+              longname,
+              exchange: String(row.exchange || row.exchDisp || marketMetaForSymbol(symbol).exchange || 'GLOBAL'),
+              quoteType: String(row.quoteType || marketMetaForSymbol(symbol).quoteType || 'EQUITY'),
+              _score: searchScore(q, symbol, longname),
+              _pop: popularityRank(symbol)
+            };
+          })
+          .filter((row) => row._score > 0);
+        cleaned.sort((a, b) => {
+          if (b._score !== a._score) return b._score - a._score;
+          if (a._pop !== b._pop) return a._pop - b._pop;
+          return String(a.symbol).localeCompare(String(b.symbol));
+        });
+        const remoteTop = cleaned.slice(0, 40).map(({ _score, _pop, ...row }) => row);
+        if (remoteTop.length) return { quotes: remoteTop, news: [] };
+      }
+    } catch (_error) {
+      // Fall back to local universe when remote search is unavailable.
+    }
+
     const candidates = SEARCH_UNIVERSE.map((sym) => {
       const longname = fullNameForSymbol(sym);
+      const meta = marketMetaForSymbol(sym);
       return {
         symbol: sym,
         shortname: longname,
         longname,
-        exchange: 'NASDAQ',
-        quoteType: 'EQUITY',
+        exchange: meta.exchange,
+        quoteType: meta.quoteType,
         _score: searchScore(q, sym, longname),
         _pop: popularityRank(sym)
       };
@@ -280,15 +477,6 @@
     });
 
     const quotes = sorted.slice(0, 12).map(({ _score, _pop, ...row }) => row);
-    if (!quotes.length) {
-      quotes.push({
-        symbol: q,
-        shortname: fullNameForSymbol(q),
-        longname: fullNameForSymbol(q),
-        exchange: 'NASDAQ',
-        quoteType: 'EQUITY'
-      });
-    }
     return { quotes, news: [] };
   }
 
@@ -327,7 +515,7 @@
         quoteType: x.quoteType || ''
       }));
     const exact = matches.find((m) => normalizeSymbol(m.symbol) === normalizeSymbol(q));
-    const best = exact || matches[0] || { symbol: normalizeSymbol(q), shortname: q, longname: q, exchange: '', quoteType: '' };
+    const best = exact || matches[0] || null;
     if (best && !best.longname) best.longname = fullNameForSymbol(best.symbol);
     return { best, matches };
   }
@@ -440,7 +628,8 @@
 
   async function buildInvestmentValuation(query, asOfDate) {
     const resolved = await resolveSymbol(query);
-    const symbol = resolved?.best?.symbol || normalizeSymbol(query);
+    const symbol = resolved?.best?.symbol || '';
+    if (!symbol) throw new Error(`No matching symbol found for "${String(query || '').trim()}". Select from dropdown.`);
     const displayName = resolved?.best?.longname || resolved?.best?.shortname || fullNameForSymbol(symbol);
     const chart = await yahooChart(symbol, '3y', '1d');
     const history = extractHistory(chart);
@@ -599,7 +788,8 @@
       const query = String(h?.query || '').trim();
       if (!query) continue;
       const resolved = await resolveSymbol(query);
-      const symbol = resolved?.best?.symbol || normalizeSymbol(query);
+      const symbol = resolved?.best?.symbol || '';
+      if (!symbol) continue;
       const displayName = resolved?.best?.longname || resolved?.best?.shortname || fullNameForSymbol(symbol);
       const chart = await yahooChart(symbol, '1y', '1d');
       const history = extractHistory(chart);
@@ -1255,7 +1445,19 @@
         return jsonResponse({ token, price: row.close, date: row.date });
       }
       if (url.startsWith('/api/assets/validate')) {
-        return jsonResponse({ ok: true });
+        const body = parseBody(init);
+        const token = normalizeSymbol(body.token || '');
+        if (!token) return jsonErrorResponse('Token is required.', 400);
+        const parts = token.split(':');
+        const kind = parts[0];
+        const baseSymbol =
+          kind === 'BOND' || kind === 'LEVERAGE' || kind === 'CALL'
+            ? normalizeSymbol(parts[1] || '')
+            : token;
+        if (!(await isKnownSearchSymbol(baseSymbol))) {
+          return jsonErrorResponse(`No matching symbol found for "${baseSymbol}". Select from dropdown.`, 400);
+        }
+        return jsonResponse({ ok: true, symbol: baseSymbol });
       }
       if (url.startsWith('/api/valuation/investment')) {
         const body = parseBody(init);
@@ -1427,16 +1629,17 @@
 
   window.fetch = async (input, init) => {
     const url = resolveApiUrl(input);
-    if (!url || !url.startsWith('/api/')) {
+    const apiPath = normalizeApiPath(url);
+    if (!apiPath || !apiPath.startsWith('/api/')) {
       return rawFetch(input, init);
     }
 
-    const localApiResponse = await handleLocalApi(url, init);
+    const localApiResponse = await handleLocalApi(apiPath, init);
     if (!(localApiResponse instanceof Response)) {
       return jsonErrorResponse('Public API handler failed.', 500);
     }
     if (localApiResponse.status === 501 && isGithubPages) {
-      const staticDataUrl = mapApiToStaticData(url);
+      const staticDataUrl = mapApiToStaticData(apiPath);
       if (staticDataUrl) {
         return rawFetch(staticDataUrl, init).catch(() =>
           jsonErrorResponse('Static data is unavailable right now. Try again in a moment.', 503)

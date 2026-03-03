@@ -1,4 +1,4 @@
-﻿const tailoredNewsForm = document.getElementById('tailoredNewsForm');
+const tailoredNewsForm = document.getElementById('tailoredNewsForm');
 const tailoredTypeSelect = document.getElementById('tailoredTypeSelect');
 const tailoredNewsDateLabel = document.getElementById('tailoredNewsDateLabel');
 const tailoredNewsResult = document.getElementById('tailoredNewsResult');
@@ -66,8 +66,8 @@ async function loadTailoredNews(typeKey) {
       throw new Error('Tailored news response was not valid JSON.');
     };
     const data = await readJsonWithFallback(
-      `/api/news/tailored?type=${encodeURIComponent(typeKey || '')}`,
-      '/data/news-tailored.json'
+      `./api/news/tailored?type=${encodeURIComponent(typeKey || '')}`,
+      './data/news-tailored.json'
     );
 
     tailoredNewsDateLabel.textContent = `Date: ${esc(data?.asOfDate || '')} | Profile: ${esc(data?.profile || '')}`;
@@ -95,4 +95,7 @@ tailoredNewsForm?.addEventListener('submit', async (event) => {
 });
 
 loadTailoredNews(String(tailoredTypeSelect?.value || 'passive_rational_allocator'));
+
+
+
 

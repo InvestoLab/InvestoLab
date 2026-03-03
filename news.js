@@ -1,4 +1,4 @@
-﻿const newsDateLabel = document.getElementById('newsDateLabel');
+const newsDateLabel = document.getElementById('newsDateLabel');
 const newsResult = document.getElementById('newsResult');
 const marketNewsDateLabel = document.getElementById('marketNewsDateLabel');
 const marketNewsResult = document.getElementById('marketNewsResult');
@@ -74,7 +74,7 @@ async function readJsonWithFallback(primaryUrl, fallbackUrl, failMessage) {
 
 async function loadMarketNews() {
   try {
-    const data = await readJsonWithFallback('/api/news/market', '/data/news-market.json', 'Failed to load market news.');
+    const data = await readJsonWithFallback('./api/news/market', './data/news-market.json', 'Failed to load market news.');
 
     marketNewsDateLabel.textContent = `Date: ${esc(data?.asOfDate || '')}`;
     marketNewsResult.innerHTML = `
@@ -98,8 +98,8 @@ async function loadTailoredNews(typeKey) {
   try {
     tailoredNewsDateLabel.textContent = 'Loading tailored feed...';
     const data = await readJsonWithFallback(
-      `/api/news/tailored?type=${encodeURIComponent(typeKey || '')}`,
-      '/data/news-tailored.json',
+      `./api/news/tailored?type=${encodeURIComponent(typeKey || '')}`,
+      './data/news-tailored.json',
       'Failed to load tailored news.'
     );
 
@@ -124,8 +124,8 @@ async function loadTailoredNews(typeKey) {
 async function loadInvestmentOfDay() {
   try {
     const data = await readJsonWithFallback(
-      '/api/news/investment-of-day',
-      '/data/news-investment-day.json',
+      './api/news/investment-of-day',
+      './data/news-investment-day.json',
       'Failed to load investment of the day.'
     );
 
@@ -201,4 +201,7 @@ Promise.all([
   loadTailoredNews(String(tailoredTypeSelect?.value || 'passive_rational_allocator')),
   loadInvestmentOfDay()
 ]);
+
+
+
 

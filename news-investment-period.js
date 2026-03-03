@@ -1,4 +1,4 @@
-﻿const newsDateLabel = document.getElementById('newsDateLabel');
+const newsDateLabel = document.getElementById('newsDateLabel');
 const newsResult = document.getElementById('newsResult');
 const investmentPeriodTitle = document.getElementById('investmentPeriodTitle');
 const pagePeriod = String(document.body?.dataset?.newsPeriod || 'day').toLowerCase();
@@ -43,10 +43,10 @@ function renderHeadlineList(headlines, emptyText = 'No headlines available.') {
 async function loadInvestmentOfPeriod() {
   try {
     const fallbackPathByPeriod = {
-      day: '/data/news-investment-day.json',
-      week: '/data/news-investment-week.json',
-      month: '/data/news-investment-month.json',
-      year: '/data/news-investment-year.json'
+      day: './data/news-investment-day.json',
+      week: './data/news-investment-week.json',
+      month: './data/news-investment-month.json',
+      year: './data/news-investment-year.json'
     };
     const readJsonWithFallback = async (primaryUrl, fallbackUrl) => {
       const response = await fetch(primaryUrl);
@@ -65,7 +65,7 @@ async function loadInvestmentOfPeriod() {
       throw new Error('Investment pick response was not valid JSON.');
     };
     const data = await readJsonWithFallback(
-      `/api/news/investment-of-day?period=${encodeURIComponent(pagePeriod)}`,
+      `./api/news/investment-of-day?period=${encodeURIComponent(pagePeriod)}`,
       fallbackPathByPeriod[pagePeriod] || fallbackPathByPeriod.day
     );
 
@@ -135,4 +135,7 @@ async function loadInvestmentOfPeriod() {
 }
 
 loadInvestmentOfPeriod();
+
+
+
 

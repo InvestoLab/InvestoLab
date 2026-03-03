@@ -7,6 +7,7 @@ const valuationResult = document.getElementById('valuationResult');
 let valuationSearchResults = [];
 let valuationSearchIndex = -1;
 let valuationSearchTimer = null;
+let valuationSelectedSymbol = '';
 const POPULAR_SYMBOL_RANK = new Map(
   [
     'SPY',
@@ -78,9 +79,24 @@ function popularityRank(symbol) {
   return POPULAR_SYMBOL_RANK.has(normalized) ? POPULAR_SYMBOL_RANK.get(normalized) : Number.POSITIVE_INFINITY;
 }
 
+function searchScore(queryUpper, option) {
+  const sym = String(option?.symbol || '').toUpperCase();
+  const name = String(option?.longname || option?.shortname || '').toUpperCase();
+  if (!queryUpper) return 0;
+  if (sym === queryUpper) return 10000;
+  if (sym.startsWith(queryUpper)) return 9000 - sym.length;
+  if (name.startsWith(queryUpper)) return 8000 - name.length;
+  const idxSym = sym.indexOf(queryUpper);
+  if (idxSym >= 0) return 7000 - idxSym * 10 - sym.length;
+  const idxName = name.indexOf(queryUpper);
+  if (idxName >= 0) return 6000 - idxName * 6 - name.length;
+  return 0;
+}
+
 async function searchSymbolOptions(rawInput) {
   const raw = String(rawInput || '').trim();
   if (!raw) return [];
+  const queryUpper = raw.toUpperCase();
 
   async function tryResolve(url, body) {
     const response = await fetch(url, {
@@ -108,6 +124,9 @@ async function searchSymbolOptions(rawInput) {
     if (!list.some((x) => x.symbol === m.symbol)) list.push(m);
   }
   list.sort((a, b) => {
+    const sa = searchScore(queryUpper, a);
+    const sb = searchScore(queryUpper, b);
+    if (sb !== sa) return sb - sa;
     const pa = popularityRank(a.symbol);
     const pb = popularityRank(b.symbol);
     if (pa !== pb) return pa - pb;
@@ -128,7 +147,18 @@ function hideValuationSearchDropdown() {
 function applyValuationSearchSelection(option) {
   if (!option || !valuationQueryInput) return;
   valuationQueryInput.value = option.symbol || '';
+  valuationSelectedSymbol = String(option.symbol || '').trim().toUpperCase();
   hideValuationSearchDropdown();
+}
+
+async function requireValuationDropdownSelection(rawInput) {
+  const raw = String(rawInput || '').trim();
+  if (!raw) return null;
+  const norm = raw.toUpperCase();
+  const local = valuationSearchResults.find((x) => String(x?.symbol || '').toUpperCase() === norm);
+  if (local) return local;
+  const fetched = await searchSymbolOptions(raw);
+  return fetched.find((x) => String(x?.symbol || '').toUpperCase() === norm) || null;
 }
 
 function renderValuationSearchDropdown() {
@@ -375,6 +405,11 @@ investmentValuationForm?.addEventListener('submit', async (event) => {
     valuationStatus.textContent = 'Enter an investment query.';
     return;
   }
+  const selected = await requireValuationDropdownSelection(query);
+  if (!selected || String(selected.symbol || '').toUpperCase() !== String(valuationSelectedSymbol || '').toUpperCase()) {
+    valuationStatus.textContent = 'Select an investment from the dropdown list.';
+    return;
+  }
 
   valuationStatus.textContent = 'Running valuation...';
   valuationResult.classList.add('hidden');
@@ -383,7 +418,7 @@ investmentValuationForm?.addEventListener('submit', async (event) => {
     const response = await fetch('/api/valuation/investment', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query, asOfDate })
+      body: JSON.stringify({ query: selected.symbol, asOfDate })
     });
 
     const data = await response.json();
@@ -403,6 +438,7 @@ if (valuationDateInput) valuationDateInput.value = todayIso();
 
 valuationQueryInput?.addEventListener('input', () => {
   const q = valuationQueryInput.value.trim();
+  valuationSelectedSymbol = '';
   if (valuationSearchTimer) clearTimeout(valuationSearchTimer);
   if (!q || q.length < 2) {
     hideValuationSearchDropdown();

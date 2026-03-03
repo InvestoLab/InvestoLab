@@ -12,6 +12,7 @@ let addSearchResults = [];
 let addSearchIndex = -1;
 let addSearchTimer = null;
 let addHoldingModal = null;
+let addSelectedSymbol = '';
 
 const POPULAR_SYMBOL_RANK = new Map(
   [
@@ -84,9 +85,24 @@ function popularityRank(symbol) {
   return POPULAR_SYMBOL_RANK.has(normalized) ? POPULAR_SYMBOL_RANK.get(normalized) : Number.POSITIVE_INFINITY;
 }
 
+function searchScore(queryUpper, option) {
+  const sym = String(option?.symbol || '').toUpperCase();
+  const name = String(option?.longname || option?.shortname || '').toUpperCase();
+  if (!queryUpper) return 0;
+  if (sym === queryUpper) return 10000;
+  if (sym.startsWith(queryUpper)) return 9000 - sym.length;
+  if (name.startsWith(queryUpper)) return 8000 - name.length;
+  const idxSym = sym.indexOf(queryUpper);
+  if (idxSym >= 0) return 7000 - idxSym * 10 - sym.length;
+  const idxName = name.indexOf(queryUpper);
+  if (idxName >= 0) return 6000 - idxName * 6 - name.length;
+  return 0;
+}
+
 async function searchSymbolOptions(rawInput) {
   const raw = String(rawInput || '').trim();
   if (!raw) return [];
+  const queryUpper = raw.toUpperCase();
 
   async function tryResolve(url, body) {
     const response = await fetch(url, {
@@ -112,6 +128,9 @@ async function searchSymbolOptions(rawInput) {
     if (!list.some((x) => x.symbol === m.symbol)) list.push(m);
   }
   list.sort((a, b) => {
+    const sa = searchScore(queryUpper, a);
+    const sb = searchScore(queryUpper, b);
+    if (sb !== sa) return sb - sa;
     const pa = popularityRank(a.symbol);
     const pb = popularityRank(b.symbol);
     if (pa !== pb) return pa - pb;
@@ -257,8 +276,20 @@ function hideAddSearchDropdown() {
 
 function applyAddSearchSelection(option) {
   if (!option || !portfolioAddQueryInput) return;
-  portfolioAddQueryInput.value = String(option.symbol || '').trim();
+  const symbol = String(option.symbol || '').trim();
+  portfolioAddQueryInput.value = symbol;
+  addSelectedSymbol = symbol.toUpperCase();
   hideAddSearchDropdown();
+}
+
+async function requireAddDropdownSelection(rawInput) {
+  const raw = String(rawInput || '').trim();
+  if (!raw) return null;
+  const norm = raw.toUpperCase();
+  const local = addSearchResults.find((x) => String(x?.symbol || '').toUpperCase() === norm);
+  if (local) return local;
+  const fetched = await searchSymbolOptions(raw);
+  return fetched.find((x) => String(x?.symbol || '').toUpperCase() === norm) || null;
 }
 
 function renderAddSearchDropdown() {
@@ -536,12 +567,17 @@ async function addHoldingFromSearch() {
     portfolioStatus.textContent = 'Search and select an investment first.';
     return;
   }
+  const selected = await requireAddDropdownSelection(rawQuery);
+  if (!selected || String(selected.symbol || '').toUpperCase() !== String(addSelectedSymbol || '').toUpperCase()) {
+    portfolioStatus.textContent = 'Select an investment from the dropdown list.';
+    return;
+  }
 
   portfolioStatus.textContent = 'Adding investment...';
   hideAddSearchDropdown();
 
   try {
-    const resolved = await resolveSymbolForAdd(rawQuery);
+    const resolved = await resolveSymbolForAdd(selected.symbol);
     const symbol = String(resolved?.symbol || '').trim();
     const fullName = String(resolved?.fullName || symbol).trim();
     if (!symbol) throw new Error('No symbol found.');
@@ -599,6 +635,7 @@ addPortfolioRowBtn?.addEventListener('click', addHoldingFromSearch);
 
 portfolioAddQueryInput?.addEventListener('input', () => {
   const q = String(portfolioAddQueryInput.value || '').trim();
+  addSelectedSymbol = '';
   if (addSearchTimer) clearTimeout(addSearchTimer);
   if (!q || q.length < 2) {
     hideAddSearchDropdown();

@@ -291,6 +291,7 @@ let setupPrices = {};
 let assetSearchResults = [];
 let assetSearchIndex = -1;
 let assetSearchTimer = null;
+let assetSelectedSymbol = '';
 const POPULAR_SYMBOL_RANK = new Map(
   [
     'SPY',
@@ -3355,6 +3356,20 @@ function popularityRank(symbol) {
   return POPULAR_SYMBOL_RANK.has(normalized) ? POPULAR_SYMBOL_RANK.get(normalized) : Number.POSITIVE_INFINITY;
 }
 
+function searchScore(queryUpper, option) {
+  const sym = String(option?.symbol || '').toUpperCase();
+  const name = String(option?.longname || option?.shortname || '').toUpperCase();
+  if (!queryUpper) return 0;
+  if (sym === queryUpper) return 10000;
+  if (sym.startsWith(queryUpper)) return 9000 - sym.length;
+  if (name.startsWith(queryUpper)) return 8000 - name.length;
+  const idxSym = sym.indexOf(queryUpper);
+  if (idxSym >= 0) return 7000 - idxSym * 10 - sym.length;
+  const idxName = name.indexOf(queryUpper);
+  if (idxName >= 0) return 6000 - idxName * 6 - name.length;
+  return 0;
+}
+
 function pickPreferredListing(response) {
   if (!response || typeof response !== 'object') return null;
   const best = response.best || null;
@@ -3436,6 +3451,7 @@ async function resolveSymbolInput(rawInput, type) {
 async function searchSymbolOptions(rawInput, type) {
   const raw = String(rawInput || '').trim();
   if (!raw) return [];
+  const queryUpper = raw.toUpperCase();
 
   const response = await apiPost('/api/assets/resolve', {
     query: raw,
@@ -3448,6 +3464,9 @@ async function searchSymbolOptions(rawInput, type) {
     if (!list.some((x) => x.symbol === m.symbol)) list.push(m);
   }
   list.sort((a, b) => {
+    const sa = searchScore(queryUpper, a);
+    const sb = searchScore(queryUpper, b);
+    if (sb !== sa) return sb - sa;
     const pa = popularityRank(a.symbol);
     const pb = popularityRank(b.symbol);
     if (pa !== pb) return pa - pb;
@@ -3468,7 +3487,18 @@ function hideAssetSearchDropdown() {
 function applyAssetSearchSelection(option) {
   if (!option) return;
   assetSymbol.value = option.symbol || '';
+  assetSelectedSymbol = String(option.symbol || '').trim().toUpperCase();
   hideAssetSearchDropdown();
+}
+
+async function requireAssetDropdownSelection(rawInput, type) {
+  const raw = String(rawInput || '').trim();
+  if (!raw) return null;
+  const norm = raw.toUpperCase();
+  const local = assetSearchResults.find((x) => String(x?.symbol || '').toUpperCase() === norm);
+  if (local) return local;
+  const fetched = await searchSymbolOptions(raw, type || 'stock');
+  return fetched.find((x) => String(x?.symbol || '').toUpperCase() === norm) || null;
 }
 
 function renderAssetSearchDropdown() {
@@ -5942,6 +5972,10 @@ addAssetBtn?.addEventListener('click', async () => {
 
     const raw = String(assetSymbol?.value || '').trim();
     if (!raw) throw new Error('Type an investment name or ticker.');
+    const selected = await requireAssetDropdownSelection(raw, 'stock');
+    if (!selected || String(selected.symbol || '').toUpperCase() !== String(assetSelectedSymbol || '').toUpperCase()) {
+      throw new Error('Select an investment from the dropdown list.');
+    }
     let token = normalizeToken(raw);
     let matchInfo = null;
     if (!['CASH', 'SAVINGS'].includes(token) && !token.startsWith('BOND:') && !token.startsWith('LEVERAGE:') && !token.startsWith('CALL:')) {
@@ -6066,6 +6100,7 @@ assetType?.addEventListener('change', updateAssetControls);
 
 assetSymbol?.addEventListener('input', () => {
   const q = assetSymbol.value.trim();
+  assetSelectedSymbol = '';
   if (assetSearchTimer) clearTimeout(assetSearchTimer);
   if (!q || q.length < 2) {
     hideAssetSearchDropdown();
@@ -6886,5 +6921,3 @@ setReplayStatus('Replay: paused');
 updateHoldOnlyButton();
 updateAutoPlayButton();
 showSlide('setup');
-
-

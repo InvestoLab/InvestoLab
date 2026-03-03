@@ -4854,6 +4854,45 @@ footer {
     flex-wrap: wrap;
     gap: 0.5rem;
   }
+
+  /* Center mobile visual boxes/icons where practical */
+  .feature-home-grid > .home-card,
+  .news-home-grid > .home-card,
+  .kpi-card,
+  .metric-card,
+  .types-card-head,
+  .investor-card h4,
+  .chart-card h4,
+  .home-card h2,
+  .home-card p {
+    text-align: center;
+  }
+
+  .feature-home-grid > .home-card .cta-link,
+  .news-home-grid > .home-card .cta-link,
+  .news-period-links,
+  .quick-picks,
+  .chart-head-row {
+    justify-content: center;
+  }
+
+  .chart-head-row {
+    align-items: center;
+  }
+
+  .chart-head-row h4 {
+    text-align: center;
+    flex: 1 1 100%;
+  }
+
+  .metric-card::before {
+    left: 50%;
+    top: 0;
+    bottom: auto;
+    width: 56px;
+    height: 4px;
+    transform: translateX(-50%);
+  }
 }
 
 /* Small mobile devices */
