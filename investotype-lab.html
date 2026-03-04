@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-816ETP25SD"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-816ETP25SD');
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>InvestoLab - Decision Arena</title>
+  <link rel="stylesheet" href="styles.css?v=20260304u" />
+  <script src="nav.js?v=20260227h" defer></script>
+  <script src="config.js?v=20260227a" defer></script>
+</head>
+<body>
+  <nav class="taskbar">
+    <a href="./index.html" class="brand">InvestoLab</a>
+    <div class="task-links">
+      <a href="./index.html">Overview</a>
+      <div class="nav-dropdown">
+        <a href="./valuation-lab.html" class="nav-dropdown-toggle">Valuation Lab</a>
+        <div class="nav-dropdown-menu">
+          <a href="./valuation.html">Investment Valuation</a>
+          <a href="./portfolio-builder.html">Portfolio Valuation</a>
+          <a href="./valuation-forecast.html">Prediction Lab</a>
+        </div>
+      </div>
+      <div class="nav-dropdown">
+        <a href="./investotype.html" class="nav-dropdown-toggle active" aria-current="page">InvestoType</a>
+        <div class="nav-dropdown-menu">
+          <a href="./investor-types.html">Types</a>
+          <a href="./simulator.html">Simulation (Demo)</a>
+          <a href="./quiz.html">Quiz</a>
+          <a href="./investotype-lab.html">Decision Arena</a>
+          <a href="./investotype-portfolio.html">Tailored Portfolio</a>
+        </div>
+      </div>
+      <div class="nav-dropdown">
+        <a href="./news.html" class="nav-dropdown-toggle">News</a>
+        <div class="nav-dropdown-menu">
+          <a href="./news-market.html">Market</a>
+          <a href="./news-tailored.html">Tailored</a>
+        </div>
+      </div>
+      <a href="./about.html">About</a>
+    </div>
+  </nav>
+
+  <header class="hero page-hero">
+    <h1>InvestoType Decision Arena</h1>
+    <p>Play short investing situations and learn your decision style in simple terms.</p>
+  </header>
+
+  <main class="single-layout">
+    <section class="card decision-arena-card">
+      <div id="arenaIntro" class="decision-arena-intro">
+        <h2>Scenario Game</h2>
+        <p>Each round shows a market moment. Pick what you would do, set confidence, and we estimate your style.</p>
+        <div class="decision-arena-meta">
+          <div><strong>Rounds</strong><span>8</span></div>
+          <div><strong>Time per Round</strong><span>20s</span></div>
+          <div><strong>Result</strong><span>Your 3-Score Style</span></div>
+        </div>
+        <div class="decision-arena-start-row">
+          <button id="arenaStartBtn" type="button">Start Arena</button>
+        </div>
+      </div>
+
+      <div id="arenaGame" class="decision-arena-game hidden">
+        <div class="decision-arena-topbar">
+          <span id="arenaProgress">Round 1 / 8</span>
+          <span id="arenaTimer">20s</span>
+        </div>
+        <div class="decision-arena-signals">
+          <span id="arenaStreak">Discipline Streak: 0</span>
+          <span id="arenaTempo">Tempo: Balanced</span>
+        </div>
+        <h3 id="arenaScenarioTitle">Scenario</h3>
+        <p id="arenaScenarioContext" class="decision-arena-context"></p>
+        <div id="arenaChoices" class="decision-arena-choices"></div>
+
+        <label class="decision-arena-confidence" for="arenaConfidence">
+          Confidence: <strong id="arenaConfidenceValue">3/5</strong>
+          <input id="arenaConfidence" type="range" min="1" max="5" step="1" value="3" />
+        </label>
+
+        <div class="decision-arena-actions">
+          <button id="arenaNextBtn" type="button" disabled>Lock Decision</button>
+        </div>
+        <div id="arenaFeedback" class="decision-arena-feedback hidden">
+          <strong id="arenaFeedbackTitle">Decision Locked</strong>
+          <p id="arenaFeedbackText">Outcome feedback appears here.</p>
+        </div>
+      </div>
+
+      <div id="arenaResult" class="decision-arena-result hidden">
+        <h3>Your Arena InvestoType</h3>
+        <p id="arenaTypeLabel" class="decision-arena-type">-</p>
+        <p id="arenaTypeSummary" class="decision-arena-summary">-</p>
+
+        <section class="chart-card investor-axis-combined decision-arena-axis-combined">
+          <h4>3-Axis Profile Breakdown</h4>
+          <p id="arenaAxisSummary" class="investor-axis-summary">Drag the widget to view your Risk, Control, and Reactivity profile.</p>
+          <div class="investor-axis-layout">
+            <div class="investor-axis-left">
+              <div id="arenaAxisBars" class="investor-axis-chips"></div>
+            </div>
+            <div class="investor-axis-right">
+              <div class="investor-cube-head">
+                <h4>Score Nebula</h4>
+              </div>
+              <div id="arenaAxis3dStage" class="axis-3d-stage">
+                <canvas id="arenaAxis3dCanvas" width="560" height="360"></canvas>
+                <div id="arenaAxis3dHover" class="axis-3d-hover hidden"></div>
+              </div>
+              <div id="arenaAxis3dLabels" class="axis-score-list"></div>
+            </div>
+          </div>
+        </section>
+        <div id="arenaInsights" class="decision-arena-insights"></div>
+        <div class="decision-arena-result-grid">
+          <section class="decision-arena-result-card">
+            <h4>How You Decide</h4>
+            <ul id="arenaBehaviorList" class="investor-list"></ul>
+          </section>
+          <section class="decision-arena-result-card">
+            <h4>Strength Signals</h4>
+            <ul id="arenaStrengthList" class="investor-list"></ul>
+          </section>
+          <section class="decision-arena-result-card">
+            <h4>Risk Signals</h4>
+            <ul id="arenaRiskList" class="investor-list"></ul>
+          </section>
+          <section class="decision-arena-result-card">
+            <h4>Action Plan</h4>
+            <ul id="arenaPlanList" class="investor-list"></ul>
+          </section>
+        </div>
+        <div id="arenaRoundLog" class="decision-arena-log"></div>
+
+        <div class="decision-arena-result-actions">
+          <button id="arenaRestartBtn" type="button" class="ghost">Play Again</button>
+          <a class="cta-link" href="./investotype-portfolio.html">Open Tailored Portfolio</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <a class="footer-contact-btn" href="mailto:tgrkhwang@gmail.com" aria-label="Contact by email">Contact</a>
+    Copyright (c) 2026 InvestoLab. All rights reserved.
+  </footer>
+
+  <script src="investotype-lab.js?v=20260305v1"></script>
+</body>
+</html>
+
+

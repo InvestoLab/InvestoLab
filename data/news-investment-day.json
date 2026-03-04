@@ -1,4 +1,4 @@
-{
+﻿{
   "asOfDate": "2026-02-27",
   "period": "day",
   "title": "Investment Of The Day",
@@ -25,7 +25,7 @@
       "compositeScore": 50,
       "label": "Neutral",
       "summary3": [
-        "Static fallback pick. Configure STATIC_DATA_SOURCE_URL for live refresh."
+        "Static snapshot is active for this pick."
       ],
       "recommendation": {
         "action": "HOLD",
@@ -46,3 +46,4 @@
     }
   }
 }
+
