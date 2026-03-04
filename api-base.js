@@ -1627,10 +1627,22 @@
     }
   }
 
+  const isLocalDevHost = /^(localhost|127\.0\.0\.1)$/i.test(String(window.location.hostname || ''));
+  if (!isGithubPages && isLocalDevHost) {
+    // In local dev, never intercept API requests. Use backend responses directly.
+    return;
+  }
+
   window.fetch = async (input, init) => {
     const url = resolveApiUrl(input);
     const apiPath = normalizeApiPath(url);
     if (!apiPath || !apiPath.startsWith('/api/')) {
+      return rawFetch(input, init);
+    }
+
+    // Outside GitHub Pages, always use the real backend API.
+    // Local/public API emulation is only for GitHub Pages static mode.
+    if (!isGithubPages) {
       return rawFetch(input, init);
     }
 

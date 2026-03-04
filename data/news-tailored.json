@@ -1,4 +1,4 @@
-{
+﻿{
   "asOfDate": "2026-02-27",
   "profile": "PASSIVE_RATIONAL_ALLOCATOR",
   "sentiment": {
@@ -14,10 +14,11 @@
   ],
   "headlines": [
     {
-      "title": "Static fallback tailored feed. Configure STATIC_DATA_SOURCE_URL for live refresh.",
+      "title": "Static tailored snapshot is active.",
       "symbol": "VTI",
       "publisher": "InvestoLab",
       "date": "2026-02-27"
     }
   ]
 }
+

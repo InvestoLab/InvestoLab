@@ -3307,7 +3307,11 @@ async function enrichCommentaryWithMarketIntel(insights) {
 async function apiPost(url, body) {
   const res = await fetch(url, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    cache: 'no-store',
+    headers: {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'no-cache'
+    },
     body: JSON.stringify(body)
   });
   const data = await res.json();
@@ -3316,7 +3320,12 @@ async function apiPost(url, body) {
 }
 
 async function apiGet(url) {
-  const res = await fetch(url);
+  const stamp = `_ts=${Date.now()}${Math.floor(Math.random() * 1000000)}`;
+  const urlWithStamp = `${url}${url.includes('?') ? '&' : '?'}${stamp}`;
+  const res = await fetch(urlWithStamp, {
+    cache: 'no-store',
+    headers: { 'Cache-Control': 'no-cache' }
+  });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || 'Request failed');
   return data;
@@ -4576,6 +4585,23 @@ function renderPeriodInsights(insights) {
     return;
   }
 
+  // Keep live UI prices synced to the latest server insight snapshot even when
+  // preview payloads are missing or stale.
+  if (Array.isArray(insights.holdings) && insights.holdings.length) {
+    const livePrices = {};
+    insights.holdings.forEach((h) => {
+      const symbol = String(h?.symbol || '');
+      const price = Number(h?.price || 0);
+      if (symbol && Number.isFinite(price) && price > 0) livePrices[symbol] = price;
+    });
+    previewState = {
+      ...previewState,
+      portfolioValue: Number(insights.portfolioValue || previewState.portfolioValue || 0),
+      prices: { ...(previewState.prices || {}), ...livePrices },
+      date: insights.date || previewState.date || null
+    };
+  }
+
   const prevInsights = latestInsights;
   const incomingHoldings = Array.isArray(insights.holdings) ? insights.holdings : [];
   const mergedHoldings = [...incomingHoldings];
@@ -5004,14 +5030,15 @@ function syncAllocationRowsWithAssets(assets = []) {
   }
 }
 
-async function refreshSimulationState() {
+async function refreshSimulationState(options = {}) {
+  const { skipInsights = false } = options;
   if (!simulationState?.simulationId) return;
   const state = await apiGet(`/api/simulations/${simulationState.simulationId}`);
   simulationState = { ...simulationState, ...state };
   syncAllocationRowsWithAssets(state.assets || []);
   populateTradeSymbols();
   if (state.preview) applyPreview(state.preview);
-  renderPeriodInsights(state.previewInsights || null);
+  if (!skipInsights) renderPeriodInsights(state.previewInsights || null);
   updateSimPanel();
   renderTimeflow();
   await updateTimeflowComparisonChart();
@@ -6015,7 +6042,7 @@ simAddAssetBtn?.addEventListener('click', async () => {
     const result = await apiPost(`/api/simulations/${simulationState.simulationId}/assets`, { token });
     if (result.preview) applyPreview(result.preview);
     if (result.previewInsights) renderPeriodInsights(result.previewInsights);
-    await refreshSimulationState();
+    await refreshSimulationState({ skipInsights: true });
     if (simAddSymbol) simAddSymbol.value = '';
     printOutput({ message: `Added ${tokenToLabel(token)} to current simulation.` });
   } catch (error) {
@@ -6207,7 +6234,7 @@ simStartForm?.addEventListener('submit', async (e) => {
     // This prevents forced sells when market value drops below setup dollars.
     resetRowTargetsToCurrentHoldings();
     updateBudgetPreview();
-    await refreshSimulationState();
+    await refreshSimulationState({ skipInsights: true });
     resetRowTargetsToCurrentHoldings();
     updateBudgetPreview();
     await playStartTransition(1350);

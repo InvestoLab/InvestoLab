@@ -244,7 +244,18 @@ function updateCodeLabel() {
   const r = state.scores.aggressive >= 50 ? 'A' : 'C';
   const c = state.scores.internal >= 50 ? 'I' : 'E';
   const e = state.scores.emotional >= 50 ? 'E' : 'R';
-  if (cubeCode) cubeCode.textContent = `${r}-${c}-${e}`;
+  const code = `${r}-${c}-${e}`;
+  const typeLabel = {
+    'A-I-R': 'The Quant',
+    'A-I-E': 'Active Conviction Investor',
+    'A-E-R': 'Tactical Trend Analyst',
+    'A-E-E': 'Aggressive Reactive Trader',
+    'C-I-R': 'Conservative Researcher',
+    'C-I-E': 'Defensive Active Allocator',
+    'C-E-R': 'Passive Rational Allocator',
+    'C-E-E': 'Passive Emotional Allocator'
+  }[code] || 'Investor Type';
+  if (cubeCode) cubeCode.textContent = typeLabel;
 }
 
 function syncFromRanges() {

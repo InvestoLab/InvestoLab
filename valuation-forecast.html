@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-816ETP25SD"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-816ETP25SD');
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>InvestoLab - Prediction Lab</title>
+  <link rel="stylesheet" href="styles.css?v=20260304v2" />
+  <script src="nav.js?v=20260227h" defer></script>
+  <script src="config.js?v=20260227a" defer></script>
+  <script src="api-base.js?v=20260227p" defer></script>
+</head>
+<body class="valuation-page forecast-page">
+  <nav class="taskbar">
+    <a href="./index.html" class="brand">InvestoLab</a>
+    <div class="task-links">
+      <a href="./index.html">Overview</a>
+      <div class="nav-dropdown">
+        <a href="./valuation-lab.html" class="nav-dropdown-toggle active" aria-current="page">Valuation Lab</a>
+        <div class="nav-dropdown-menu">
+          <a href="./valuation.html">Investment Valuation</a>
+          <a href="./portfolio-builder.html">Portfolio Valuation</a>
+          <a href="./valuation-forecast.html" class="active" aria-current="page">Prediction Lab</a>
+        </div>
+      </div>
+      <div class="nav-dropdown">
+        <a href="./investotype.html" class="nav-dropdown-toggle">InvestoType</a>
+        <div class="nav-dropdown-menu">
+          <a href="./investor-types.html">Types</a>
+          <a href="./simulator.html">Simulation (Demo)</a>
+          <a href="./quiz.html">Quiz</a>
+          <a href="./investotype-lab.html">Decision Arena</a>
+          <a href="./investotype-portfolio.html">Tailored Portfolio</a>
+        </div>
+      </div>
+      <div class="nav-dropdown">
+        <a href="./news.html" class="nav-dropdown-toggle">News</a>
+        <div class="nav-dropdown-menu">
+          <a href="./news-market.html">Market</a>
+          <a href="./news-tailored.html">Tailored</a>
+        </div>
+      </div>
+      <a href="./about.html">About</a>
+    </div>
+  </nav>
+
+  <header class="hero page-hero">
+    <h1>Prediction Lab</h1>
+    <p>Run AI-assisted scenario simulations using historical market behavior and current news tone.</p>
+  </header>
+
+  <main class="single-layout">
+    <section class="card valuation-card forecast-card">
+      <div class="valuation-head">
+        <h2>Investment Future Simulator</h2>
+        <p>Follow the steps below. Start simple with AI presets, then tune settings only if needed.</p>
+      </div>
+      <form id="forecastForm" class="valuation-form-grid forecast-form-grid">
+        <section class="forecast-step">
+          <h3>Step 1: Choose Investment</h3>
+          <label>
+            <span class="field-label">Investment</span>
+            <div class="search-wrap">
+              <input id="forecastQuery" type="text" placeholder="Ticker or company name (example: AAPL, NVDA, SPY)" autocomplete="off" required />
+              <div id="forecastSearchDropdown" class="search-dropdown hidden"></div>
+            </div>
+            <small class="field-help">Pick from dropdown for best data quality.</small>
+            <p id="forecastSelectionState" class="forecast-selection-state hidden" aria-live="polite"></p>
+          </label>
+        </section>
+
+        <section class="forecast-step">
+          <h3>Step 2: Let AI Set Assumptions (Recommended)</h3>
+          <div class="forecast-actions">
+            <button type="button" id="aiAutoBtn">AI Auto</button>
+            <button type="button" id="aiConservativeBtn">AI Conservative</button>
+            <button type="button" id="aiBalancedBtn">AI Balanced</button>
+            <button type="button" id="aiAggressiveBtn">AI Aggressive</button>
+          </div>
+          <small class="field-help">Auto adapts to historical trend and headline tone.</small>
+        </section>
+
+        <section class="forecast-step forecast-step-advanced">
+          <h3>Step 3: Fine-Tune Settings (Optional)</h3>
+          <div class="forecast-grid-controls">
+            <label>
+              <span class="field-label">Horizon (Years)</span>
+              <div class="field-inline">
+                <input id="forecastYearsRange" type="range" min="0" max="10" value="0" />
+                <input id="forecastYears" type="number" min="0" max="10" value="0" />
+              </div>
+              <small class="field-help">How far ahead to project.</small>
+            </label>
+            <label>
+              <span class="field-label">Simulation Paths</span>
+              <div class="field-inline">
+                <input id="forecastPathsRange" type="range" min="0" max="3000" step="50" value="0" />
+                <input id="forecastPaths" type="number" min="0" max="3000" step="50" value="0" />
+              </div>
+              <small class="field-help">More paths = smoother results, slower run.</small>
+            </label>
+            <label>
+              <span class="field-label">Expected Drift % (Annual)</span>
+              <div class="field-inline">
+                <input id="forecastDriftRange" type="range" min="-30" max="40" step="0.1" value="0" />
+                <input id="forecastDrift" type="number" min="-30" max="40" step="0.1" value="0" />
+              </div>
+              <small class="field-help">Long-run growth expectation.</small>
+            </label>
+            <label>
+              <span class="field-label">Volatility % (Annual)</span>
+              <div class="field-inline">
+                <input id="forecastVolatilityRange" type="range" min="0" max="150" step="0.1" value="0" />
+                <input id="forecastVolatility" type="number" min="0" max="150" step="0.1" value="0" />
+              </div>
+              <small class="field-help">Higher means wider upside/downside swings.</small>
+            </label>
+            <label>
+              <span class="field-label">News Impact Index</span>
+              <div class="field-inline">
+                <input id="forecastNewsIndexRange" type="range" min="-100" max="100" step="1" value="0" />
+                <input id="forecastNewsIndex" type="number" min="-100" max="100" step="1" value="0" />
+              </div>
+              <small class="field-help">Negative = bearish headlines, positive = bullish headlines.</small>
+            </label>
+            <label>
+              <span class="field-label">Macro Regime Index</span>
+              <div class="field-inline">
+                <input id="forecastMacroIndexRange" type="range" min="-100" max="100" step="1" value="0" />
+                <input id="forecastMacroIndex" type="number" min="-100" max="100" step="1" value="0" />
+              </div>
+              <small class="field-help">Macro backdrop: recession risk to expansion strength.</small>
+            </label>
+            <label>
+              <span class="field-label">Mean Reversion %</span>
+              <div class="field-inline">
+                <input id="forecastMeanReversionRange" type="range" min="0" max="100" step="1" value="25" />
+                <input id="forecastMeanReversion" type="number" min="0" max="100" step="1" value="25" />
+              </div>
+              <small class="field-help">How strongly prices pull back toward long-run trend.</small>
+            </label>
+          </div>
+        </section>
+
+        <p id="forecastQuickSummary" class="forecast-quick-summary">Using default assumptions.</p>
+        <button type="submit" class="forecast-run-btn">Run Future Simulation</button>
+      </form>
+      <p id="forecastStatus" class="asset-help">Choose an investment and run simulation.</p>
+      <div id="forecastResult" class="valuation-result hidden"></div>
+    </section>
+  </main>
+
+  <footer>
+    <a class="footer-contact-btn" href="mailto:tgrkhwang@gmail.com" aria-label="Contact by email">Contact</a>
+    Copyright (c) 2026 InvestoLab. All rights reserved.
+  </footer>
+
+  <script src="valuation-forecast.js?v=20260305v2"></script>
+</body>
+</html>

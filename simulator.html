@@ -1,13 +1,21 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-816ETP25SD"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-816ETP25SD');
+  </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>InvestoLab - Simulation</title>
-  <link rel="stylesheet" href="styles.css?v=20260228b" />
+  <title>InvestoLab - Simulation (Demo)</title>
+  <link rel="stylesheet" href="styles.css?v=20260304i" />
   <script src="nav.js?v=20260227h" defer></script>
   <script src="config.js?v=20260227a" defer></script>
-  <script src="api-base.js?v=20260227p" defer></script>
 </head>
 <body>
   <nav class="taskbar">
@@ -18,16 +26,18 @@
         <a href="./valuation-lab.html" class="nav-dropdown-toggle">Valuation Lab</a>
         <div class="nav-dropdown-menu">
           <a href="./valuation.html">Investment Valuation</a>
-          <a href="./portfolio-builder.html">Portfolio Valuation</a>
+          <a href="./portfolio-builder.html">Portfolio Valuation</a>
+          <a href="./valuation-forecast.html">Prediction Lab</a>
         </div>
       </div>
       <div class="nav-dropdown">
         <a href="./investotype.html" class="nav-dropdown-toggle active">InvestoType</a>
         <div class="nav-dropdown-menu">
-          <a href="./simulator.html">Simulation</a>
-          <a href="./quiz.html">Quiz</a>
           <a href="./investor-types.html">Types</a>
-          <a href="./investotype-portfolio.html">AI Portfolio</a>
+          <a href="./simulator.html">Simulation (Demo)</a>
+          <a href="./quiz.html">Quiz</a>
+          <a href="./investotype-lab.html">Decision Arena</a>
+          <a href="./investotype-portfolio.html">Tailored Portfolio</a>
         </div>
       </div>
             <div class="nav-dropdown">
@@ -35,10 +45,6 @@
         <div class="nav-dropdown-menu">
           <a href="./news-market.html">Market</a>
           <a href="./news-tailored.html">Tailored</a>
-          <a href="./news-investment-day.html">Day Pick</a>
-          <a href="./news-investment-week.html">Week Pick</a>
-          <a href="./news-investment-month.html">Month Pick</a>
-          <a href="./news-investment-year.html">Year Pick</a>
         </div>
       </div>
       <a href="./about.html">About</a>
@@ -46,7 +52,7 @@
   </nav>
 
   <header class="hero page-hero">
-    <h1>Investment Simulation</h1>
+    <h1>Simulation (Demo)</h1>
     <p>Test your portfolio decisions on past market data.</p>
   </header>
 
@@ -73,7 +79,7 @@
 
           <div id="setupCardSettings" class="setup-card expanded" data-setup-stage="settings">
             <button id="setupToggleSettings" type="button" class="setup-card-toggle">
-              <span class="setup-title-row"><span>1. Simulation Settings</span><span id="checkSettings" class="setup-check">??/span></span>
+              <span class="setup-title-row"><span>1. Simulation Settings</span><span id="checkSettings" class="setup-check">Pending</span></span>
               <small id="setupSettingsPreview">Timeline, budget, and rebalance pace</small>
             </button>
             <div class="setup-card-body setup-section">
@@ -118,7 +124,7 @@
 
           <div id="setupCardPortfolio" class="setup-card" data-setup-stage="portfolio">
             <button id="setupTogglePortfolio" type="button" class="setup-card-toggle">
-              <span class="setup-title-row"><span>2. Create Portfolio</span><span id="checkPortfolio" class="setup-check">??/span></span>
+              <span class="setup-title-row"><span>2. Create Portfolio</span><span id="checkPortfolio" class="setup-check">Pending</span></span>
               <small id="setupPortfolioPreview">Add investments and set initial allocation</small>
             </button>
             <div class="setup-card-body setup-section asset-builder">
@@ -170,7 +176,7 @@
 
           <div id="setupCardBenchmark" class="setup-card" data-setup-stage="benchmark">
             <button id="setupToggleBenchmark" type="button" class="setup-card-toggle">
-              <span class="setup-title-row"><span>3. Compare Indexes</span><span id="checkBenchmark" class="setup-check">??/span></span>
+              <span class="setup-title-row"><span>3. Compare Indexes</span><span id="checkBenchmark" class="setup-check">Pending</span></span>
               <small id="setupBenchmarkPreview">Select benchmark indexes for comparison</small>
             </button>
             <div class="setup-card-body setup-section">
@@ -209,7 +215,7 @@
 
           <div id="setupCardSummary" class="setup-card" data-setup-stage="summary">
             <button id="setupToggleSummary" type="button" class="setup-card-toggle">
-              <span class="setup-title-row"><span>Summary</span><span id="checkSummary" class="setup-check">??/span></span>
+              <span class="setup-title-row"><span>Summary</span><span id="checkSummary" class="setup-check">Pending</span></span>
               <small>Review choices and start simulation</small>
             </button>
             <div class="setup-card-body setup-section">
@@ -245,14 +251,6 @@
       <div id="slideGame" class="sim-slide">
         <div id="simPanel" class="hidden sim-shell">
           <p id="simNextDate"></p>
-          <div id="simQuickNav" class="sim-quicknav">
-            <button type="button" class="ghost" data-jump="snapshot">Snapshot</button>
-            <button type="button" class="ghost" data-jump="adjustment">Adjustments</button>
-            <button type="button" class="ghost" data-jump="charts">Charts</button>
-            <button type="button" class="ghost" data-jump="controls">Controls</button>
-            <span class="sim-shortcuts-hint">Shortcuts: N next, P automate/pause, S result</span>
-          </div>
-
           <div class="sim-section-head compact">
             <h4>Simulation Control Center</h4>
             <p>Track progress and adjust positions as you go.</p>
@@ -329,9 +327,10 @@
                   <option value="option">Option-like</option>
                 </select>
               </label>
-              <label id="simAddSymbolWrap">
+              <label id="simAddSymbolWrap" class="search-wrap">
                 Symbol / Company
                 <input id="simAddSymbol" type="text" placeholder="AAPL, BTC, or Bitcoin" />
+                <div id="simAddSearchDropdown" class="search-dropdown hidden"></div>
               </label>
               <label id="simAddMultiplierWrap" class="hidden">
                 Multiplier
@@ -413,23 +412,23 @@
               <p>See how your portfolio moved over time and how your final allocation ended.</p>
             </div>
             <div class="result-analytics">
-              <div id="benchmarkPanel" class="chart-card result-benchmark-panel">
-                <h4>Benchmark Comparison</h4>
-                <p class="chart-subtitle">Portfolio return versus selected indexes.</p>
-                <div id="benchmarkList"></div>
-              </div>
-              <div class="chart-grid result-chart-grid">
-                <div class="chart-card chart-card-timeline">
-                  <h4>Portfolio Value Timeline</h4>
-                  <p class="chart-subtitle">Tracks portfolio value against each benchmark during the full simulation.</p>
-                  <canvas id="equityChart" width="960" height="300"></canvas>
-                  <div id="equityLegend" class="chart-legend"></div>
+              <div class="chart-grid result-chart-grid result-chart-grid-top">
+                <div id="benchmarkPanel" class="chart-card result-benchmark-panel">
+                  <h4>Benchmark Comparison</h4>
+                  <p class="chart-subtitle">Portfolio return versus selected indexes.</p>
+                  <div id="benchmarkList"></div>
                 </div>
                 <div class="chart-card chart-card-allocation">
                   <h4>Final Allocation Mix</h4>
                   <p class="chart-subtitle">Shows weight and dollar contribution of each holding at the end.</p>
                   <canvas id="allocationChart" width="480" height="300"></canvas>
                 </div>
+              </div>
+              <div class="chart-card chart-card-timeline">
+                <h4>Portfolio Value Timeline</h4>
+                <p class="chart-subtitle">Tracks portfolio value against each benchmark during the full simulation.</p>
+                <canvas id="equityChart" width="960" height="300"></canvas>
+                <div id="equityLegend" class="chart-legend"></div>
               </div>
             </div>
           </section>
@@ -526,9 +525,12 @@
     Copyright (c) 2026 InvestoLab. All rights reserved.
   </footer>
 
-  <script src="simulator.js?v=20260228b"></script>
+  <script src="simulator.js?v=20260304l"></script>
 </body>
 </html>
+
+
+
 
 
 

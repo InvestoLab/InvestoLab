@@ -1,4 +1,4 @@
-{
+﻿{
   "asOfDate": "2026-02-27",
   "sentiment": {
     "news": 0.5,
@@ -13,10 +13,11 @@
   ],
   "headlines": [
     {
-      "title": "Static fallback market feed. Configure STATIC_DATA_SOURCE_URL for live refresh.",
+      "title": "Static market snapshot is active.",
       "symbol": "SPY",
       "publisher": "InvestoLab",
       "date": "2026-02-27"
     }
   ]
 }
+
