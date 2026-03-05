@@ -5,6 +5,8 @@ const forecastSelectionState = document.getElementById('forecastSelectionState')
 const forecastStatus = document.getElementById('forecastStatus');
 const forecastResult = document.getElementById('forecastResult');
 const forecastYearsInput = document.getElementById('forecastYears');
+const forecastIntervalSelect = document.getElementById('forecastInterval');
+const forecastHorizonHelp = document.getElementById('forecastHorizonHelp');
 const forecastPathsInput = document.getElementById('forecastPaths');
 const forecastDriftInput = document.getElementById('forecastDrift');
 const forecastVolInput = document.getElementById('forecastVolatility');
@@ -56,6 +58,54 @@ function esc(raw) {
 
 function clamp(v, lo, hi) {
   return Math.max(lo, Math.min(hi, Number(v || 0)));
+}
+
+function getIntervalMeta(intervalRaw) {
+  const interval = String(intervalRaw || 'monthly').toLowerCase();
+  if (interval === 'daily') {
+    return { key: 'daily', periodsPerYear: 252, unitLabel: 'Day', titleLabel: 'Daily' };
+  }
+  if (interval === 'weekly') {
+    return { key: 'weekly', periodsPerYear: 52, unitLabel: 'Week', titleLabel: 'Weekly' };
+  }
+  return { key: 'monthly', periodsPerYear: 12, unitLabel: 'Month', titleLabel: 'Monthly' };
+}
+
+function getHorizonBounds(intervalMeta) {
+  const perYear = Number(intervalMeta?.periodsPerYear || 12);
+  return {
+    min: perYear,
+    max: perYear * 10,
+    step: 1
+  };
+}
+
+function getCurrentHorizonYears() {
+  const prevInterval = String(forecastYearsInput?.dataset.intervalKey || 'monthly');
+  const prevMeta = getIntervalMeta(prevInterval);
+  const units = Number(forecastYearsInput?.value || 0);
+  return clamp(units / prevMeta.periodsPerYear, 1, 10);
+}
+
+function applyHorizonConfig(intervalRaw, preserveYears = true) {
+  if (!forecastYearsInput || !forecastYearsRange) return;
+  const intervalMeta = getIntervalMeta(intervalRaw);
+  const bounds = getHorizonBounds(intervalMeta);
+  const years = preserveYears ? getCurrentHorizonYears() : 3;
+  const units = Math.round(clamp(years, 1, 10) * intervalMeta.periodsPerYear);
+
+  forecastYearsInput.min = String(bounds.min);
+  forecastYearsInput.max = String(bounds.max);
+  forecastYearsInput.step = String(bounds.step);
+  forecastYearsRange.min = String(bounds.min);
+  forecastYearsRange.max = String(bounds.max);
+  forecastYearsRange.step = String(bounds.step);
+  forecastYearsInput.dataset.intervalKey = intervalMeta.key;
+  setControlValue(forecastYearsInput, forecastYearsRange, units);
+
+  if (forecastHorizonHelp) {
+    forecastHorizonHelp.textContent = `${intervalMeta.unitLabel}s to project (about 1 to 10 years).`;
+  }
 }
 
 function roundByStep(value, step) {
@@ -240,7 +290,7 @@ function renderHistoryChart(rows) {
   `;
 }
 
-function renderFanChart(fan, samplePaths) {
+function renderFanChart(fan, samplePaths, intervalMeta) {
   if (!fan?.length) return '<p class="asset-help">No simulation output.</p>';
   const width = 900;
   const height = 270;
@@ -275,23 +325,27 @@ function renderFanChart(fan, samplePaths) {
       <polyline points="${p50}" fill="none" stroke="#0284c7" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></polyline>
     </svg>
     <div class="price-chart-axis">
-      <span>Month 0</span>
-      <span>Month ${fan.length - 1}</span>
+      <span>${esc(intervalMeta?.unitLabel || 'Step')} 0</span>
+      <span>${esc(intervalMeta?.unitLabel || 'Step')} ${fan.length - 1}</span>
     </div>
   `;
 }
 
 function updateQuickSummary() {
   if (!forecastQuickSummary) return;
-  const years = Number(forecastYearsInput?.value || 3);
+  const intervalMeta = getIntervalMeta(forecastIntervalSelect?.value);
+  const horizonUnits = Number(forecastYearsInput?.value || intervalMeta.periodsPerYear * 3);
+  const years = horizonUnits / intervalMeta.periodsPerYear;
   const paths = Number(forecastPathsInput?.value || 500);
   const drift = Number(forecastDriftInput?.value || 8);
   const vol = Number(forecastVolInput?.value || 25);
   const news = Number(forecastNewsInput?.value || 0);
   const macro = Number(forecastMacroInput?.value || 0);
-  forecastQuickSummary.textContent = `Preview: ${years}Y horizon, ${paths} paths, drift ${drift.toFixed(
+  forecastQuickSummary.textContent = `Preview: ${Math.round(horizonUnits)} ${intervalMeta.unitLabel.toLowerCase()}s (~${years.toFixed(
     1
-  )}%, volatility ${vol.toFixed(1)}%, news ${news.toFixed(0)}, macro ${macro.toFixed(0)}.`;
+  )}Y), ${paths} paths, drift ${drift.toFixed(
+    1
+  )}%, volatility ${vol.toFixed(1)}%, news ${news.toFixed(0)}, macro ${macro.toFixed(0)}, ${intervalMeta.titleLabel.toLowerCase()} steps.`;
 }
 
 function bindNumberRange(numberInput, rangeInput, options = {}) {
@@ -361,7 +415,8 @@ function applyAiPreset(preset) {
     meanRev = 0.25 - tilt * 0.08;
   }
 
-  setControlValue(forecastYearsInput, forecastYearsRange, Math.round(clamp(years, 1, 10)));
+  const intervalMeta = getIntervalMeta(forecastIntervalSelect?.value);
+  setControlValue(forecastYearsInput, forecastYearsRange, Math.round(clamp(years, 1, 10) * intervalMeta.periodsPerYear));
   setControlValue(forecastPathsInput, forecastPathsRange, Math.round(clamp(paths, 100, 3000)));
   setControlValue(forecastDriftInput, forecastDriftRange, clamp(mu, -0.3, 0.4) * 100);
   setControlValue(forecastVolInput, forecastVolRange, clamp(sigma, 0.05, 1.5) * 100);
@@ -443,10 +498,16 @@ async function handlePresetClick(preset) {
 }
 
 function runSimulation(base, settings) {
-  const years = clamp(settings.years, 1, 10);
-  const steps = Math.round(years * 12);
-  const paths = Math.round(clamp(settings.paths, 100, 3000));
-  const dt = 1 / 12;
+  const intervalMeta = getIntervalMeta(settings.interval);
+  const horizonUnits = Math.round(
+    clamp(settings.horizonUnits, intervalMeta.periodsPerYear, intervalMeta.periodsPerYear * 10)
+  );
+  const years = horizonUnits / intervalMeta.periodsPerYear;
+  const steps = horizonUnits;
+  const requestedPaths = Math.round(clamp(settings.paths, 100, 3000));
+  const maxCells = 1200000;
+  const paths = Math.max(80, Math.min(requestedPaths, Math.floor(maxCells / Math.max(steps + 1, 1))));
+  const dt = 1 / intervalMeta.periodsPerYear;
   const muInput = clamp(settings.driftPct / 100, -0.3, 0.4);
   const volInput = clamp(settings.volPct / 100, 0.05, 1.5);
   const newsIdx = clamp(settings.newsIndex / 100, -1, 1);
@@ -467,10 +528,11 @@ function runSimulation(base, settings) {
   for (let p = 0; p < paths; p += 1) {
     const path = [start];
     let price = start;
-    for (let m = 1; m <= steps; m += 1) {
+    for (let i = 1; i <= steps; i += 1) {
       const z = randomNormal();
-      const cycle = Math.sin((m / 12) * Math.PI * 2) * macroIdx * 0.012;
-      const sentimentDrift = newsIdx * Math.exp(-m / 18) * 0.02;
+      const tYears = i / intervalMeta.periodsPerYear;
+      const cycle = Math.sin(tYears * Math.PI * 2) * macroIdx * 0.012;
+      const sentimentDrift = newsIdx * Math.exp(-tYears / 1.5) * 0.02;
       const rev = meanRev * (Math.log(longRun) - Math.log(Math.max(0.01, price))) * dt;
       const step = (mu - 0.5 * sigma * sigma) * dt + sigma * Math.sqrt(dt) * z + cycle + sentimentDrift + rev;
       price = Math.max(0.01, price * Math.exp(step));
@@ -487,7 +549,7 @@ function runSimulation(base, settings) {
   const fan = monthly.map((arr, i) => {
     const s = arr.slice().sort((a, b) => a - b);
     return {
-      month: i,
+      step: i,
       p10: percentile(s, 0.1),
       p50: percentile(s, 0.5),
       p90: percentile(s, 0.9),
@@ -503,8 +565,11 @@ function runSimulation(base, settings) {
   return {
     fan,
     samplePaths,
+    intervalMeta,
     effectiveDrift: mu,
     effectiveVol: sigma,
+    actualPaths: paths,
+    requestedPaths,
     metrics: {
       probGain: upCount / paths,
       probDouble: doubleCount / paths,
@@ -548,8 +613,8 @@ function renderResult(base, simulation) {
         ${renderHistoryChart(base.history)}
       </section>
       <section class="chart-card">
-        <h4>AI Future Paths (Monte Carlo)</h4>
-        ${renderFanChart(simulation.fan, simulation.samplePaths)}
+        <h4>AI Future Paths (Monte Carlo, ${esc(simulation.intervalMeta?.titleLabel || 'Monthly')})</h4>
+        ${renderFanChart(simulation.fan, simulation.samplePaths, simulation.intervalMeta)}
       </section>
     </div>
 
@@ -557,6 +622,8 @@ function renderResult(base, simulation) {
       <section class="chart-card">
         <h4>Assumption Summary</h4>
         <ul class="investor-list">
+          <li>Time interval: ${esc(simulation.intervalMeta?.titleLabel || 'Monthly')}</li>
+          <li>Simulation paths used: ${fmtNum(simulation.actualPaths || 0, 0)}${simulation.actualPaths < simulation.requestedPaths ? ` (reduced from ${fmtNum(simulation.requestedPaths, 0)} for performance)` : ''}</li>
           <li>Effective drift used: ${fmtPct(simulation.effectiveDrift)}</li>
           <li>Effective volatility used: ${fmtPct(simulation.effectiveVol)}</li>
           <li>Historical drift baseline: ${fmtPct(base.annualDrift)}</li>
@@ -676,7 +743,8 @@ forecastForm?.addEventListener('submit', async (event) => {
 
     forecastStatus.textContent = 'Running AI simulation paths...';
     const simulation = runSimulation(currentBaseline, {
-      years: Number(forecastYearsInput?.value || 3),
+      horizonUnits: Number(forecastYearsInput?.value || 36),
+      interval: String(forecastIntervalSelect?.value || 'monthly'),
       paths: Number(forecastPathsInput?.value || 500),
       driftPct: Number(forecastDriftInput?.value || 8),
       volPct: Number(forecastVolInput?.value || 25),
@@ -692,6 +760,12 @@ forecastForm?.addEventListener('submit', async (event) => {
   }
 });
 
+forecastIntervalSelect?.addEventListener('change', () => {
+  applyHorizonConfig(forecastIntervalSelect.value, true);
+  updateQuickSummary();
+});
+
+applyHorizonConfig(forecastIntervalSelect?.value || 'monthly', false);
 bindNumberRange(forecastYearsInput, forecastYearsRange);
 bindNumberRange(forecastPathsInput, forecastPathsRange);
 bindNumberRange(forecastDriftInput, forecastDriftRange, { userSet: true });

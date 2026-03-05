@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://investolab.onrender.com/sitemap.xml

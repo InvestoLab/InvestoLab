@@ -294,12 +294,17 @@ let roundStartedAtMs = 0;
 let awaitingContinue = false;
 let disciplineStreak = 0;
 const picks = [];
-let arenaAxis3dPoint = null;
-let arenaAxisYaw = -0.78;
-let arenaAxisPitch = 0.5;
-let arenaAxisDragging = false;
-let arenaAxisDragX = 0;
-let arenaAxisDragY = 0;
+const arenaAxis3dState = {
+  rotX: -22,
+  rotY: 28,
+  dragging: false,
+  startX: 0,
+  startY: 0,
+  baseRotX: -22,
+  baseRotY: 28,
+  scores: { aggressive: 50, internal: 50, emotional: 50 },
+  projectedCorners: []
+};
 let arenaLastScores = null;
 let currentScenarios = [];
 
@@ -349,178 +354,358 @@ function escapeHtml(raw) {
     .replace(/'/g, '&#39;');
 }
 
-function project3d(point, yaw, pitch, scale, cx, cy) {
-  const cosy = Math.cos(yaw);
-  const siny = Math.sin(yaw);
-  const cosp = Math.cos(pitch);
-  const sinp = Math.sin(pitch);
-
-  const x1 = point.x * cosy - point.z * siny;
-  const z1 = point.x * siny + point.z * cosy;
-  const y1 = point.y * cosp - z1 * sinp;
-  const z2 = point.y * sinp + z1 * cosp;
-  const perspective = 1 / (1 + z2 * 0.55);
-  return {
-    x: cx + x1 * scale * perspective,
-    y: cy - y1 * scale * perspective
-  };
+function rotate3D(point, rxDeg, ryDeg) {
+  const rx = (rxDeg * Math.PI) / 180;
+  const ry = (ryDeg * Math.PI) / 180;
+  const cosX = Math.cos(rx);
+  const sinX = Math.sin(rx);
+  const cosY = Math.cos(ry);
+  const sinY = Math.sin(ry);
+  const y1 = point.y * cosX - point.z * sinX;
+  const z1 = point.y * sinX + point.z * cosX;
+  const x2 = point.x * cosY + z1 * sinY;
+  const z2 = -point.x * sinY + z1 * cosY;
+  return { x: x2, y: y1, z: z2 };
 }
 
-function drawArenaAxis3d(scores) {
+function ensureArenaAxis3dCanvasSize() {
+  if (!arenaAxis3dCanvas || !arenaAxis3dStage) return { w: 0, h: 0 };
+  const rect = arenaAxis3dStage.getBoundingClientRect();
+  const cssW = Math.max(220, Math.floor(rect.width - 10));
+  const cssH = Math.max(180, Math.floor(rect.height - 10));
+  const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+  const targetW = Math.floor(cssW * dpr);
+  const targetH = Math.floor(cssH * dpr);
+  if (arenaAxis3dCanvas.width !== targetW || arenaAxis3dCanvas.height !== targetH) {
+    arenaAxis3dCanvas.width = targetW;
+    arenaAxis3dCanvas.height = targetH;
+  }
+  return { w: targetW, h: targetH };
+}
+
+function setArenaAxis3dHover(content, x, y) {
+  if (!arenaAxis3dHover || !arenaAxis3dStage) return;
+  arenaAxis3dHover.innerHTML = content;
+  arenaAxis3dHover.classList.remove('hidden');
+  arenaAxis3dHover.style.left = `${x}px`;
+  arenaAxis3dHover.style.top = `${y}px`;
+}
+
+function hideArenaAxis3dHover() {
+  if (!arenaAxis3dHover) return;
+  arenaAxis3dHover.classList.add('hidden');
+}
+
+function cornerMetaFromPoint(p) {
+  const risk = p.x >= 0 ? 'A' : 'C';
+  const control = p.y >= 0 ? 'I' : 'E';
+  const react = p.z >= 0 ? 'E' : 'R';
+  const code = `${risk}-${control}-${react}`;
+  const explanation = {
+    'A-I-R': 'Aggressive, Active, Rational',
+    'A-I-E': 'Aggressive, Active, Emotional',
+    'A-E-R': 'Aggressive, Passive, Rational',
+    'A-E-E': 'Aggressive, Passive, Emotional',
+    'C-I-R': 'Conservative, Active, Rational',
+    'C-I-E': 'Conservative, Active, Emotional',
+    'C-E-R': 'Conservative, Passive, Rational',
+    'C-E-E': 'Conservative, Passive, Emotional'
+  }[code];
+  return { code, explanation: explanation || 'Unclassified profile' };
+}
+
+function updateArenaAxis3dHover(clientX, clientY) {
+  if (!arenaAxis3dCanvas || !arenaAxis3dStage || !arenaAxis3dState.projectedCorners.length) return;
+  const rect = arenaAxis3dCanvas.getBoundingClientRect();
+  const dpr = arenaAxis3dCanvas.width / Math.max(1, rect.width);
+  const x = (clientX - rect.left) * dpr;
+  const y = (clientY - rect.top) * dpr;
+  let best = null;
+  let bestD2 = Infinity;
+  arenaAxis3dState.projectedCorners.forEach((c) => {
+    const dx = c.x - x;
+    const dy = c.y - y;
+    const d2 = dx * dx + dy * dy;
+    if (d2 < bestD2) {
+      bestD2 = d2;
+      best = c;
+    }
+  });
+  if (!best || bestD2 > (16 * dpr) ** 2) {
+    hideArenaAxis3dHover();
+    return;
+  }
+  const stageRect = arenaAxis3dStage.getBoundingClientRect();
+  const localX = clientX - stageRect.left;
+  const localY = clientY - stageRect.top;
+  setArenaAxis3dHover(`<strong>${best.explanation}</strong>`, localX, localY);
+}
+
+function renderArenaAxis3dGraph() {
   if (!arenaAxis3dCanvas) return;
+  const { w, h } = ensureArenaAxis3dCanvasSize();
+  if (w <= 0 || h <= 0) return;
   const ctx = arenaAxis3dCanvas.getContext('2d');
   if (!ctx) return;
-  const w = arenaAxis3dCanvas.width;
-  const h = arenaAxis3dCanvas.height;
-  const cx = w / 2;
-  const cy = h / 2 + 8;
-  const scale = Math.min(w, h) * 0.28;
-  const yaw = arenaAxisYaw;
-  const pitch = arenaAxisPitch;
-
   ctx.clearRect(0, 0, w, h);
-  ctx.fillStyle = '#f8fbff';
+
+  const cx = w / 2;
+  const cy = h / 2;
+  const unit = Math.min(w, h) * 0.23;
+  const perspective = unit * 3.4;
+  const transform = (p) => {
+    const r = rotate3D(p, arenaAxis3dState.rotX, arenaAxis3dState.rotY);
+    const s = perspective / (perspective + r.z * unit);
+    return { x: cx + r.x * unit * s, y: cy - r.y * unit * s, z: r.z };
+  };
+  const drawSegment = (a, b, color, width = 1, alpha = 1, dash = null, glow = 0) => {
+    const p1 = transform(a);
+    const p2 = transform(b);
+    ctx.save();
+    if (dash) ctx.setLineDash(dash);
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    if (glow > 0) {
+      ctx.shadowBlur = glow;
+      ctx.shadowColor = color;
+    }
+    ctx.beginPath();
+    ctx.moveTo(p1.x, p1.y);
+    ctx.lineTo(p2.x, p2.y);
+    ctx.stroke();
+    ctx.restore();
+    return { p1, p2 };
+  };
+  const drawArrow = (from, to, color) => {
+    const seg = drawSegment(from, to, color, 2.5, 0.92, null, 8);
+    const a = Math.atan2(seg.p2.y - seg.p1.y, seg.p2.x - seg.p1.x);
+    const len = Math.max(6, Math.min(11, w * 0.015));
+    ctx.save();
+    ctx.fillStyle = color;
+    ctx.globalAlpha = 0.95;
+    ctx.beginPath();
+    ctx.moveTo(seg.p2.x, seg.p2.y);
+    ctx.lineTo(seg.p2.x - len * Math.cos(a - 0.35), seg.p2.y - len * Math.sin(a - 0.35));
+    ctx.lineTo(seg.p2.x - len * Math.cos(a + 0.35), seg.p2.y - len * Math.sin(a + 0.35));
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  };
+  const drawPillLabel = (text, p, fg = '#0f172a', bg = 'rgba(255,255,255,0.92)', border = 'rgba(148,163,184,0.45)') => {
+    const padX = 6;
+    const padY = 4;
+    ctx.save();
+    ctx.font = `${Math.max(9, Math.floor(w * 0.014))}px ui-sans-serif, system-ui`;
+    const tw = ctx.measureText(text).width;
+    const x = p.x + (p.x >= cx ? 6 : -(tw + padX * 2 + 6));
+    const y = p.y - 9;
+    const bw = tw + padX * 2;
+    const bh = 17 + padY * 0.6;
+    ctx.fillStyle = bg;
+    ctx.strokeStyle = border;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect(x, y, bw, bh, 7);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = fg;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, x + padX, y + bh / 2 + 0.5);
+    ctx.restore();
+  };
+
+  const bg = ctx.createLinearGradient(0, 0, 0, h);
+  bg.addColorStop(0, '#f8fbff');
+  bg.addColorStop(1, '#edf3ff');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, w, h);
+  const nebula = ctx.createRadialGradient(cx - unit * 0.35, cy - unit * 0.42, 12, cx, cy, unit * 2);
+  nebula.addColorStop(0, 'rgba(59,130,246,0.18)');
+  nebula.addColorStop(0.5, 'rgba(14,165,233,0.08)');
+  nebula.addColorStop(1, 'rgba(14,165,233,0)');
+  ctx.fillStyle = nebula;
   ctx.fillRect(0, 0, w, h);
 
-  const cube = [
+  for (let i = 0; i < 32; i += 1) {
+    const sx = ((Math.sin((i + 1) * 12.9898) * 43758.5453) % 1 + 1) % 1;
+    const sy = ((Math.sin((i + 1) * 78.233) * 12345.6789) % 1 + 1) % 1;
+    const r = 0.5 + ((Math.sin((i + 1) * 4.17) + 1) * 0.5) * 1.4;
+    ctx.fillStyle = 'rgba(148,163,184,0.22)';
+    ctx.beginPath();
+    ctx.arc(sx * w, sy * h, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  for (const t of [-0.6, -0.3, 0, 0.3, 0.6]) {
+    drawSegment({ x: -1, y: t, z: -1 }, { x: 1, y: t, z: -1 }, '#c7d2fe', 1, 0.24, [3, 4]);
+    drawSegment({ x: t, y: -1, z: -1 }, { x: t, y: 1, z: -1 }, '#c7d2fe', 1, 0.24, [3, 4]);
+    drawSegment({ x: -1, y: -1, z: t }, { x: 1, y: -1, z: t }, '#cbd5e1', 1, 0.18, [2, 5]);
+  }
+
+  const cubePts = [
     { x: -1, y: -1, z: -1 }, { x: 1, y: -1, z: -1 }, { x: 1, y: 1, z: -1 }, { x: -1, y: 1, z: -1 },
     { x: -1, y: -1, z: 1 }, { x: 1, y: -1, z: 1 }, { x: 1, y: 1, z: 1 }, { x: -1, y: 1, z: 1 }
   ];
-  const edges = [
-    [0, 1], [1, 2], [2, 3], [3, 0],
-    [4, 5], [5, 6], [6, 7], [7, 4],
-    [0, 4], [1, 5], [2, 6], [3, 7]
-  ];
-  const p2 = cube.map((p) => project3d(p, yaw, pitch, scale, cx, cy));
-  ctx.strokeStyle = '#bfdbfe';
-  ctx.lineWidth = 1.4;
+  const edges = [[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]];
   edges.forEach(([a, b]) => {
+    const za = rotate3D(cubePts[a], arenaAxis3dState.rotX, arenaAxis3dState.rotY).z;
+    const zb = rotate3D(cubePts[b], arenaAxis3dState.rotX, arenaAxis3dState.rotY).z;
+    const depthAlpha = 0.24 + ((za + zb + 2) / 4) * 0.32;
+    drawSegment(cubePts[a], cubePts[b], '#64748b', 1.2, depthAlpha);
+  });
+
+  drawArrow({ x: -1.22, y: 0, z: 0 }, { x: 1.22, y: 0, z: 0 }, '#2563eb');
+  drawArrow({ x: 0, y: -1.22, z: 0 }, { x: 0, y: 1.22, z: 0 }, '#0f766e');
+  drawArrow({ x: 0, y: 0, z: -1.22 }, { x: 0, y: 0, z: 1.22 }, '#dc2626');
+
+  const endpointLabels = [
+    { p: { x: 1.29, y: 0, z: 0 }, t: 'Aggressive', c: '#1d4ed8' },
+    { p: { x: -1.29, y: 0, z: 0 }, t: 'Conservative', c: '#1d4ed8' },
+    { p: { x: 0, y: 1.29, z: 0 }, t: 'Active', c: '#0f766e' },
+    { p: { x: 0, y: -1.29, z: 0 }, t: 'Passive', c: '#0f766e' },
+    { p: { x: 0, y: 0, z: 1.29 }, t: 'Emotional', c: '#dc2626' },
+    { p: { x: 0, y: 0, z: -1.29 }, t: 'Rational', c: '#dc2626' }
+  ];
+  endpointLabels.forEach((item) => {
+    drawPillLabel(item.t, transform(item.p), item.c, 'rgba(255,255,255,0.9)', 'rgba(203,213,225,0.8)');
+  });
+
+  arenaAxis3dState.projectedCorners = cubePts.map((c) => {
+    const p = transform(c);
+    const meta = cornerMetaFromPoint(c);
+    return { x: p.x, y: p.y, code: meta.code, explanation: meta.explanation, z: p.z };
+  });
+
+  arenaAxis3dState.projectedCorners.sort((a, b) => a.z - b.z).forEach((c) => {
+    const radius = Math.max(2.4, Math.min(5.5, w * 0.0065 + c.z * 0.9));
+    ctx.fillStyle = `rgba(100,116,139,${0.4 + (c.z + 1) * 0.15})`;
+    ctx.strokeStyle = 'rgba(255,255,255,0.78)';
+    ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(p2[a].x, p2[a].y);
-    ctx.lineTo(p2[b].x, p2[b].y);
+    ctx.arc(c.x, c.y, radius, 0, Math.PI * 2);
+    ctx.fill();
     ctx.stroke();
   });
 
-  const risk = clamp01(scores.risk);
-  const control = clamp01(scores.control);
-  const react = clamp01(scores.react);
-  const point = {
-    x: control * 2 - 1,
-    y: risk * 2 - 1,
-    z: react * 2 - 1
-  };
-  const pp = project3d(point, yaw, pitch, scale, cx, cy);
-  arenaAxis3dPoint = { x: pp.x, y: pp.y, risk, control, react };
+  const scores = arenaAxis3dState.scores;
+  const pr = { x: scores.aggressive / 50 - 1, y: 0, z: 0 };
+  const pc = { x: 0, y: scores.internal / 50 - 1, z: 0 };
+  const pe = { x: 0, y: 0, z: scores.emotional / 50 - 1 };
+  const rr = transform(pr);
+  const rc = transform(pc);
+  const re = transform(pe);
 
-  const origin = project3d({ x: 0, y: 0, z: 0 }, yaw, pitch, scale, cx, cy);
-  ctx.strokeStyle = '#93c5fd';
-  ctx.lineWidth = 1;
+  const glow = ctx.createRadialGradient(cx, cy, 10, cx, cy, unit * 1.2);
+  glow.addColorStop(0, 'rgba(56,189,248,0.2)');
+  glow.addColorStop(1, 'rgba(56,189,248,0)');
+  ctx.fillStyle = glow;
   ctx.beginPath();
-  ctx.moveTo(origin.x, origin.y);
-  ctx.lineTo(pp.x, pp.y);
-  ctx.stroke();
-
-  ctx.fillStyle = '#0f766e';
-  ctx.beginPath();
-  ctx.arc(pp.x, pp.y, 7, 0, Math.PI * 2);
+  ctx.moveTo(rr.x, rr.y);
+  ctx.lineTo(rc.x, rc.y);
+  ctx.lineTo(re.x, re.y);
+  ctx.closePath();
   ctx.fill();
-  ctx.strokeStyle = '#ffffff';
-  ctx.lineWidth = 2;
+
+  const profileFill = ctx.createLinearGradient(rr.x, rr.y, re.x, re.y);
+  profileFill.addColorStop(0, 'rgba(37,99,235,0.24)');
+  profileFill.addColorStop(0.5, 'rgba(15,118,110,0.18)');
+  profileFill.addColorStop(1, 'rgba(220,38,38,0.24)');
+  ctx.fillStyle = profileFill;
+  ctx.beginPath();
+  ctx.moveTo(rr.x, rr.y);
+  ctx.lineTo(rc.x, rc.y);
+  ctx.lineTo(re.x, re.y);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.strokeStyle = 'rgba(30,64,175,0.9)';
+  ctx.lineWidth = 2.2;
+  ctx.shadowBlur = 8;
+  ctx.shadowColor = 'rgba(59,130,246,0.34)';
+  ctx.beginPath();
+  ctx.moveTo(rr.x, rr.y);
+  ctx.lineTo(rc.x, rc.y);
+  ctx.lineTo(re.x, re.y);
+  ctx.closePath();
   ctx.stroke();
+  ctx.shadowBlur = 0;
 
-  ctx.fillStyle = '#1e3a8a';
-  ctx.font = '12px ui-sans-serif, system-ui, -apple-system, Segoe UI';
-  const riskLabel = project3d({ x: -1.05, y: 1.05, z: -1.05 }, yaw, pitch, scale, cx, cy);
-  const controlLabel = project3d({ x: 1.05, y: -1.05, z: -1.05 }, yaw, pitch, scale, cx, cy);
-  const reactLabel = project3d({ x: 1.05, y: 1.05, z: 1.05 }, yaw, pitch, scale, cx, cy);
-  ctx.fillText('Risk', riskLabel.x, riskLabel.y);
-  ctx.fillText('Control', controlLabel.x, controlLabel.y);
-  ctx.fillText('Reactivity', reactLabel.x, reactLabel.y);
+  [rr, rc, re].forEach((p) => {
+    ctx.strokeStyle = 'rgba(148,163,184,0.36)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(p.x, p.y);
+    ctx.stroke();
+  });
 
-  if (arenaAxis3dLabels) {
-    arenaAxis3dLabels.innerHTML = [
-      `Risk ${Math.round(risk * 100)}`,
-      `Control ${Math.round(control * 100)}`,
-      `Reactivity ${Math.round(react * 100)}`
-    ]
-      .map((label) => `<div class="axis-score-item">${escapeHtml(label)}</div>`)
-      .join('');
-  }
+  [
+    { p: rr, c: '#2563eb', t: `Aggressive ${Math.round(scores.aggressive)}%` },
+    { p: rc, c: '#0f766e', t: `Active ${Math.round(scores.internal)}%` },
+    { p: re, c: '#dc2626', t: `Emotional ${Math.round(scores.emotional)}%` }
+  ].forEach((n) => {
+    ctx.save();
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = n.c;
+    ctx.fillStyle = n.c;
+    ctx.beginPath();
+    ctx.arc(n.p.x, n.p.y, Math.max(4.5, Math.min(7.2, w * 0.0092)), 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+    drawPillLabel(n.t, n.p, '#0f172a', 'rgba(255,255,255,0.95)', 'rgba(148,163,184,0.65)');
+  });
 }
 
-function bindArenaAxis3dHover() {
-  if (!arenaAxis3dStage || !arenaAxis3dHover || !arenaAxis3dCanvas) return;
-  arenaAxis3dStage.addEventListener('mousemove', (event) => {
-    if (!arenaAxis3dPoint) return;
-    const rect = arenaAxis3dCanvas.getBoundingClientRect();
-    const sx = ((event.clientX - rect.left) * arenaAxis3dCanvas.width) / Math.max(1, rect.width);
-    const sy = ((event.clientY - rect.top) * arenaAxis3dCanvas.height) / Math.max(1, rect.height);
-    const dist = Math.hypot(sx - arenaAxis3dPoint.x, sy - arenaAxis3dPoint.y);
-    if (dist > 24) {
-      arenaAxis3dHover.classList.add('hidden');
+function initArenaAxis3dInteractivity() {
+  if (!arenaAxis3dStage || arenaAxis3dStage.dataset.bound === '1') return;
+  arenaAxis3dStage.dataset.bound = '1';
+
+  arenaAxis3dStage.addEventListener('pointerdown', (event) => {
+    event.preventDefault();
+    arenaAxis3dState.dragging = true;
+    arenaAxis3dState.startX = event.clientX;
+    arenaAxis3dState.startY = event.clientY;
+    arenaAxis3dState.baseRotX = arenaAxis3dState.rotX;
+    arenaAxis3dState.baseRotY = arenaAxis3dState.rotY;
+    arenaAxis3dStage.classList.add('dragging');
+    arenaAxis3dStage.setPointerCapture?.(event.pointerId);
+  });
+  arenaAxis3dStage.addEventListener('pointermove', (event) => {
+    if (arenaAxis3dState.dragging) {
+      event.preventDefault();
+      const dx = event.clientX - arenaAxis3dState.startX;
+      const dy = event.clientY - arenaAxis3dState.startY;
+      arenaAxis3dState.rotY = arenaAxis3dState.baseRotY + dx * 0.34;
+      arenaAxis3dState.rotX = Math.max(-80, Math.min(80, arenaAxis3dState.baseRotX - dy * 0.28));
+      renderArenaAxis3dGraph();
+      hideArenaAxis3dHover();
       return;
     }
-    arenaAxis3dHover.innerHTML = `Risk ${Math.round(arenaAxis3dPoint.risk * 100)} | Control ${Math.round(
-      arenaAxis3dPoint.control * 100
-    )} | React ${Math.round(arenaAxis3dPoint.react * 100)}`;
-    arenaAxis3dHover.classList.remove('hidden');
-    arenaAxis3dHover.style.left = `${event.clientX - rect.left + 14}px`;
-    arenaAxis3dHover.style.top = `${event.clientY - rect.top + 10}px`;
+    updateArenaAxis3dHover(event.clientX, event.clientY);
   });
-  arenaAxis3dStage.addEventListener('mouseleave', () => arenaAxis3dHover.classList.add('hidden'));
+  const stop = () => {
+    arenaAxis3dState.dragging = false;
+    arenaAxis3dStage.classList.remove('dragging');
+  };
+  arenaAxis3dStage.addEventListener('pointerup', stop);
+  arenaAxis3dStage.addEventListener('pointercancel', stop);
+  arenaAxis3dStage.addEventListener('mouseleave', () => {
+    stop();
+    hideArenaAxis3dHover();
+  });
+}
 
-  arenaAxis3dStage.addEventListener('mousedown', (event) => {
-    arenaAxisDragging = true;
-    arenaAxis3dStage.classList.add('dragging');
-    arenaAxisDragX = event.clientX;
-    arenaAxisDragY = event.clientY;
-  });
-  arenaAxis3dStage.addEventListener(
-    'touchstart',
-    (event) => {
-      const touch = event.touches?.[0];
-      if (!touch) return;
-      arenaAxisDragging = true;
-      arenaAxis3dStage.classList.add('dragging');
-      arenaAxisDragX = touch.clientX;
-      arenaAxisDragY = touch.clientY;
-    },
-    { passive: true }
-  );
-  window.addEventListener('mouseup', () => {
-    arenaAxisDragging = false;
-    arenaAxis3dStage?.classList.remove('dragging');
-  });
-  window.addEventListener('touchend', () => {
-    arenaAxisDragging = false;
-    arenaAxis3dStage?.classList.remove('dragging');
-  });
-  window.addEventListener('mousemove', (event) => {
-    if (!arenaAxisDragging) return;
-    const dx = event.clientX - arenaAxisDragX;
-    const dy = event.clientY - arenaAxisDragY;
-    arenaAxisDragX = event.clientX;
-    arenaAxisDragY = event.clientY;
-    arenaAxisYaw += dx * 0.008;
-    arenaAxisPitch = Math.max(-1.05, Math.min(1.05, arenaAxisPitch + dy * 0.006));
-    if (arenaLastScores) drawArenaAxis3d(arenaLastScores);
-  });
-  window.addEventListener(
-    'touchmove',
-    (event) => {
-      if (!arenaAxisDragging) return;
-      const touch = event.touches?.[0];
-      if (!touch) return;
-      const dx = touch.clientX - arenaAxisDragX;
-      const dy = touch.clientY - arenaAxisDragY;
-      arenaAxisDragX = touch.clientX;
-      arenaAxisDragY = touch.clientY;
-      arenaAxisYaw += dx * 0.008;
-      arenaAxisPitch = Math.max(-1.05, Math.min(1.05, arenaAxisPitch + dy * 0.006));
-      if (arenaLastScores) drawArenaAxis3d(arenaLastScores);
-    },
-    { passive: true }
-  );
+function setArenaAxis3dScores(scores = {}) {
+  const aggressive = Math.round(clamp01(scores.risk) * 100);
+  const internal = Math.round(clamp01(scores.control) * 100);
+  const emotional = Math.round(clamp01(scores.react) * 100);
+  arenaAxis3dState.scores = { aggressive, internal, emotional };
+  if (arenaAxis3dLabels) {
+    arenaAxis3dLabels.innerHTML = '';
+  }
+  renderArenaAxis3dGraph();
 }
 
 function showView(mode) {
@@ -881,7 +1066,7 @@ function renderResult() {
       axisRow('Emotional Reactivity', scores.react, 'Composed', 'Reactive')
     ].join('');
   }
-  drawArenaAxis3d(scores);
+  setArenaAxis3dScores(scores);
 
   if (arenaInsights) {
     arenaInsights.innerHTML = `
@@ -935,8 +1120,10 @@ async function resetArena(withStartTransition = false) {
   stopTimer();
   currentScenarios = buildScenarioSet();
   arenaLastScores = null;
-  arenaAxisYaw = -0.78;
-  arenaAxisPitch = 0.5;
+  arenaAxis3dState.rotX = -22;
+  arenaAxis3dState.rotY = 28;
+  hideArenaAxis3dHover();
+  renderArenaAxis3dGraph();
   roundIndex = 0;
   roundSelected = null;
   awaitingContinue = false;
@@ -984,4 +1171,8 @@ window.addEventListener('keydown', (event) => {
 showView('intro');
 updateConfidenceLabel();
 updateLiveSignals(0.4);
-bindArenaAxis3dHover();
+initArenaAxis3dInteractivity();
+renderArenaAxis3dGraph();
+window.addEventListener('resize', () => {
+  renderArenaAxis3dGraph();
+});

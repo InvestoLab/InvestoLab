@@ -6192,18 +6192,31 @@ footer {
 
 .forecast-actions button {
   border: 1px solid #d8e5f5;
-  background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
+  background: #ffffff;
   color: #0f172a;
   border-radius: 8px;
   padding: 0.42rem 0.75rem;
   font-size: 0.8rem;
   font-weight: 700;
+  box-shadow: none;
+  transform: none;
 }
 
 .forecast-actions button:hover {
-  color: #fff;
-  border-color: var(--brand);
-  background: var(--brand);
+  color: #0f172a;
+  border-color: #b8cde7;
+  background: #ffffff;
+  box-shadow: none;
+  transform: none;
+}
+
+.forecast-actions button:focus-visible,
+.forecast-actions button:active {
+  color: #0f172a;
+  border-color: #9db8d8;
+  background: #ffffff;
+  box-shadow: none;
+  transform: none;
 }
 
 .forecast-quick-summary {
@@ -6547,5 +6560,34 @@ footer {
 
   .kpi-card strong {
     font-size: 0.92rem;
+  }
+
+  /* Prevent text overlap in feature cards on small screens */
+  .feature-home-grid > .home-card h2,
+  .news-home-grid > .home-card h2,
+  .home-card h2 {
+    font-size: 0.94rem;
+    line-height: 1.3;
+  }
+
+  .feature-home-grid > .home-card p,
+  .news-home-grid > .home-card p,
+  .home-card p {
+    font-size: 0.84rem;
+    line-height: 1.5;
+  }
+}
+
+@media (max-width: 480px) {
+  .feature-home-grid > .home-card h2,
+  .news-home-grid > .home-card h2,
+  .home-card h2 {
+    font-size: 0.88rem;
+  }
+
+  .feature-home-grid > .home-card p,
+  .news-home-grid > .home-card p,
+  .home-card p {
+    font-size: 0.8rem;
   }
 }

@@ -67,7 +67,6 @@
         <section class="forecast-step">
           <h3>Step 1: Choose Investment</h3>
           <label>
-            <span class="field-label">Investment</span>
             <div class="search-wrap">
               <input id="forecastQuery" type="text" placeholder="Ticker or company name (example: AAPL, NVDA, SPY)" autocomplete="off" required />
               <div id="forecastSearchDropdown" class="search-dropdown hidden"></div>
@@ -92,12 +91,21 @@
           <h3>Step 3: Fine-Tune Settings (Optional)</h3>
           <div class="forecast-grid-controls">
             <label>
-              <span class="field-label">Horizon (Years)</span>
+              <span class="field-label">Horizon</span>
               <div class="field-inline">
-                <input id="forecastYearsRange" type="range" min="0" max="10" value="0" />
-                <input id="forecastYears" type="number" min="0" max="10" value="0" />
+                <input id="forecastYearsRange" type="range" min="12" max="120" step="1" value="36" />
+                <input id="forecastYears" type="number" min="12" max="120" step="1" value="36" />
               </div>
-              <small class="field-help">How far ahead to project.</small>
+              <small id="forecastHorizonHelp" class="field-help">How far ahead to project in selected interval units.</small>
+            </label>
+            <label>
+              <span class="field-label">Time Interval</span>
+              <select id="forecastInterval">
+                <option value="monthly" selected>Monthly</option>
+                <option value="weekly">Weekly</option>
+                <option value="daily">Daily</option>
+              </select>
+              <small class="field-help">Projection granularity for simulation steps.</small>
             </label>
             <label>
               <span class="field-label">Simulation Paths</span>
@@ -163,6 +171,6 @@
     Copyright (c) 2026 InvestoLab. All rights reserved.
   </footer>
 
-  <script src="valuation-forecast.js?v=20260305v2"></script>
+  <script src="valuation-forecast.js?v=20260305v3"></script>
 </body>
 </html>

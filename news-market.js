@@ -47,20 +47,22 @@ function renderNewsSignalCards(sentiment) {
 async function loadMarketNews() {
   try {
     const readJsonWithFallback = async (primaryUrl, fallbackUrl) => {
-      const response = await fetch(primaryUrl);
-      const contentType = String(response.headers.get('content-type') || '').toLowerCase();
-      if (contentType.includes('application/json')) {
+      const readJson = async (url) => {
+        const response = await fetch(url);
+        const contentType = String(response.headers.get('content-type') || '').toLowerCase();
+        if (!contentType.includes('application/json')) {
+          throw new Error('Market news response was not valid JSON.');
+        }
         const data = await response.json();
         if (!response.ok) throw new Error(data?.error || 'Failed to load market news.');
         return data;
+      };
+      try {
+        return await readJson(primaryUrl);
+      } catch (primaryError) {
+        if (!fallbackUrl) throw primaryError;
+        return readJson(fallbackUrl);
       }
-      if (fallbackUrl) {
-        const fb = await fetch(fallbackUrl);
-        const fbData = await fb.json();
-        if (!fb.ok) throw new Error(fbData?.error || 'Failed to load market news.');
-        return fbData;
-      }
-      throw new Error('Market news response was not valid JSON.');
     };
     const data = await readJsonWithFallback('./api/news/market', './data/news-market.json');
 

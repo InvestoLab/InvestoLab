@@ -57,20 +57,22 @@ async function loadInvestmentOfDay() {
       year: './data/news-investment-year.json'
     };
     const readJsonWithFallback = async (primaryUrl, fallbackUrl) => {
-      const response = await fetch(primaryUrl);
-      const contentType = String(response.headers.get('content-type') || '').toLowerCase();
-      if (contentType.includes('application/json')) {
+      const readJson = async (url) => {
+        const response = await fetch(url);
+        const contentType = String(response.headers.get('content-type') || '').toLowerCase();
+        if (!contentType.includes('application/json')) {
+          throw new Error('Investment response was not valid JSON.');
+        }
         const data = await response.json();
         if (!response.ok) throw new Error(data?.error || 'Failed to load investment of the day.');
         return data;
+      };
+      try {
+        return await readJson(primaryUrl);
+      } catch (primaryError) {
+        if (!fallbackUrl) throw primaryError;
+        return readJson(fallbackUrl);
       }
-      if (fallbackUrl) {
-        const fb = await fetch(fallbackUrl);
-        const fbData = await fb.json();
-        if (!fb.ok) throw new Error(fbData?.error || 'Failed to load investment of the day.');
-        return fbData;
-      }
-      throw new Error('Investment response was not valid JSON.');
     };
     const data = await readJsonWithFallback(
       `./api/news/investment-of-day?period=${encodeURIComponent(selectedPeriod)}`,
