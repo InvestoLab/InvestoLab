@@ -415,6 +415,16 @@
     );
   }
 
+  function shouldForceLocalFirst(apiPath) {
+    return (
+      apiPath.startsWith('/api/assets/resolve') ||
+      apiPath.startsWith('/api/assets/validate') ||
+      apiPath.startsWith('/api/valuation/resolve') ||
+      apiPath.startsWith('/api/valuation/investment') ||
+      apiPath.startsWith('/api/investotype/portfolio')
+    );
+  }
+
   function isPriceCriticalApi(apiPath) {
     return (
       apiPath.startsWith('/api/simulations/') ||
@@ -1808,6 +1818,17 @@
       const localApiResponse = await handleLocalApi(apiPath, init);
       if (localApiResponse instanceof Response) return localApiResponse;
       return jsonErrorResponse('Local API fallback failed.', 500);
+    }
+
+    // On GitHub Pages, keep core search/AI actions deterministic by using
+    // local handlers first. Remote backend failures/4xx should not break UX.
+    if (shouldForceLocalFirst(apiPath)) {
+      const localFirst = await handleLocalApi(apiPath, init);
+      if (localFirst instanceof Response && localFirst.status < 500) return localFirst;
+      const remoteFallback = await fetchFromRemoteApiBases(apiPath, init);
+      if (remoteFallback instanceof Response) return remoteFallback;
+      if (localFirst instanceof Response) return localFirst;
+      return jsonErrorResponse('Local-first API handler failed.', 500);
     }
 
     if (shouldPreferRemoteApi(apiPath)) {
