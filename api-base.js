@@ -431,10 +431,28 @@
     for (const base of API_BASES) {
       try {
         const response = await rawFetch(`${base}${apiPath}`, init);
-        if (response && response.status !== 404 && response.status !== 502 && response.status !== 503) {
+        if (!response) {
+          lastError = new Error(`Remote API did not return a response from ${base}`);
+          continue;
+        }
+
+        const status = Number(response.status || 0);
+        const contentType = String(response.headers.get('content-type') || '').toLowerCase();
+        const expectsJson = apiPath.startsWith('/api/');
+        const hasJsonPayload = !expectsJson || contentType.includes('application/json');
+
+        // Accept successful JSON API responses as-is.
+        if (response.ok && hasJsonPayload) {
           return response;
         }
-        lastError = new Error(`Remote API returned ${response?.status || 'unknown'} from ${base}`);
+
+        // Preserve functional client errors from backend (validation, bad input, etc.).
+        if (status >= 400 && status < 500 && status !== 404) {
+          return response;
+        }
+
+        // For gateway/server errors or malformed payloads, keep trying and allow local fallback.
+        lastError = new Error(`Remote API returned ${status || 'unknown'} from ${base}`);
       } catch (error) {
         lastError = error;
       }
@@ -456,6 +474,11 @@
     return {};
   }
 
+  function extractSimulationIdFromApiPath(apiPath) {
+    const match = String(apiPath || '').match(/^\/api\/simulations\/([^/?#]+)/i);
+    return match ? decodeURIComponent(match[1] || '') : '';
+  }
+
   function syntheticSeries(startDate, points = 400, startPrice = 100, drift = 0.0006, vol = 0.012) {
     const out = [];
     let price = Math.max(1, Number(startPrice || 100));
@@ -468,6 +491,36 @@
       };
     })();
     for (let i = 0; i < points; i += 1) {
+      const shock = (rand() - 0.5) * vol;
+      price = Math.max(1, price * (1 + drift + shock));
+      out.push({ date, close: Number(price.toFixed(2)) });
+      date = addDaysIso(date, 1);
+    }
+    return out;
+  }
+
+  function syntheticSeriesByDateRange(startDate, endDate, startPrice = 100, drift = 0.0006, vol = 0.012, seed = 1234567) {
+    const start = String(startDate || toIsoDate(Date.now() - 365 * 86400000));
+    const end = String(endDate || toIsoDate());
+    const startMs = Date.parse(`${start}T00:00:00Z`);
+    const endMs = Date.parse(`${end}T00:00:00Z`);
+    if (!Number.isFinite(startMs) || !Number.isFinite(endMs) || endMs < startMs) return [];
+
+    const maxDays = 7000;
+    const totalDays = Math.min(maxDays, Math.max(1, Math.floor((endMs - startMs) / 86400000) + 1));
+    let price = Math.max(1, Number(startPrice || 100));
+    let date = start;
+    const out = [];
+    const rand = (() => {
+      let s = Number(seed || 1234567) % 2147483647;
+      if (s <= 0) s += 2147483646;
+      return () => {
+        s = (s * 16807) % 2147483647;
+        return (s - 1) / 2147483646;
+      };
+    })();
+
+    for (let i = 0; i < totalDays; i += 1) {
       const shock = (rand() - 0.5) * vol;
       price = Math.max(1, price * (1 + drift + shock));
       out.push({ date, close: Number(price.toFixed(2)) });
@@ -1042,7 +1095,24 @@
     if (sim.series[symbol]) return;
     const chart = await yahooChart(symbol, '5y', '1d');
     const rows = extractHistory(chart);
-    sim.series[symbol] = { rows: rows.length ? rows : [{ date: sim.startDate, close: 100 }] };
+    const coversWindow =
+      rows.length &&
+      String(rows[0]?.date || '') <= String(sim.startDate || '') &&
+      String(rows[rows.length - 1]?.date || '') >= String(sim.endDate || '');
+
+    if (coversWindow) {
+      sim.series[symbol] = { rows };
+      return;
+    }
+
+    const seed = symbolSeed(symbol);
+    const drift = ((seed % 9) - 4) * 0.00008 + 0.00055;
+    const vol = 0.007 + ((seed % 7) * 0.0015);
+    const startPrice = 70 + (seed % 160);
+    const seriesStart = addDaysIso(String(sim.startDate || toIsoDate()), -40);
+    const seriesEnd = addDaysIso(String(sim.endDate || toIsoDate()), 5);
+    const fallbackRows = syntheticSeriesByDateRange(seriesStart, seriesEnd, startPrice, drift, vol, seed + 17);
+    sim.series[symbol] = { rows: fallbackRows.length ? fallbackRows : [{ date: sim.startDate, close: 100 }] };
   }
 
   function getAssetPriceOn(sim, asset, date) {
@@ -1218,6 +1288,9 @@
     sim.costBasis = newCost;
     sim.firstBuyPrice = newFirst;
     sim.cash = Math.max(0, portfolioValue - used);
+    // Snapshot right after executing targets at the decision date.
+    // This is the correct baseline for "since last rebalance" deltas.
+    const executed = getSimSnapshot(sim, date, sim.lastInsightDate);
     const sinceDate = sim.currentDate;
     if (sim.nextRebalanceDate) sim.currentDate = sim.nextRebalanceDate;
     sim.stepIndex = Math.min(sim.totalSteps, Number(sim.stepIndex || 0) + 1);
@@ -1242,6 +1315,10 @@
       realizedProfit: sim.realizedProfit,
       symbols: sim.symbols,
       assets: sim.assets,
+      beforePreview: before.preview,
+      beforePreviewInsights: before.insights,
+      executedPreview: executed.preview,
+      executedPreviewInsights: executed.insights,
       nextPreview: after.preview,
       nextPreviewInsights: after.insights
     };
@@ -1542,7 +1619,7 @@
         return jsonResponse(data);
       }
       if (/^\/api\/simulations\/[^/]+\/assets/.test(url)) {
-        const simId = url.split('/')[3];
+        const simId = extractSimulationIdFromApiPath(url);
         const sim = getSimById(simId);
         if (!sim) return jsonErrorResponse('Simulation not found.', 404);
         const body = parseBody(init);
@@ -1564,7 +1641,7 @@
         });
       }
       if (/^\/api\/simulations\/[^/]+\/rebalance/.test(url)) {
-        const simId = url.split('/')[3];
+        const simId = extractSimulationIdFromApiPath(url);
         const sim = getSimById(simId);
         if (!sim) return jsonErrorResponse('Simulation not found.', 404);
         const body = parseBody(init);
@@ -1572,14 +1649,14 @@
         return jsonResponse(data);
       }
       if (/^\/api\/simulations\/[^/]+\/trade/.test(url)) {
-        const simId = url.split('/')[3];
+        const simId = extractSimulationIdFromApiPath(url);
         const sim = getSimById(simId);
         if (!sim) return jsonErrorResponse('Simulation not found.', 404);
         const body = parseBody(init);
         return jsonResponse(tradeSimulation(sim, body || {}));
       }
       if (/^\/api\/simulations\/[^/]+\/timeline/.test(url)) {
-        const simId = url.split('/')[3];
+        const simId = extractSimulationIdFromApiPath(url);
         const sim = getSimById(simId);
         if (!sim) return jsonErrorResponse('Simulation not found.', 404);
         const endMatch = url.match(/[?&]endDate=([^&]+)/i);
@@ -1587,19 +1664,19 @@
         return jsonResponse(simTimeline(sim, endDate || sim.currentDate));
       }
       if (/^\/api\/simulations\/[^/]+\/projection/.test(url)) {
-        const simId = url.split('/')[3];
+        const simId = extractSimulationIdFromApiPath(url);
         const sim = getSimById(simId);
         if (!sim) return jsonErrorResponse('Simulation not found.', 404);
         return jsonResponse(simProjection(sim));
       }
       if (/^\/api\/simulations\/[^/]+\/finish/.test(url)) {
-        const simId = url.split('/')[3];
+        const simId = extractSimulationIdFromApiPath(url);
         const sim = getSimById(simId);
         if (!sim) return jsonErrorResponse('Simulation not found.', 404);
         return jsonResponse(simFinish(sim));
       }
       if (/^\/api\/simulations\/[^/]+\/market-briefing/.test(url)) {
-        const simId = url.split('/')[3];
+        const simId = extractSimulationIdFromApiPath(url);
         const sim = getSimById(simId);
         if (!sim) return jsonErrorResponse('Simulation not found.', 404);
         const d = url.match(/[?&]date=([^&]+)/i);
@@ -1607,20 +1684,20 @@
         return jsonResponse(simBriefing(sim, d ? decodeURIComponent(d[1] || '') : sim.currentDate, s ? decodeURIComponent(s[1] || '') : sim.lastInsightDate));
       }
       if (/^\/api\/simulations\/[^/]+\/market-search/.test(url)) {
-        const simId = url.split('/')[3];
+        const simId = extractSimulationIdFromApiPath(url);
         const sim = getSimById(simId);
         if (!sim) return jsonErrorResponse('Simulation not found.', 404);
         const body = parseBody(init);
         return jsonResponse(simSearch(sim, body?.query || '', body?.date || sim.currentDate, body?.sinceDate || sim.lastInsightDate));
       }
       if (/^\/api\/simulations\/[^/]+\/replay/.test(url)) {
-        const simId = url.split('/')[3];
+        const simId = extractSimulationIdFromApiPath(url);
         const sim = getSimById(simId);
         if (!sim) return jsonErrorResponse('Simulation not found.', 404);
         return jsonResponse(simReplay(sim));
       }
       if (/^\/api\/simulations\/[^/]+$/.test(url)) {
-        const simId = url.split('/')[3];
+        const simId = extractSimulationIdFromApiPath(url);
         const sim = getSimById(simId);
         if (!sim) return jsonErrorResponse('Simulation not found.', 404);
         const snap = getSimSnapshot(sim, sim.currentDate, sim.lastInsightDate);
@@ -1694,12 +1771,6 @@
     }
   }
 
-  const isLocalDevHost = /^(localhost|127\.0\.0\.1)$/i.test(String(window.location.hostname || ''));
-  if (!isGithubPages && isLocalDevHost) {
-    // In local dev, never intercept API requests. Use backend responses directly.
-    return;
-  }
-
   window.fetch = async (input, init) => {
     const url = resolveApiUrl(input);
     const apiPath = normalizeApiPath(url);
@@ -1707,10 +1778,36 @@
       return rawFetch(input, init);
     }
 
-    // Outside GitHub Pages, always use the real backend API.
-    // Local/public API emulation is only for GitHub Pages static mode.
+    const shouldFallbackToLocal = (response) => {
+      if (!(response instanceof Response)) return true;
+      const status = Number(response.status || 0);
+      const contentType = String(response.headers.get('content-type') || '').toLowerCase();
+      if (status === 404 || status >= 500) return true;
+      if (status >= 200 && status < 300 && !contentType.includes('application/json')) return true;
+      return false;
+    };
+
+    // Keep simulation session state in one place for the full browser session.
+    // Mixing backend/local simulation IDs causes "Simulation not found" errors.
+    if (!isGithubPages && apiPath.startsWith('/api/simulations/')) {
+      const localApiResponse = await handleLocalApi(apiPath, init);
+      if (localApiResponse instanceof Response) return localApiResponse;
+      return jsonErrorResponse('Local simulation API failed.', 500);
+    }
+
+    // Outside GitHub Pages, prefer the real backend API, but gracefully
+    // fall back to local/public API emulation when backend is unreachable.
     if (!isGithubPages) {
-      return rawFetch(input, init);
+      try {
+        const response = await rawFetch(input, init);
+        if (!shouldFallbackToLocal(response)) return response;
+      } catch (_error) {
+        // Fall through to local API mode.
+      }
+
+      const localApiResponse = await handleLocalApi(apiPath, init);
+      if (localApiResponse instanceof Response) return localApiResponse;
+      return jsonErrorResponse('Local API fallback failed.', 500);
     }
 
     if (shouldPreferRemoteApi(apiPath)) {

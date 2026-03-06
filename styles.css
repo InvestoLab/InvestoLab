@@ -4640,7 +4640,14 @@ footer {
   }
 
   .axis-chip-bar {
-    grid-template-columns: 56px minmax(0, 1fr) 56px;
+    grid-template-columns: minmax(68px, auto) minmax(0, 1fr) minmax(68px, auto);
+  }
+
+  .axis-chip-bar span {
+    font-size: 0.64rem;
+    line-height: 1.05;
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
 
   #axis3dCanvas {
@@ -5052,7 +5059,14 @@ footer {
   }
 
   .axis-chip-bar {
-    grid-template-columns: 48px minmax(0, 1fr) 48px;
+    grid-template-columns: minmax(64px, auto) minmax(0, 1fr) minmax(64px, auto);
+  }
+
+  .axis-chip-bar span {
+    font-size: 0.6rem;
+    line-height: 1.05;
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
 
   /* Smaller buttons on very small screens */

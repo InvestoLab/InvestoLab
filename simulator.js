@@ -48,7 +48,6 @@ const allocationChart = document.getElementById('allocationChart');
 const budgetSummary = document.getElementById('budgetSummary');
 const budgetHint = document.getElementById('budgetHint');
 const budgetFill = document.getElementById('budgetFill');
-const periodDecisionTimer = document.getElementById('periodDecisionTimer');
 const timeflowLabel = document.getElementById('timeflowLabel');
 const timeflowPercent = document.getElementById('timeflowPercent');
 const timeflowFill = document.getElementById('timeflowFill');
@@ -66,9 +65,11 @@ const periodTitle = document.getElementById('periodTitle');
 const periodCards = document.getElementById('periodCards');
 const holdingsTable = document.getElementById('holdingsTable');
 const periodPanel = document.getElementById('periodPanel');
+const simCommentary = document.getElementById('simCommentary');
+const simAddUnder = document.querySelector('.sim-add-under');
+const simBottomActions = document.querySelector('.sim-bottom-actions');
 const actionCashValue = document.querySelector('[data-action-cash-value]');
 const actionCashFill = document.querySelector('[data-action-cash-fill]');
-const actionTimeFill = document.querySelector('[data-action-time-fill]');
 const replayToggleBtn = document.getElementById('replayToggleBtn');
 const replayStatusLabel = document.getElementById('replayStatusLabel');
 const replayDurationSelect = document.getElementById('replayDurationSelect');
@@ -82,6 +83,7 @@ const showOnlyActiveBtn = document.getElementById('showOnlyActiveBtn');
 const simAddType = document.getElementById('simAddType');
 const simAddSymbolWrap = document.getElementById('simAddSymbolWrap');
 const simAddSymbol = document.getElementById('simAddSymbol');
+const simAddSearchDropdown = document.getElementById('simAddSearchDropdown');
 const simAddMultiplierWrap = document.getElementById('simAddMultiplierWrap');
 const simAddMultiplier = document.getElementById('simAddMultiplier');
 const simAddAssetBtn = document.getElementById('simAddAssetBtn');
@@ -277,6 +279,8 @@ const portfolioQuickPicks = document.getElementById('portfolioQuickPicks');
 
 let simulationState = null;
 let latestFinalResult = null;
+let latestResultChartSnapshot = null;
+let resultChartsRenderRaf = null;
 let selectedAssets = [];
 let previewState = { portfolioValue: 0, prices: {}, date: null };
 let latestInsights = null;
@@ -292,6 +296,10 @@ let assetSearchResults = [];
 let assetSearchIndex = -1;
 let assetSearchTimer = null;
 let assetSelectedSymbol = '';
+let simAddSearchResults = [];
+let simAddSearchIndex = -1;
+let simAddSearchTimer = null;
+let simAddSelectedSymbol = '';
 const POPULAR_SYMBOL_RANK = new Map(
   [
     'SPY',
@@ -358,6 +366,12 @@ const SETUP_TRADE_FEE_RATE = 0.001; // match server FEE_RATE (0.10%)
 let setupStepHoldTimeout = null;
 let setupStepHoldInterval = null;
 let setupStepSuppressClick = false;
+let mobileFocusSection = 'snapshot';
+let funProfitStreak = 0;
+let funLossStreak = 0;
+let funBestPortfolioValue = 0;
+let funLastInsightDate = '';
+const funMilestonesShown = new Set();
 let setupStage = 'settings';
 let setupValidated = {
   settings: false,
@@ -369,16 +383,13 @@ let setupSummaryReady = false;
 let toastHost = null;
 let toastTimer = null;
 let floatingActionsDocked = false;
+let floatingActionsHiddenByScroll = false;
+let floatingActionsLastScrollY = Math.max(0, window.scrollY || window.pageYOffset || 0);
 let startTransitionOverlay = null;
 let commentaryBaseLead = '';
 let commentaryBasePoints = [];
 let marketBriefReqSeq = 0;
 let marketSearchReqSeq = 0;
-const PERIOD_DECISION_LIMIT_MS = 60 * 1000;
-let periodDecisionDeadlineMs = 0;
-let periodDecisionTimerId = null;
-let periodDecisionPeriodKey = '';
-let periodDecisionAdvanceBusy = false;
 const axis3dState = {
   rotX: -22,
   rotY: 28,
@@ -460,11 +471,13 @@ function showSlide(which) {
     stepSetup?.classList.add('active');
     simFloatingActions?.classList.add('hidden');
     updateFloatingActionDockState();
+    renderFunStatus();
   } else if (which === 'game') {
     slideGame?.classList.add('active');
     stepGame?.classList.add('active');
     if (simulationState) simFloatingActions?.classList.remove('hidden');
     updateFloatingActionDockState();
+    renderFunStatus();
     setTimeout(() => {
       periodPanel?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 0);
@@ -482,11 +495,135 @@ function showSlide(which) {
     stepResult?.classList.add('active');
     simFloatingActions?.classList.add('hidden');
     updateFloatingActionDockState();
+    renderFunStatus();
+    scheduleResultChartsRender();
   }
+  applySimulationMobileFocus(mobileFocusSection);
 }
 
 function scrollToInvestorIntro() {
   window.scrollTo({ top: 0, behavior: 'auto' });
+}
+
+function ensureSimFunStatusElement() {
+  if (!simPanel) return null;
+  let el = document.getElementById('simFunStatus');
+  if (el) return el;
+  el = document.createElement('div');
+  el.id = 'simFunStatus';
+  el.className = 'sim-fun-status';
+  if (simNextDate?.parentElement) simNextDate.insertAdjacentElement('afterend', el);
+  return el;
+}
+
+function resetFunLayer() {
+  funProfitStreak = 0;
+  funLossStreak = 0;
+  funBestPortfolioValue = 0;
+  funLastInsightDate = '';
+  funMilestonesShown.clear();
+  const el = document.getElementById('simFunStatus');
+  if (el) el.innerHTML = '';
+}
+
+function getFunMood(insights) {
+  const periodReturn = Number(insights?.periodReturn || 0);
+  if (periodReturn > 0.03) return { text: 'Market Mood: Surge', tone: 'up' };
+  if (periodReturn > 0.01) return { text: 'Market Mood: Uptrend', tone: 'up' };
+  if (periodReturn < -0.03) return { text: 'Market Mood: Stormy', tone: 'down' };
+  if (periodReturn < -0.01) return { text: 'Market Mood: Pullback', tone: 'down' };
+  return { text: 'Market Mood: Sideways', tone: 'neutral' };
+}
+
+function renderFunStatus() {
+  const el = ensureSimFunStatusElement();
+  if (!el) return;
+  if (!simulationState || !slideGame?.classList.contains('active') || simPanel?.classList.contains('hidden')) {
+    el.innerHTML = '';
+    return;
+  }
+  if (!latestInsights) {
+    el.innerHTML = '<span class="fun-badge neutral">Market Mood: Waiting for first period</span>';
+    return;
+  }
+
+  const mood = getFunMood(latestInsights);
+  const streakTone = funProfitStreak >= 2 ? 'up hot' : funLossStreak >= 2 ? 'down' : 'neutral';
+  const streakLabel =
+    funProfitStreak >= 2
+      ? `Win Streak: ${funProfitStreak}`
+      : funLossStreak >= 2
+      ? `Recovery Needed: ${funLossStreak}`
+      : 'Streak: warming up';
+  const bestValue = Math.max(funBestPortfolioValue, Number(latestInsights?.portfolioValue || 0));
+  const bench = buildBenchmarkMarketContext(latestInsights);
+  const edge = bench ? Number(latestInsights.periodReturn || 0) - Number(bench.avg || 0) : null;
+  const edgeLabel =
+    Number.isFinite(edge) && edge !== null
+      ? edge > 1e-10
+        ? `Alpha: +${toPercent(Math.abs(edge))}`
+        : edge < -1e-10
+        ? `Alpha: -${toPercent(Math.abs(edge))}`
+        : 'Alpha: flat'
+      : 'Alpha: n/a';
+  const edgeTone = Number.isFinite(edge) && edge !== null ? (edge > 1e-10 ? 'up' : edge < -1e-10 ? 'down' : 'neutral') : 'neutral';
+
+  el.innerHTML = `
+    <span class="fun-badge ${mood.tone}">${mood.text}</span>
+    <span class="fun-badge ${streakTone}">${streakLabel}</span>
+    <span class="fun-badge neutral">High Score: ${toCurrency(bestValue)}</span>
+    <span class="fun-badge ${edgeTone}">${edgeLabel}</span>
+  `;
+}
+
+function updateFunProgress(insights) {
+  if (!insights) {
+    renderFunStatus();
+    return;
+  }
+
+  const insightDate = String(insights.date || '');
+  if (insightDate && insightDate === funLastInsightDate) {
+    renderFunStatus();
+    return;
+  }
+  if (insightDate) funLastInsightDate = insightDate;
+
+  const periodReturn = Number(insights.periodReturn || 0);
+  if (periodReturn > 0.0005) {
+    funProfitStreak += 1;
+    funLossStreak = 0;
+  } else if (periodReturn < -0.0005) {
+    funLossStreak += 1;
+    funProfitStreak = 0;
+  } else {
+    funProfitStreak = 0;
+    funLossStreak = 0;
+  }
+
+  const value = Number(insights.portfolioValue || 0);
+  if (value > funBestPortfolioValue + 0.01) {
+    funBestPortfolioValue = value;
+    if (value > 0 && !funMilestonesShown.has(`high:${insightDate}`)) {
+      showToast(`New high score: ${toCurrency(value)}`, 'info');
+      funMilestonesShown.add(`high:${insightDate}`);
+    }
+  }
+
+  if (funProfitStreak === 3 && !funMilestonesShown.has(`win3:${insightDate}`)) {
+    showToast('3-period win streak. Momentum is with you.', 'info');
+    funMilestonesShown.add(`win3:${insightDate}`);
+  }
+  if (funProfitStreak === 5 && !funMilestonesShown.has(`win5:${insightDate}`)) {
+    showToast('5-period streak. You are in the zone.', 'info');
+    funMilestonesShown.add(`win5:${insightDate}`);
+  }
+  if (funLossStreak === 3 && !funMilestonesShown.has(`loss3:${insightDate}`)) {
+    showToast('3 down periods in a row. Time to rebalance strategy.', 'error');
+    funMilestonesShown.add(`loss3:${insightDate}`);
+  }
+
+  renderFunStatus();
 }
 
 function hideShareMenu() {
@@ -807,9 +944,27 @@ function updateFloatingActionDockState() {
 
   if (!shouldShow) {
     simFloatingActions.classList.remove('docked');
+    simFloatingActions.classList.remove('scroll-hidden');
     floatingActionsDocked = false;
+    floatingActionsHiddenByScroll = false;
+    floatingActionsLastScrollY = Math.max(0, window.scrollY || window.pageYOffset || 0);
     if (simFloatingActions.parentElement !== document.body) document.body.appendChild(simFloatingActions);
     return;
+  }
+
+  const isMobileViewport = window.matchMedia && window.matchMedia('(max-width: 768px)').matches;
+  if (isMobileViewport) {
+    const nextScrollY = Math.max(0, window.scrollY || window.pageYOffset || 0);
+    const deltaY = nextScrollY - floatingActionsLastScrollY;
+    const directionThreshold = 10;
+    if (nextScrollY < 20 || deltaY < -directionThreshold) floatingActionsHiddenByScroll = false;
+    else if (deltaY > directionThreshold) floatingActionsHiddenByScroll = true;
+    floatingActionsLastScrollY = nextScrollY;
+    simFloatingActions.classList.toggle('scroll-hidden', floatingActionsHiddenByScroll);
+  } else {
+    floatingActionsHiddenByScroll = false;
+    floatingActionsLastScrollY = Math.max(0, window.scrollY || window.pageYOffset || 0);
+    simFloatingActions.classList.remove('scroll-hidden');
   }
 
   const anchor = simControlsSection;
@@ -2128,8 +2283,53 @@ function scrollToSimulationSection(key) {
     controls: simControlsSection
   };
   const el = map[key];
+  if (applySimulationMobileFocus(key, { fromNav: true })) return;
   if (!el) return;
   el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function isSimulationMobileViewport() {
+  return !!(window.matchMedia && window.matchMedia('(max-width: 768px)').matches);
+}
+
+function applySimulationMobileFocus(nextSection = mobileFocusSection, options = {}) {
+  const fromNav = !!options.fromNav;
+  const sections = {
+    snapshot: [periodPanel, simCommentary],
+    adjustment: [allocationRows, simAddUnder],
+    charts: [simChartsSection],
+    controls: [simControlsSection, simBottomActions]
+  };
+  const keys = Object.keys(sections);
+  const safeSection = keys.includes(String(nextSection || '')) ? String(nextSection) : 'snapshot';
+  mobileFocusSection = safeSection;
+  const hasFocusNav = !!simQuickNav?.querySelector('button[data-jump]');
+
+  const managed = [...new Set(keys.flatMap((k) => sections[k]).filter(Boolean))];
+  const modeEnabled =
+    hasFocusNav &&
+    isSimulationMobileViewport() &&
+    !!simulationState &&
+    !!slideGame?.classList.contains('active') &&
+    !simPanel?.classList.contains('hidden');
+
+  simPanel?.classList.toggle('sim-mobile-focus-mode', modeEnabled);
+  managed.forEach((el) => el.classList.remove('sim-mobile-focus-hidden'));
+  simQuickNav?.querySelectorAll('button[data-jump]').forEach((btn) => {
+    btn.classList.remove('mobile-focus-active');
+  });
+
+  if (!modeEnabled) return false;
+
+  const visibleSet = new Set(sections[safeSection] || []);
+  managed.forEach((el) => {
+    if (!visibleSet.has(el)) el.classList.add('sim-mobile-focus-hidden');
+  });
+  simQuickNav?.querySelectorAll('button[data-jump]').forEach((btn) => {
+    btn.classList.toggle('mobile-focus-active', String(btn.dataset.jump || '') === safeSection);
+  });
+  if (fromNav) window.scrollTo({ top: 0, behavior: 'smooth' });
+  return true;
 }
 
 function getInitialCashInput() {
@@ -2281,12 +2481,6 @@ function renderActionCashBar(cashAmount = 0, portfolioValue = 0) {
   const pct = total > 0 ? Math.max(0, Math.min(1, cash / total)) : 0;
   actionCashValue.textContent = `${toCurrency(cash)} (${(pct * 100).toFixed(2)}%)`;
   actionCashFill.style.width = `${(pct * 100).toFixed(2)}%`;
-}
-
-function renderActionTimeBar(percent = 0) {
-  if (!actionTimeFill) return;
-  const pct = Math.max(0, Math.min(100, Number(percent || 0)));
-  actionTimeFill.style.width = `${pct.toFixed(2)}%`;
 }
 
 function getRemainingTargetCash() {
@@ -2737,78 +2931,6 @@ function stopAutoPlay(silent = false) {
   if (!silent) printOutput({ message: 'Auto simulation paused.' });
 }
 
-function formatPeriodCountdown(ms) {
-  const totalSeconds = Math.max(0, Math.ceil(ms / 1000));
-  const mins = Math.floor(totalSeconds / 60);
-  const secs = totalSeconds % 60;
-  return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-}
-
-function renderPeriodDecisionTimer(msLeft, active = false) {
-  if (!periodDecisionTimer) return;
-  const text = active ? `Period timer: ${formatPeriodCountdown(msLeft)}` : 'Period timer: --:--';
-  periodDecisionTimer.textContent = text;
-  periodDecisionTimer.classList.toggle('critical', active && msLeft <= 15000);
-}
-
-function stopPeriodDecisionTimer(resetDisplay = true) {
-  if (periodDecisionTimerId) {
-    clearInterval(periodDecisionTimerId);
-    periodDecisionTimerId = null;
-  }
-  periodDecisionDeadlineMs = 0;
-  periodDecisionPeriodKey = '';
-  if (resetDisplay) renderPeriodDecisionTimer(0, false);
-}
-
-function getPeriodDecisionKey() {
-  if (!simulationState) return '';
-  return `${simulationState.simulationId || ''}:${simulationState.stepIndex || 0}:${simulationState.nextRebalanceDate || ''}`;
-}
-
-async function handlePeriodDecisionTimeout() {
-  if (periodDecisionAdvanceBusy || !simulationState || !hasRemainingSteps()) return;
-  periodDecisionAdvanceBusy = true;
-  try {
-    printOutput({ message: 'Decision time expired. Advancing to next period.' });
-    pushTimeflowEvent(`Decision time expired at step ${(simulationState.stepIndex || 0) + 1}. Advanced automatically.`);
-    await advanceSimulationPeriod(true);
-  } catch (error) {
-    printError(error.message);
-  } finally {
-    periodDecisionAdvanceBusy = false;
-  }
-}
-
-function tickPeriodDecisionTimer() {
-  if (!simulationState || !hasRemainingSteps()) {
-    stopPeriodDecisionTimer(true);
-    return;
-  }
-  const msLeft = Math.max(0, periodDecisionDeadlineMs - Date.now());
-  renderPeriodDecisionTimer(msLeft, true);
-  if (msLeft <= 0) {
-    stopPeriodDecisionTimer(false);
-    handlePeriodDecisionTimeout().catch(() => {});
-  }
-}
-
-function syncPeriodDecisionTimer() {
-  if (!simulationState || !hasRemainingSteps()) {
-    stopPeriodDecisionTimer(true);
-    return;
-  }
-  const nextKey = getPeriodDecisionKey();
-  if (periodDecisionPeriodKey !== nextKey || periodDecisionDeadlineMs <= 0) {
-    periodDecisionPeriodKey = nextKey;
-    periodDecisionDeadlineMs = Date.now() + PERIOD_DECISION_LIMIT_MS;
-  }
-  if (!periodDecisionTimerId) {
-    periodDecisionTimerId = setInterval(tickPeriodDecisionTimer, 250);
-  }
-  tickPeriodDecisionTimer();
-}
-
 function hasReachedEndDate() {
   if (!simulationState) return false;
   const total = Math.max(1, Number(simulationState.totalSteps || 1));
@@ -2822,6 +2944,14 @@ function hasRemainingSteps() {
   const total = Math.max(1, Number(simulationState.totalSteps || 1));
   const completed = Math.max(0, Number(simulationState.stepIndex || 0));
   return !!simulationState.nextRebalanceDate && completed < total;
+}
+
+function extractStepSnapshot(payload) {
+  const data = payload && typeof payload === 'object' ? payload : {};
+  return {
+    preview: data.nextPreview || data.preview || null,
+    insights: data.nextPreviewInsights || data.previewInsights || null
+  };
 }
 
 async function advanceSimulationPeriod(fromAuto = false) {
@@ -2853,14 +2983,15 @@ async function advanceSimulationPeriod(fromAuto = false) {
       populateTradeSymbols();
     }
     simulationState.nextRebalanceDate = result.nextRebalanceDate;
-    if (result.nextPreview) applyPreview(result.nextPreview);
-    renderPeriodInsights(result.nextPreviewInsights || null);
+    const stepSnapshot = extractStepSnapshot(result);
+    if (stepSnapshot.preview) applyPreview(stepSnapshot.preview);
+    renderPeriodInsights(stepSnapshot.insights);
     resetRowTargetsToCurrentHoldings();
     updateBudgetPreview();
-    simulationState.stepIndex = result.stepIndex;
-    simulationState.totalSteps = result.totalSteps;
+    if (Number.isFinite(Number(result.stepIndex))) simulationState.stepIndex = Number(result.stepIndex);
+    if (Number.isFinite(Number(result.totalSteps))) simulationState.totalSteps = Number(result.totalSteps);
     updateSimPanel();
-    await updateTimeflowComparisonChart();
+    await refreshSimulationState({ skipInsights: true });
     const hop = simulationState.frequency === 'daily' ? '1 day' : simulationState.frequency === 'weekly' ? '1 week' : '1 month';
     pushTimeflowEvent(`Advanced ${hop} to ${result.nextRebalanceDate || simulationState.endDate}.`);
 
@@ -2937,6 +3068,12 @@ function escapeHtml(raw) {
     .replace(/'/g, '&#39;');
 }
 
+function safeExternalUrl(raw) {
+  const url = String(raw || '').trim();
+  if (!url) return '';
+  return /^https?:\/\//i.test(url) ? url : '';
+}
+
 function normalizeToken(token) {
   return String(token || '').trim().toUpperCase();
 }
@@ -3007,9 +3144,11 @@ function renderBriefingSearchResults(result) {
     ? news
         .map((h) => {
           const meta = [h.publisher, h.date].filter(Boolean).join(' | ');
-          return `<div class="briefing-search-item news"><span>${escapeHtml(h.title || '')}</span>${
-            meta ? `<small>${escapeHtml(meta)}</small>` : ''
-          }</div>`;
+          const url = safeExternalUrl(h.url);
+          const titleHtml = url
+            ? `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(h.title || '')}</a>`
+            : `<span>${escapeHtml(h.title || '')}</span>`;
+          return `<div class="briefing-search-item news">${titleHtml}${meta ? `<small>${escapeHtml(meta)}</small>` : ''}</div>`;
         })
         .join('')
     : '<div class="briefing-search-item">No matching headlines were returned for this period.</div>';
@@ -3510,6 +3649,61 @@ async function requireAssetDropdownSelection(rawInput, type) {
   return fetched.find((x) => String(x?.symbol || '').toUpperCase() === norm) || null;
 }
 
+async function pickAssetSearchCandidate(rawInput, type) {
+  const raw = String(rawInput || '').trim();
+  if (!raw) return null;
+  const norm = raw.toUpperCase();
+  const localExact = assetSearchResults.find((x) => String(x?.symbol || '').toUpperCase() === norm);
+  if (localExact) return localExact;
+  const fetched = await searchSymbolOptions(raw, type || 'stock');
+  if (!Array.isArray(fetched) || !fetched.length) return null;
+  return fetched.find((x) => String(x?.symbol || '').toUpperCase() === norm) || fetched[0];
+}
+
+function hideSimAddSearchDropdown() {
+  simAddSearchDropdown?.classList.add('hidden');
+  simAddSearchResults = [];
+  simAddSearchIndex = -1;
+}
+
+function applySimAddSearchSelection(option) {
+  if (!option) return;
+  if (simAddSymbol) simAddSymbol.value = option.symbol || '';
+  simAddSelectedSymbol = String(option.symbol || '').trim().toUpperCase();
+  hideSimAddSearchDropdown();
+}
+
+async function pickSimAddSearchCandidate(rawInput, type) {
+  const raw = String(rawInput || '').trim();
+  if (!raw) return null;
+  const norm = raw.toUpperCase();
+  const local = simAddSearchResults.find((x) => String(x?.symbol || '').toUpperCase() === norm);
+  if (local) return local;
+  const fetched = await searchSymbolOptions(raw, type || 'stock');
+  if (!Array.isArray(fetched) || !fetched.length) return null;
+  return fetched.find((x) => String(x?.symbol || '').toUpperCase() === norm) || fetched[0];
+}
+
+function renderSimAddSearchDropdown() {
+  if (!simAddSearchDropdown) return;
+  if (!simAddSearchResults.length) {
+    hideSimAddSearchDropdown();
+    return;
+  }
+
+  simAddSearchDropdown.classList.remove('hidden');
+  simAddSearchDropdown.innerHTML = simAddSearchResults
+    .map((opt, i) => {
+      const name = opt.longname || opt.shortname || opt.symbol;
+      const sub = [opt.symbol, opt.exchange, opt.quoteType].filter(Boolean).join(' | ');
+      return `<button type="button" class="search-option ${i === simAddSearchIndex ? 'active' : ''}" data-sim-add-search-index="${i}">
+        <div class="search-option-title">${escapeHtml(name)}</div>
+        <div class="search-option-sub">${escapeHtml(sub)}</div>
+      </button>`;
+    })
+    .join('');
+}
+
 function renderAssetSearchDropdown() {
   if (!assetSearchDropdown) return;
   if (!assetSearchResults.length) {
@@ -3521,10 +3715,10 @@ function renderAssetSearchDropdown() {
   assetSearchDropdown.innerHTML = assetSearchResults
     .map((opt, i) => {
       const name = opt.longname || opt.shortname || opt.symbol;
-      const sub = [opt.symbol, opt.exchange, opt.quoteType].filter(Boolean).join(' ? ');
+      const sub = [opt.symbol, opt.exchange, opt.quoteType].filter(Boolean).join(' | ');
       return `<button type="button" class="search-option ${i === assetSearchIndex ? 'active' : ''}" data-search-index="${i}">
-        <div class="search-option-title">${name}</div>
-        <div class="search-option-sub">${sub}</div>
+        <div class="search-option-title">${escapeHtml(name)}</div>
+        <div class="search-option-sub">${escapeHtml(sub)}</div>
       </button>`;
     })
     .join('');
@@ -3947,8 +4141,10 @@ async function buildAiCombinationSelection() {
     }
   }));
 
-  const available = checked.filter(Boolean);
-  if (!available.length) return [];
+  let available = checked.filter(Boolean);
+  if (!available.length) {
+    available = pool.map((item) => ({ symbol: item.symbol, weight: Number(item.weight || 0), price: 0 }));
+  }
 
   const preferredOrder = pool.map((p) => p.symbol);
   available.sort((a, b) => preferredOrder.indexOf(a.symbol) - preferredOrder.indexOf(b.symbol));
@@ -3975,7 +4171,7 @@ async function applySetupAiCombination() {
   }
 
   selectedAssets = picks.map((p) => p.symbol);
-  setupPrices = Object.fromEntries(picks.map((p) => [p.symbol, p.price]));
+  setupPrices = Object.fromEntries(picks.filter((p) => Number(p.price) > 0).map((p) => [p.symbol, p.price]));
   setupAllocations = {};
   const allocation = allocateByWeightsInCents(picks.map((p) => ({ symbol: p.symbol, weight: p.weight })), cash);
   picks.forEach((p) => {
@@ -4000,14 +4196,14 @@ function getHoldingForSymbol(symbol) {
   const price = Number.isFinite(replayPrice) && replayPrice > 0 ? replayPrice : Number.isFinite(insightPrice) ? insightPrice : 0;
 
   const value = qty * price;
-  const stateCostBasis = Number(simulationState?.costBasis?.[symbol]);
+  const stateAvgCostBasis = Number(simulationState?.costBasis?.[symbol]);
   const insightAvg = Number(fromInsights?.avgBuyPrice);
-  const costBasis = Number.isFinite(stateCostBasis)
-    ? Math.max(0, stateCostBasis)
-    : Number.isFinite(insightAvg)
-    ? Math.max(0, insightAvg * qty)
+  const avgBuyPrice = Number.isFinite(stateAvgCostBasis) && stateAvgCostBasis > 0
+    ? stateAvgCostBasis
+    : Number.isFinite(insightAvg) && insightAvg > 0
+    ? insightAvg
     : 0;
-  const avgBuyPrice = qty > 0 ? costBasis / qty : 0;
+  const costBasis = qty > 0 ? avgBuyPrice * qty : 0;
 
   const stateFirstBuy = Number(simulationState?.firstBuyPrice?.[symbol]);
   const insightFirstBuy = Number(fromInsights?.firstBuyPrice);
@@ -4063,12 +4259,12 @@ function getRowProfitValue(symbol) {
   const holding = getHoldingForSymbol(symbol) || {};
   const qty = Number(holding.quantity || 0);
   const currentValue = Number(holding.value || 0);
-  const stateBasis = Number(simulationState?.costBasis?.[symbol]);
+  const stateAvgBasis = Number(simulationState?.costBasis?.[symbol]);
   const avgBuy = Number(holding.avgBuyPrice || 0);
   const firstBuy = Number(holding.firstBuyPrice || 0);
   const fallbackBasisPerUnit = avgBuy > 0 ? avgBuy : firstBuy > 0 ? firstBuy : 0;
   const fallbackBasis = Math.max(0, fallbackBasisPerUnit * qty);
-  const basis = Number.isFinite(stateBasis) && stateBasis > 0 ? Math.max(0, stateBasis) : fallbackBasis;
+  const basis = Number.isFinite(stateAvgBasis) && stateAvgBasis > 0 ? Math.max(0, stateAvgBasis * qty) : fallbackBasis;
   const realized = Number(simulationState?.realizedProfit?.[symbol] || 0);
   return currentValue - basis + realized;
 }
@@ -4492,10 +4688,10 @@ function updateBudgetPreview() {
       const holding = getHoldingForSymbol(symbol) || {};
       const avgBuy = Number(holding.avgBuyPrice || 0);
       const firstBuy = Number(holding.firstBuyPrice || 0);
-      const stateBasis = Number(simulationState?.costBasis?.[symbol]);
+      const stateAvgBasis = Number(simulationState?.costBasis?.[symbol]);
       const fallbackBasisPerUnit = avgBuy > 0 ? avgBuy : firstBuy > 0 ? firstBuy : 0;
       const fallbackBasis = Math.max(0, fallbackBasisPerUnit * holdingQty);
-      const costBasis = Number.isFinite(stateBasis) && stateBasis > 0 ? Math.max(0, stateBasis) : fallbackBasis;
+      const costBasis = Number.isFinite(stateAvgBasis) && stateAvgBasis > 0 ? Math.max(0, stateAvgBasis * holdingQty) : fallbackBasis;
       const profit = currentHolding - costBasis;
       const profitPct = costBasis > 0 ? profit / costBasis : 0;
       const cls = profit > 0.01 ? 'up' : profit < -0.01 ? 'down' : 'flat';
@@ -4526,14 +4722,17 @@ function updateBudgetPreview() {
 
   const usedRounded = roundCurrency(used);
   const currentPortfolioRounded = roundCurrency(currentInvested);
-  const pct = currentPortfolioRounded > 0 ? usedRounded / currentPortfolioRounded : 0;
+  const portfolioTotalRounded = roundCurrency(total);
+  const pctBase = portfolioTotalRounded > 0 ? portfolioTotalRounded : currentPortfolioRounded;
+  const pct = pctBase > 0 ? usedRounded / pctBase : 0;
   const tolerance = getBudgetTolerance();
-  const isOver = usedRounded > currentPortfolioRounded + tolerance;
-  budgetSummary.textContent = `Allocated Value: ${toCurrency(usedRounded)} / ${toCurrency(currentPortfolioRounded)} (${toPercent(pct)})`;
+  const budgetBase = portfolioTotalRounded > 0 ? portfolioTotalRounded : currentPortfolioRounded;
+  const isOver = usedRounded > budgetBase + tolerance;
+  budgetSummary.textContent = `Allocated Value: ${toCurrency(usedRounded)} / ${toCurrency(budgetBase)} (${toPercent(pct)})`;
   if (isOver) {
-    budgetHint.textContent = `Over budget by ${toCurrency(usedRounded - currentPortfolioRounded)}. Use Sell/Clear controls before advancing.`;
+    budgetHint.textContent = `Over budget by ${toCurrency(usedRounded - budgetBase)}. Use Sell/Clear controls before advancing.`;
   } else {
-    budgetHint.textContent = `Remaining cash plan: ${toCurrency(Math.max(currentPortfolioRounded - usedRounded, 0))}`;
+    budgetHint.textContent = `Remaining cash plan: ${toCurrency(Math.max(budgetBase - usedRounded, 0))}`;
   }
   renderCashFloat(Math.max(total - used, 0), total);
   if (!latestInsights) renderActionCashBar(simulationState?.cash || 0, previewState.portfolioValue || 0);
@@ -4582,6 +4781,7 @@ function renderPeriodInsights(insights) {
     renderCashFloat(simulationState?.cash || 0, previewState.portfolioValue || 0);
     renderActionCashBar(simulationState?.cash || 0, previewState.portfolioValue || 0);
     updateOverallPnLGlow();
+    renderFunStatus();
     return;
   }
 
@@ -4717,11 +4917,10 @@ function renderPeriodInsights(insights) {
 
   const toChangeMeta = (current, previous, epsilon = 1e-9) => {
     if (!Number.isFinite(previous)) return null;
+    if (Math.abs(previous || 0) <= epsilon) return null;
     const diff = Number(current || 0) - Number(previous || 0);
     const cls = diff > epsilon ? 'up' : diff < -epsilon ? 'down' : 'flat';
-    let pct = 0;
-    if (Math.abs(previous || 0) > epsilon) pct = diff / Math.abs(previous);
-    else if (Math.abs(current || 0) > epsilon) pct = Math.sign(diff || current);
+    const pct = diff / Math.abs(previous);
     return { cls, pct };
   };
   const renderChange = (current, previous, epsilon = 1e-9) => {
@@ -4767,9 +4966,11 @@ function renderPeriodInsights(insights) {
     .join('');
 
   holdingsTable.innerHTML = `<div class="holdings-table"><div class="holdings-head"><div>Asset</div><div>Price</div><div>Average Bought Price</div><div>Qty</div><div>Value</div><div>Profit</div><div>Weight</div></div>${rows || '<div class="holdings-row"><div>No positions</div><div>-</div><div>-</div><div>-</div><div>-</div><div>-</div><div>-</div></div>'}</div>`;
+  updateFunProgress(latestInsights);
   buildMovementCommentary(insights, prevInsights);
   enrichCommentaryWithMarketIntel(insights).catch(() => {});
   // Repaint per-row profit/metrics using the just-updated latestInsights snapshot.
+  syncAllocationRowsWithAssets(simulationState?.assets || []);
   updateBudgetPreview();
   filterAllocationRows();
   renderCashFloat(insights.cash || 0, insights.portfolioValue || previewState.portfolioValue || 0);
@@ -4967,7 +5168,6 @@ function renderTimeflow() {
     if (timeflowEvents) timeflowEvents.textContent = '';
     if (timeflowLegend) timeflowLegend.innerHTML = '';
     drawCompactTimeflowChart(timeflowChart, []);
-    renderActionTimeBar(0);
     return;
   }
 
@@ -4985,7 +5185,6 @@ function renderTimeflow() {
     if (floatingTimePercent) floatingTimePercent.textContent = `${pct.toFixed(2)}%`;
     if (floatingTimeFill) floatingTimeFill.style.width = `${pct}%`;
     if (floatingTimeTicks) floatingTimeTicks.innerHTML = `<span>Start: ${start}</span><span>Current: ${now}</span><span>End: ${end}</span>`;
-    renderActionTimeBar(pct);
     if (timeflowTicks) timeflowTicks.innerHTML = `<span>Start: ${start}</span><span>Current: ${now}</span><span>End: ${end}</span>`;
     if (timeflowEvents) timeflowEvents.textContent = '';
     return;
@@ -4993,18 +5192,20 @@ function renderTimeflow() {
 
   const total = Math.max(1, Number(simulationState.totalSteps || 1));
   const completed = Math.max(0, Number(simulationState.stepIndex || 0));
-  const ended = !hasRemainingSteps() || completed >= total;
-  const shownCompleted = ended ? total : Math.min(completed, total);
-  const pct = Math.max(0, Math.min(100, (shownCompleted / total) * 100));
+  // Exclude the initial seed rebalance step from visible progress.
+  const progressTotal = Math.max(1, total - 1);
+  const progressCompleted = completed <= 1 ? 0 : Math.max(0, completed - 1);
+  const ended = (!hasRemainingSteps() || completed >= total) && progressCompleted > 0;
+  const shownCompleted = ended ? progressTotal : Math.min(progressCompleted, progressTotal);
+  const pct = Math.max(0, Math.min(100, (shownCompleted / progressTotal) * 100));
   const unit = simulationState.frequency === 'daily' ? 'days' : simulationState.frequency === 'weekly' ? 'weeks' : 'months';
 
-  if (timeflowLabel) timeflowLabel.textContent = `Time Progress: ${shownCompleted} / ${total} ${unit}`;
+  if (timeflowLabel) timeflowLabel.textContent = `Time Progress: ${shownCompleted} / ${progressTotal} ${unit}`;
   if (timeflowPercent) timeflowPercent.textContent = `${pct.toFixed(2)}%`;
   if (timeflowFill) timeflowFill.style.width = `${pct}%`;
-  if (floatingTimeLabel) floatingTimeLabel.textContent = `Time Progress: ${shownCompleted} / ${total} ${unit}`;
+  if (floatingTimeLabel) floatingTimeLabel.textContent = `Time Progress: ${shownCompleted} / ${progressTotal} ${unit}`;
   if (floatingTimePercent) floatingTimePercent.textContent = `${pct.toFixed(2)}%`;
   if (floatingTimeFill) floatingTimeFill.style.width = `${pct}%`;
-  renderActionTimeBar(pct);
 
   const currentDate = String(latestInsights?.date || previewState?.date || simulationState.startDate || '-');
   const start = simulationState.startDate || '-';
@@ -5015,16 +5216,34 @@ function renderTimeflow() {
   drawCompactTimeflowChart(timeflowChart, timeflowSeries);
 }
 
+function getAdjustableAssets(assets = []) {
+  const list = Array.isArray(assets) ? assets : [];
+  if (!list.length) return [];
+  if (!latestInsights || !simulationState) return list;
+  if (Number(simulationState.stepIndex || 0) <= 0) return list;
+
+  const bySymbol = Object.fromEntries((latestInsights.holdings || []).map((h) => [String(h.symbol || ''), h]));
+  return list.filter((asset) => {
+    const symbol = String(asset?.id || '');
+    if (!symbol) return false;
+    const insight = bySymbol[symbol] || null;
+    const qty = Number(insight?.quantity ?? simulationState?.holdings?.[symbol] ?? 0);
+    const value = Number(insight?.value ?? 0);
+    return value > 0.01 || qty > 1e-8;
+  });
+}
+
 function syncAllocationRowsWithAssets(assets = []) {
-  const desired = (assets || []).map((a) => a.id).sort();
+  const desiredAssets = getAdjustableAssets(assets || []);
+  const desired = desiredAssets.map((a) => a.id).sort();
   const current = [...allocationRows.querySelectorAll('.alloc-row')].map((r) => r.dataset.symbol).sort();
   if (desired.length !== current.length) {
-    renderAllocationRows(assets || []);
+    renderAllocationRows(desiredAssets);
     return;
   }
   for (let i = 0; i < desired.length; i += 1) {
     if (desired[i] !== current[i]) {
-      renderAllocationRows(assets || []);
+      renderAllocationRows(desiredAssets);
       return;
     }
   }
@@ -5057,7 +5276,8 @@ function updateSimPanel() {
     renderCashFloat(0, 0);
     renderActionCashBar(0, 0);
     if (investorTypeBtn) investorTypeBtn.disabled = true;
-    stopPeriodDecisionTimer(true);
+    renderFunStatus();
+    applySimulationMobileFocus(mobileFocusSection);
     return;
   }
 
@@ -5080,7 +5300,6 @@ function updateSimPanel() {
     if (autoPlayBtn) autoPlayBtn.disabled = false;
     if (replayToggleBtn) replayToggleBtn.disabled = false;
     if (executeTradeBtn) executeTradeBtn.disabled = false;
-    syncPeriodDecisionTimer();
   } else {
     simNextDate.textContent = finishedByDate
       ? `Simulation reached end date (${simulationState.endDate}). You can view results.`
@@ -5093,13 +5312,14 @@ function updateSimPanel() {
     if (replayToggleBtn) replayToggleBtn.disabled = false;
     if (executeTradeBtn) executeTradeBtn.disabled = true;
     stopAutoPlay(true);
-    stopPeriodDecisionTimer(true);
   }
 
   renderTimeflow();
   renderCashFloat(simulationState.cash || latestInsights?.cash || 0, previewState.portfolioValue || 0);
   renderActionCashBar(simulationState.cash || latestInsights?.cash || 0, previewState.portfolioValue || 0);
   updateOverallPnLGlow();
+  renderFunStatus();
+  applySimulationMobileFocus(mobileFocusSection);
   if (investorTypeBtn) investorTypeBtn.disabled = hasRemainingSteps() && !latestFinalResult;
 }
 
@@ -5265,6 +5485,44 @@ function renderProjectionBenchmarkComparison(proj) {
       return `<div class="benchmark-row"><div><span class="benchmark-badge">${escapeHtml(b.symbol)}</span><small class="benchmark-caption">Projected Benchmark</small></div><div class="benchmark-return">${escapeHtml(status)}</div><div class="benchmark-edge ${cls}">${escapeHtml(diff)}</div></div>`;
     })
     .join('');
+}
+
+function renderResultChartsNow() {
+  if (!latestResultChartSnapshot) return;
+  const timeline = Array.isArray(latestResultChartSnapshot.timeline) ? latestResultChartSnapshot.timeline : [];
+  const benchmarkSeries = Array.isArray(latestResultChartSnapshot.benchmarkSeries) ? latestResultChartSnapshot.benchmarkSeries : [];
+  const weights = latestResultChartSnapshot.weights && typeof latestResultChartSnapshot.weights === 'object' ? latestResultChartSnapshot.weights : {};
+  const amountMap = latestResultChartSnapshot.amountMap && typeof latestResultChartSnapshot.amountMap === 'object' ? latestResultChartSnapshot.amountMap : {};
+  const totalValue = Number(latestResultChartSnapshot.totalValue || 0);
+
+  drawComparisonChart(
+    equityChart,
+    timeline,
+    benchmarkSeries.map((b) => ({ symbol: b.symbol, points: b.points || [] })),
+    equityLegend,
+    { interactive: true }
+  );
+
+  drawDonutChart(allocationChart, weights, getAssetLabelMap(), {
+    amountMap,
+    totalValue,
+    centerTop: 'Final Mix',
+    centerBottom: `${Object.keys(weights).filter((k) => Number(weights[k] || 0) > 0.0001).length} assets`
+  });
+}
+
+function scheduleResultChartsRender() {
+  if (!latestResultChartSnapshot) return;
+  if (!slideResult?.classList.contains('active')) return;
+
+  if (resultChartsRenderRaf != null) cancelAnimationFrame(resultChartsRenderRaf);
+  resultChartsRenderRaf = requestAnimationFrame(() => {
+    resultChartsRenderRaf = requestAnimationFrame(() => {
+      resultChartsRenderRaf = null;
+      if (!slideResult?.classList.contains('active')) return;
+      renderResultChartsNow();
+    });
+  });
 }
 
 async function ensureFinalResult() {
@@ -5999,14 +6257,19 @@ addAssetBtn?.addEventListener('click', async () => {
 
     const raw = String(assetSymbol?.value || '').trim();
     if (!raw) throw new Error('Type an investment name or ticker.');
-    const selected = await requireAssetDropdownSelection(raw, 'stock');
-    if (!selected || String(selected.symbol || '').toUpperCase() !== String(assetSelectedSymbol || '').toUpperCase()) {
-      throw new Error('Select an investment from the dropdown list.');
+    let selected = null;
+    if (assetSelectedSymbol) {
+      selected = await requireAssetDropdownSelection(assetSelectedSymbol, 'stock');
+    } else {
+      selected = await pickAssetSearchCandidate(raw, 'stock');
     }
-    let token = normalizeToken(raw);
+    if (!selected?.symbol) throw new Error('No matching investment found. Try a ticker or choose from dropdown.');
+    const resolvedInput = String(selected.symbol || '').trim().toUpperCase();
+    assetSelectedSymbol = resolvedInput;
+    let token = normalizeToken(resolvedInput);
     let matchInfo = null;
     if (!['CASH', 'SAVINGS'].includes(token) && !token.startsWith('BOND:') && !token.startsWith('LEVERAGE:') && !token.startsWith('CALL:')) {
-      const built = await buildAssetTokenFromInputs('stock', raw, null);
+      const built = await buildAssetTokenFromInputs('stock', resolvedInput, null);
       token = built.token;
       matchInfo = built.matchInfo;
     }
@@ -6024,12 +6287,71 @@ addAssetBtn?.addEventListener('click', async () => {
   }
 });
 
-simAddType?.addEventListener('change', updateSimAddControls);
+simAddType?.addEventListener('change', () => {
+  updateSimAddControls();
+  simAddSelectedSymbol = '';
+  hideSimAddSearchDropdown();
+});
 simAddSymbol?.addEventListener('keydown', (e) => {
+  if (simAddSearchResults.length) {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      simAddSearchIndex = Math.min(simAddSearchResults.length - 1, simAddSearchIndex + 1);
+      renderSimAddSearchDropdown();
+      return;
+    }
+    if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      simAddSearchIndex = Math.max(0, simAddSearchIndex - 1);
+      renderSimAddSearchDropdown();
+      return;
+    }
+    if (e.key === 'Enter' && simAddSearchIndex >= 0 && simAddSearchIndex < simAddSearchResults.length) {
+      e.preventDefault();
+      applySimAddSearchSelection(simAddSearchResults[simAddSearchIndex]);
+      return;
+    }
+    if (e.key === 'Escape') {
+      hideSimAddSearchDropdown();
+      return;
+    }
+  }
   if (e.key === 'Enter') {
     e.preventDefault();
     simAddAssetBtn?.click();
   }
+});
+simAddSymbol?.addEventListener('input', () => {
+  simAddSelectedSymbol = '';
+  const type = String(simAddType?.value || 'stock');
+  if (type === 'cash' || type === 'savings') {
+    hideSimAddSearchDropdown();
+    return;
+  }
+  const q = String(simAddSymbol?.value || '').trim();
+  if (simAddSearchTimer) clearTimeout(simAddSearchTimer);
+  if (!q || q.length < 2) {
+    hideSimAddSearchDropdown();
+    return;
+  }
+  simAddSearchTimer = setTimeout(async () => {
+    try {
+      simAddSearchResults = await searchSymbolOptions(q, type === 'stock' ? 'stock' : type);
+      simAddSearchIndex = simAddSearchResults.length ? 0 : -1;
+      renderSimAddSearchDropdown();
+    } catch (_error) {
+      hideSimAddSearchDropdown();
+    }
+  }, 220);
+});
+simAddSymbol?.addEventListener('blur', () => {
+  setTimeout(() => hideSimAddSearchDropdown(), 140);
+});
+simAddSearchDropdown?.addEventListener('mousedown', (e) => {
+  const btn = e.target.closest('button[data-sim-add-search-index]');
+  if (!btn) return;
+  const idx = Number(btn.dataset.simAddSearchIndex);
+  if (Number.isFinite(idx)) applySimAddSearchSelection(simAddSearchResults[idx]);
 });
 simAddAssetBtn?.addEventListener('click', async () => {
   if (!simulationState?.simulationId) return printError('Start simulation first.');
@@ -6037,13 +6359,27 @@ simAddAssetBtn?.addEventListener('click', async () => {
     simAddAssetBtn.disabled = true;
     simAddAssetBtn.textContent = 'Adding...';
 
-    const built = await buildAssetTokenFromInputs(simAddType.value, simAddSymbol?.value, simAddMultiplier?.value);
+    const currentType = String(simAddType?.value || 'stock');
+    let resolvedInput = String(simAddSymbol?.value || '').trim();
+    if (currentType !== 'cash' && currentType !== 'savings') {
+      if (!resolvedInput) throw new Error('Type an investment name or ticker.');
+      const candidate = await pickSimAddSearchCandidate(resolvedInput, currentType);
+      if (candidate?.symbol) {
+        resolvedInput = String(candidate.symbol || resolvedInput).trim();
+        simAddSelectedSymbol = String(candidate.symbol || '').trim().toUpperCase();
+        if (simAddSymbol) simAddSymbol.value = resolvedInput;
+      }
+    }
+
+    const built = await buildAssetTokenFromInputs(currentType, resolvedInput, simAddMultiplier?.value);
     const token = built.token;
     const result = await apiPost(`/api/simulations/${simulationState.simulationId}/assets`, { token });
     if (result.preview) applyPreview(result.preview);
     if (result.previewInsights) renderPeriodInsights(result.previewInsights);
     await refreshSimulationState({ skipInsights: true });
     if (simAddSymbol) simAddSymbol.value = '';
+    simAddSelectedSymbol = '';
+    hideSimAddSearchDropdown();
     printOutput({ message: `Added ${tokenToLabel(token)} to current simulation.` });
   } catch (error) {
     printError(error.message);
@@ -6201,6 +6537,7 @@ simStartForm?.addEventListener('submit', async (e) => {
     };
 
     simulationState = await apiPost('/api/simulations/start', payload);
+    resetFunLayer();
     latestFinalResult = null;
     closedHoldingsCache = {};
     selectedBenchmarks = [...(simulationState.benchmarkSymbols || selectedBenchmarks)];
@@ -6220,7 +6557,7 @@ simStartForm?.addEventListener('submit', async (e) => {
     applyPreview(simulationState.preview || null);
     const hasSetup = applySetupAllocationToGameRows();
     if (!hasSetup) applyRandomStartingAllocation();
-    renderPeriodInsights(simulationState.previewInsights || null);
+    // Do not lock deltas to a pre-allocation zero-holdings snapshot.
     updateBudgetPreview();
     const initialTargets = collectTargets(true);
     const seeded = await postRebalanceWithBudgetGuard(simulationState.simulationId, initialTargets);
@@ -6228,8 +6565,12 @@ simStartForm?.addEventListener('submit', async (e) => {
     simulationState.nextRebalanceDate = seeded.nextRebalanceDate;
     simulationState.stepIndex = seeded.stepIndex;
     simulationState.totalSteps = seeded.totalSteps;
-    if (seeded.nextPreview) applyPreview(seeded.nextPreview);
-    renderPeriodInsights(seeded.nextPreviewInsights || null);
+    const seededSnapshot = extractStepSnapshot(seeded);
+    if (seededSnapshot.preview) applyPreview(seededSnapshot.preview);
+    if (seeded?.executedPreviewInsights) {
+      latestInsights = seeded.executedPreviewInsights;
+    }
+    renderPeriodInsights(seededSnapshot.insights);
     // After initial buy-in, default plan should track current holdings.
     // This prevents forced sells when market value drops below setup dollars.
     resetRowTargetsToCurrentHoldings();
@@ -6278,8 +6619,9 @@ executeTradeBtn?.addEventListener('click', async () => {
       syncAllocationRowsWithAssets(result.assets);
       populateTradeSymbols();
     }
-    if (result.nextPreview) applyPreview(result.nextPreview);
-    renderPeriodInsights(result.nextPreviewInsights || null);
+    const tradeSnapshot = extractStepSnapshot(result);
+    if (tradeSnapshot.preview) applyPreview(tradeSnapshot.preview);
+    renderPeriodInsights(tradeSnapshot.insights);
     updateSimPanel();
     await updateTimeflowComparisonChart();
 
@@ -6390,30 +6732,29 @@ finishBtn?.addEventListener('click', async () => {
       const finalResult = await ensureFinalResult();
       renderResultCards(finalResult);
       renderBenchmarkComparison(finalResult);
-      drawComparisonChart(
-        equityChart,
-        finalResult.timeline || [],
-        (finalResult.benchmarkSeries || []).map((b) => ({ symbol: b.symbol, points: b.points || [] })),
-        equityLegend,
-        { interactive: true }
-      );
-      drawDonutChart(allocationChart, finalResult.finalWeights || {}, getAssetLabelMap());
+      latestResultChartSnapshot = {
+        timeline: finalResult.timeline || [],
+        benchmarkSeries: finalResult.benchmarkSeries || [],
+        weights: finalResult.finalWeights || {},
+        amountMap: finalResult.finalAmounts || {},
+        totalValue: Number(finalResult.finalValue || 0)
+      };
       if (investorTypeBtn) investorTypeBtn.disabled = false;
     } else {
       latestFinalResult = null;
       renderProjectionCards(projection);
       renderProjectionBenchmarkComparison(projection);
-      drawComparisonChart(
-        equityChart,
-        projection.projectedTimeline || [],
-        (projection.benchmarkProjection || []).map((b) => ({ symbol: b.symbol, points: b.series || [] })),
-        equityLegend,
-        { interactive: true }
-      );
-      drawDonutChart(allocationChart, {}, getAssetLabelMap());
+      latestResultChartSnapshot = {
+        timeline: projection.projectedTimeline || [],
+        benchmarkSeries: (projection.benchmarkProjection || []).map((b) => ({ symbol: b.symbol, points: b.series || [] })),
+        weights: {},
+        amountMap: {},
+        totalValue: 0
+      };
       if (investorTypeBtn) investorTypeBtn.disabled = true;
     }
     showSlide('result');
+    scheduleResultChartsRender();
 
     printOutput({
       currentValue: toCurrency(projection.currentValue),
@@ -6628,6 +6969,8 @@ window.addEventListener('resize', () => {
   }
   renderAxis3dGraph();
   updateFloatingActionDockState();
+  applySimulationMobileFocus(mobileFocusSection);
+  if (slideResult?.classList.contains('active')) scheduleResultChartsRender();
 });
 window.addEventListener('scroll', updateFloatingActionDockState, { passive: true });
 backToGameBtn?.addEventListener('click', () => {
@@ -6652,9 +6995,11 @@ investorTypeBtn?.addEventListener('click', async () => {
     printError(error.message);
   }
 });
-newGameBtn?.addEventListener('click', () => {
+function resetSimulationToSetup() {
   simulationState = null;
   latestFinalResult = null;
+  latestResultChartSnapshot = null;
+  resetFunLayer();
   previewState = { portfolioValue: 0, prices: {}, date: null };
   latestInsights = null;
   closedHoldingsCache = {};
@@ -6677,7 +7022,6 @@ newGameBtn?.addEventListener('click', () => {
   stopReplay(true);
   setReplayStatus('Replay: paused');
   marketSearchReqSeq += 1;
-  stopPeriodDecisionTimer(true);
   clearBriefingSearchResults();
   setBriefingSearchStatus('Search any asset for period performance, earnings timing, and headlines at this simulation step.');
   simPanel.classList.add('hidden');
@@ -6708,9 +7052,13 @@ newGameBtn?.addEventListener('click', () => {
     {}
   );
   showSlide('setup');
+}
+
+newGameBtn?.addEventListener('click', () => {
+  resetSimulationToSetup();
 });
 newGameFromInvestorBtn?.addEventListener('click', () => {
-  newGameBtn?.click();
+  resetSimulationToSetup();
 });
 
 // quiz event wiring (only active on quiz page)
