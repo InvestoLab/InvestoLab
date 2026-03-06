@@ -1,24 +1,157 @@
-﻿{
-  "asOfDate": "2026-02-27",
-  "profile": "PASSIVE_RATIONAL_ALLOCATOR",
-  "sentiment": {
-    "news": 0.5,
-    "social": 0.5,
-    "confidence": 0.5
-  },
+{
+  "ok": true,
+  "asOfDate": "2026-03-05",
+  "type": "passive_rational_allocator",
+  "profile": "Passive Rational Allocator",
   "watchlist": [
-    "SPY",
-    "QQQ",
     "VTI",
-    "BND"
+    "VOO",
+    "VXUS",
+    "BND",
+    "SCHD",
+    "VNQ"
   ],
+  "sentiment": {
+    "news": 0.04411764705882353,
+    "social": 0.041666666666666664,
+    "confidence": 1
+  },
   "headlines": [
     {
-      "title": "Static tailored snapshot is active.",
+      "title": "Meet The ETF That Tracks Everything and Costs Almost Nothing",
+      "publisher": "Motley Fool",
+      "date": "2026-03-04",
       "symbol": "VTI",
-      "publisher": "InvestoLab",
-      "date": "2026-02-27"
+      "url": "https://news.google.com/search?q=VTI%20Meet%20The%20ETF%20That%20Tracks%20Everything%20and%20Costs%20Almost%20Nothing",
+      "link": "https://news.google.com/search?q=VTI%20Meet%20The%20ETF%20That%20Tracks%20Everything%20and%20Costs%20Almost%20Nothing"
+    },
+    {
+      "title": "We Told You So — These IBD 50 Stocks Dominate This Year",
+      "publisher": "Investor's Business Daily",
+      "date": "2026-03-04",
+      "symbol": "VOO",
+      "url": "https://news.google.com/search?q=VOO%20We%20Told%20You%20So%20%E2%80%94%20These%20IBD%2050%20Stocks%20Dominate%20This%20Year",
+      "link": "https://news.google.com/search?q=VOO%20We%20Told%20You%20So%20%E2%80%94%20These%20IBD%2050%20Stocks%20Dominate%20This%20Year"
+    },
+    {
+      "title": "ETFs Highlight Market Turmoil of Iran Conflict",
+      "publisher": "The Daily Upside",
+      "date": "2026-03-04",
+      "symbol": "VOO",
+      "url": "https://news.google.com/search?q=VOO%20ETFs%20Highlight%20Market%20Turmoil%20of%20Iran%20Conflict",
+      "link": "https://news.google.com/search?q=VOO%20ETFs%20Highlight%20Market%20Turmoil%20of%20Iran%20Conflict"
+    },
+    {
+      "title": "What This Top International ETF Is Buying Now",
+      "publisher": "Barrons.com",
+      "date": "2026-03-04",
+      "symbol": "VXUS",
+      "url": "https://news.google.com/search?q=VXUS%20What%20This%20Top%20International%20ETF%20Is%20Buying%20Now",
+      "link": "https://news.google.com/search?q=VXUS%20What%20This%20Top%20International%20ETF%20Is%20Buying%20Now"
+    },
+    {
+      "title": "Vanguard’s VTI ETF Turned $10,000 Into $38,000 Over the Last Decade — Can It Do It Again?",
+      "publisher": "24/7 Wall St.",
+      "date": "2026-03-03",
+      "symbol": "VTI",
+      "url": "https://news.google.com/search?q=VTI%20Vanguard%E2%80%99s%20VTI%20ETF%20Turned%20%2410%2C000%20Into%20%2438%2C000%20Over%20the%20Last%20Decade%20%E2%80%94%20Can%20It%20Do%20It%20Again%3F",
+      "link": "https://news.google.com/search?q=VTI%20Vanguard%E2%80%99s%20VTI%20ETF%20Turned%20%2410%2C000%20Into%20%2438%2C000%20Over%20the%20Last%20Decade%20%E2%80%94%20Can%20It%20Do%20It%20Again%3F"
+    },
+    {
+      "title": "Better S&P 500 ETF: State Street's SPY vs. Vanguard's VOO",
+      "publisher": "Motley Fool",
+      "date": "2026-03-03",
+      "symbol": "VOO",
+      "url": "https://news.google.com/search?q=VOO%20Better%20S%26P%20500%20ETF%3A%20State%20Street's%20SPY%20vs.%20Vanguard's%20VOO",
+      "link": "https://news.google.com/search?q=VOO%20Better%20S%26P%20500%20ETF%3A%20State%20Street's%20SPY%20vs.%20Vanguard's%20VOO"
+    },
+    {
+      "title": "Higher Emerging Market Potential or Balanced Global Growth? SCHE vs. VXUS",
+      "publisher": "Motley Fool",
+      "date": "2026-03-03",
+      "symbol": "VXUS",
+      "url": "https://news.google.com/search?q=VXUS%20Higher%20Emerging%20Market%20Potential%20or%20Balanced%20Global%20Growth%3F%20SCHE%20vs.%20VXUS",
+      "link": "https://news.google.com/search?q=VXUS%20Higher%20Emerging%20Market%20Potential%20or%20Balanced%20Global%20Growth%3F%20SCHE%20vs.%20VXUS"
+    },
+    {
+      "title": "International ETFs Lead as February Flows Top $190B",
+      "publisher": "etf.com",
+      "date": "2026-03-02",
+      "symbol": "VXUS",
+      "url": "https://news.google.com/search?q=VXUS%20International%20ETFs%20Lead%20as%20February%20Flows%20Top%20%24190B",
+      "link": "https://news.google.com/search?q=VXUS%20International%20ETFs%20Lead%20as%20February%20Flows%20Top%20%24190B"
+    },
+    {
+      "title": "REIT ETFs in the Spotlight as U.S. Mortgage Rate Sinks Below 6%",
+      "publisher": "Zacks",
+      "date": "2026-03-02",
+      "symbol": "VNQ",
+      "url": "https://news.google.com/search?q=VNQ%20REIT%20ETFs%20in%20the%20Spotlight%20as%20U.S.%20Mortgage%20Rate%20Sinks%20Below%206%25",
+      "link": "https://news.google.com/search?q=VNQ%20REIT%20ETFs%20in%20the%20Spotlight%20as%20U.S.%20Mortgage%20Rate%20Sinks%20Below%206%25"
+    },
+    {
+      "title": "The Schwab U.S. Dividend Equity ETF Has Delivered a 12.9% Annualized Return. These 2 Top Holdings Showcase the Power of its Investment Strategy.",
+      "publisher": "Motley Fool",
+      "date": "2026-02-28",
+      "symbol": "SCHD",
+      "url": "https://news.google.com/search?q=SCHD%20The%20Schwab%20U.S.%20Dividend%20Equity%20ETF%20Has%20Delivered%20a%2012.9%25%20Annualized%20Return.%20These%202%20Top%20Holdings%20Showcase%20the%20Power%20of%20its%20Investment%20Strategy.",
+      "link": "https://news.google.com/search?q=SCHD%20The%20Schwab%20U.S.%20Dividend%20Equity%20ETF%20Has%20Delivered%20a%2012.9%25%20Annualized%20Return.%20These%202%20Top%20Holdings%20Showcase%20the%20Power%20of%20its%20Investment%20Strategy."
+    },
+    {
+      "title": "The Silent Risk of Over Diversification in Retirement Portfolios",
+      "publisher": "24/7 Wall St.",
+      "date": "2026-02-28",
+      "symbol": "SCHD",
+      "url": "https://news.google.com/search?q=SCHD%20The%20Silent%20Risk%20of%20Over%20Diversification%20in%20Retirement%20Portfolios",
+      "link": "https://news.google.com/search?q=SCHD%20The%20Silent%20Risk%20of%20Over%20Diversification%20in%20Retirement%20Portfolios"
+    },
+    {
+      "title": "3 “Set and Forget” ETFs That Could Fund Your Entire Retirement",
+      "publisher": "24/7 Wall St.",
+      "date": "2026-02-27",
+      "symbol": "VTI",
+      "url": "https://news.google.com/search?q=VTI%203%20%E2%80%9CSet%20and%20Forget%E2%80%9D%20ETFs%20That%20Could%20Fund%20Your%20Entire%20Retirement",
+      "link": "https://news.google.com/search?q=VTI%203%20%E2%80%9CSet%20and%20Forget%E2%80%9D%20ETFs%20That%20Could%20Fund%20Your%20Entire%20Retirement"
+    },
+    {
+      "title": "2026 Stock Market Crash Coming? 3 Best ETFs to Protect You Now",
+      "publisher": "24/7 Wall St.",
+      "date": "2026-02-24",
+      "symbol": "BND",
+      "url": "https://news.google.com/search?q=BND%202026%20Stock%20Market%20Crash%20Coming%3F%203%20Best%20ETFs%20to%20Protect%20You%20Now",
+      "link": "https://news.google.com/search?q=BND%202026%20Stock%20Market%20Crash%20Coming%3F%203%20Best%20ETFs%20to%20Protect%20You%20Now"
+    },
+    {
+      "title": "Retirees Are Eyeing VNQ for Quarterly Income While Growth Investors Look Away",
+      "publisher": "24/7 Wall St.",
+      "date": "2026-02-19",
+      "symbol": "VNQ",
+      "url": "https://news.google.com/search?q=VNQ%20Retirees%20Are%20Eyeing%20VNQ%20for%20Quarterly%20Income%20While%20Growth%20Investors%20Look%20Away",
+      "link": "https://news.google.com/search?q=VNQ%20Retirees%20Are%20Eyeing%20VNQ%20for%20Quarterly%20Income%20While%20Growth%20Investors%20Look%20Away"
+    },
+    {
+      "title": "AI Disruption Hit Multiple Sector ETFs: Is the Fear Overblown?",
+      "publisher": "Zacks",
+      "date": "2026-02-12",
+      "symbol": "VNQ",
+      "url": "https://news.google.com/search?q=VNQ%20AI%20Disruption%20Hit%20Multiple%20Sector%20ETFs%3A%20Is%20the%20Fear%20Overblown%3F",
+      "link": "https://news.google.com/search?q=VNQ%20AI%20Disruption%20Hit%20Multiple%20Sector%20ETFs%3A%20Is%20the%20Fear%20Overblown%3F"
+    },
+    {
+      "title": "Can’t Live on $2k a Month in Social Security? Add These ETFs to Your Retirement Portfolio",
+      "publisher": "24/7 Wall St.",
+      "date": "2026-02-01",
+      "symbol": "BND",
+      "url": "https://news.google.com/search?q=BND%20Can%E2%80%99t%20Live%20on%20%242k%20a%20Month%20in%20Social%20Security%3F%20Add%20These%20ETFs%20to%20Your%20Retirement%20Portfolio",
+      "link": "https://news.google.com/search?q=BND%20Can%E2%80%99t%20Live%20on%20%242k%20a%20Month%20in%20Social%20Security%3F%20Add%20These%20ETFs%20to%20Your%20Retirement%20Portfolio"
+    },
+    {
+      "title": "Over 50? 3 ETFs to Buy Now to Supplement Your Future Social Security",
+      "publisher": "24/7 Wall St.",
+      "date": "2026-01-31",
+      "symbol": "BND",
+      "url": "https://news.google.com/search?q=BND%20Over%2050%3F%203%20ETFs%20to%20Buy%20Now%20to%20Supplement%20Your%20Future%20Social%20Security",
+      "link": "https://news.google.com/search?q=BND%20Over%2050%3F%203%20ETFs%20to%20Buy%20Now%20to%20Supplement%20Your%20Future%20Social%20Security"
     }
   ]
 }
-

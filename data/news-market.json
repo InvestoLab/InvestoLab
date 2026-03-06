@@ -1,23 +1,166 @@
-﻿{
-  "asOfDate": "2026-02-27",
-  "sentiment": {
-    "news": 0.5,
-    "social": 0.5,
-    "confidence": 0.5
-  },
+{
+  "ok": true,
+  "asOfDate": "2026-03-05",
+  "title": "Market News",
   "universe": [
     "SPY",
     "QQQ",
-    "DIA",
-    "IWM"
+    "AAPL",
+    "MSFT",
+    "NVDA",
+    "AMZN",
+    "TLT",
+    "GLD"
   ],
+  "sentiment": {
+    "news": 0.03571428571428571,
+    "social": 0.125,
+    "confidence": 1
+  },
   "headlines": [
     {
-      "title": "Static market snapshot is active.",
+      "title": "CTA Gained While the S&P 500 Collapsed. Here Is What It Holds",
+      "publisher": "24/7 Wall St.",
+      "date": "2026-03-05",
       "symbol": "SPY",
-      "publisher": "InvestoLab",
-      "date": "2026-02-27"
+      "url": "https://news.google.com/search?q=SPY%20CTA%20Gained%20While%20the%20S%26P%20500%20Collapsed.%20Here%20Is%20What%20It%20Holds",
+      "link": "https://news.google.com/search?q=SPY%20CTA%20Gained%20While%20the%20S%26P%20500%20Collapsed.%20Here%20Is%20What%20It%20Holds"
+    },
+    {
+      "title": "Is Apple Stock Going to $1,000?",
+      "publisher": "Motley Fool",
+      "date": "2026-03-05",
+      "symbol": "AAPL",
+      "url": "https://news.google.com/search?q=AAPL%20Is%20Apple%20Stock%20Going%20to%20%241%2C000%3F",
+      "link": "https://news.google.com/search?q=AAPL%20Is%20Apple%20Stock%20Going%20to%20%241%2C000%3F"
+    },
+    {
+      "title": "Major Tech Group Reportedly Voices Concern Over Anthropic's 'Supply Chain Risk' Label",
+      "publisher": "MT Newswires",
+      "date": "2026-03-05",
+      "symbol": "AAPL",
+      "url": "https://news.google.com/search?q=AAPL%20Major%20Tech%20Group%20Reportedly%20Voices%20Concern%20Over%20Anthropic's%20'Supply%20Chain%20Risk'%20Label",
+      "link": "https://news.google.com/search?q=AAPL%20Major%20Tech%20Group%20Reportedly%20Voices%20Concern%20Over%20Anthropic's%20'Supply%20Chain%20Risk'%20Label"
+    },
+    {
+      "title": "Broadcom’s AI Business Is Booming. The Rest Is Complicated.",
+      "publisher": "The Wall Street Journal",
+      "date": "2026-03-05",
+      "symbol": "AAPL",
+      "url": "https://news.google.com/search?q=AAPL%20Broadcom%E2%80%99s%20AI%20Business%20Is%20Booming.%20The%20Rest%20Is%20Complicated.",
+      "link": "https://news.google.com/search?q=AAPL%20Broadcom%E2%80%99s%20AI%20Business%20Is%20Booming.%20The%20Rest%20Is%20Complicated."
+    },
+    {
+      "title": "CZ Health Insurances Chooses Sapiens IDITSuite for P&C to Modernise Their Business",
+      "publisher": "PR Newswire",
+      "date": "2026-03-05",
+      "symbol": "MSFT",
+      "url": "https://news.google.com/search?q=MSFT%20CZ%20Health%20Insurances%20Chooses%20Sapiens%20IDITSuite%20for%20P%26C%20to%20Modernise%20Their%20Business",
+      "link": "https://news.google.com/search?q=MSFT%20CZ%20Health%20Insurances%20Chooses%20Sapiens%20IDITSuite%20for%20P%26C%20to%20Modernise%20Their%20Business"
+    },
+    {
+      "title": "Market Chatter: Trade Desk, OpenAI in Discussions Over Ads Sale",
+      "publisher": "MT Newswires",
+      "date": "2026-03-05",
+      "symbol": "MSFT",
+      "url": "https://news.google.com/search?q=MSFT%20Market%20Chatter%3A%20Trade%20Desk%2C%20OpenAI%20in%20Discussions%20Over%20Ads%20Sale",
+      "link": "https://news.google.com/search?q=MSFT%20Market%20Chatter%3A%20Trade%20Desk%2C%20OpenAI%20in%20Discussions%20Over%20Ads%20Sale"
+    },
+    {
+      "title": "Social Buzz: Wallstreetbets Stocks Mixed Pre-Bell Thursday; Broadcom to Advance, Webull to Decline",
+      "publisher": "MT Newswires",
+      "date": "2026-03-05",
+      "symbol": "MSFT",
+      "url": "https://news.google.com/search?q=MSFT%20Social%20Buzz%3A%20Wallstreetbets%20Stocks%20Mixed%20Pre-Bell%20Thursday%3B%20Broadcom%20to%20Advance%2C%20Webull%20to%20Decline",
+      "link": "https://news.google.com/search?q=MSFT%20Social%20Buzz%3A%20Wallstreetbets%20Stocks%20Mixed%20Pre-Bell%20Thursday%3B%20Broadcom%20to%20Advance%2C%20Webull%20to%20Decline"
+    },
+    {
+      "title": "Netflix Calls It Quits on Warner Bros. Acquisition. Is the Stock a Buy?",
+      "publisher": "Motley Fool",
+      "date": "2026-03-05",
+      "symbol": "NVDA",
+      "url": "https://news.google.com/search?q=NVDA%20Netflix%20Calls%20It%20Quits%20on%20Warner%20Bros.%20Acquisition.%20Is%20the%20Stock%20a%20Buy%3F",
+      "link": "https://news.google.com/search?q=NVDA%20Netflix%20Calls%20It%20Quits%20on%20Warner%20Bros.%20Acquisition.%20Is%20the%20Stock%20a%20Buy%3F"
+    },
+    {
+      "title": "Nvidia Shifts Focus After China Chip Roadblock",
+      "publisher": "GuruFocus.com",
+      "date": "2026-03-05",
+      "symbol": "NVDA",
+      "url": "https://news.google.com/search?q=NVDA%20Nvidia%20Shifts%20Focus%20After%20China%20Chip%20Roadblock",
+      "link": "https://news.google.com/search?q=NVDA%20Nvidia%20Shifts%20Focus%20After%20China%20Chip%20Roadblock"
+    },
+    {
+      "title": "Broadcom Stock Pops. Why Its Earnings Got a Better Response Than Nvidia’s.",
+      "publisher": "Barrons.com",
+      "date": "2026-03-05",
+      "symbol": "NVDA",
+      "url": "https://news.google.com/search?q=NVDA%20Broadcom%20Stock%20Pops.%20Why%20Its%20Earnings%20Got%20a%20Better%20Response%20Than%20Nvidia%E2%80%99s.",
+      "link": "https://news.google.com/search?q=NVDA%20Broadcom%20Stock%20Pops.%20Why%20Its%20Earnings%20Got%20a%20Better%20Response%20Than%20Nvidia%E2%80%99s."
+    },
+    {
+      "title": "Trade Desk Stock Jumps. Why the Beaten Down Shares Are Getting a Big Boost.",
+      "publisher": "Barrons.com",
+      "date": "2026-03-05",
+      "symbol": "AMZN",
+      "url": "https://news.google.com/search?q=AMZN%20Trade%20Desk%20Stock%20Jumps.%20Why%20the%20Beaten%20Down%20Shares%20Are%20Getting%20a%20Big%20Boost.",
+      "link": "https://news.google.com/search?q=AMZN%20Trade%20Desk%20Stock%20Jumps.%20Why%20the%20Beaten%20Down%20Shares%20Are%20Getting%20a%20Big%20Boost."
+    },
+    {
+      "title": "COWG Is Up While QQQ Slips. What the Free Cash Flow Screen Is Actually Doing",
+      "publisher": "24/7 Wall St.",
+      "date": "2026-03-04",
+      "symbol": "SPY",
+      "url": "https://news.google.com/search?q=SPY%20COWG%20Is%20Up%20While%20QQQ%20Slips.%20What%20the%20Free%20Cash%20Flow%20Screen%20Is%20Actually%20Doing",
+      "link": "https://news.google.com/search?q=SPY%20COWG%20Is%20Up%20While%20QQQ%20Slips.%20What%20the%20Free%20Cash%20Flow%20Screen%20Is%20Actually%20Doing"
+    },
+    {
+      "title": "Turns Out, a Simple ETF That Bets on Farmers Is Beating The S&P 500 Right Now",
+      "publisher": "24/7 Wall St.",
+      "date": "2026-03-04",
+      "symbol": "SPY",
+      "url": "https://news.google.com/search?q=SPY%20Turns%20Out%2C%20a%20Simple%20ETF%20That%20Bets%20on%20Farmers%20Is%20Beating%20The%20S%26P%20500%20Right%20Now",
+      "link": "https://news.google.com/search?q=SPY%20Turns%20Out%2C%20a%20Simple%20ETF%20That%20Bets%20on%20Farmers%20Is%20Beating%20The%20S%26P%20500%20Right%20Now"
+    },
+    {
+      "title": "Exchange-Traded Funds Rise as US Equities Move Up on Strong Data After Midday",
+      "publisher": "MT Newswires",
+      "date": "2026-03-04",
+      "symbol": "QQQ",
+      "url": "https://news.google.com/search?q=QQQ%20Exchange-Traded%20Funds%20Rise%20as%20US%20Equities%20Move%20Up%20on%20Strong%20Data%20After%20Midday",
+      "link": "https://news.google.com/search?q=QQQ%20Exchange-Traded%20Funds%20Rise%20as%20US%20Equities%20Move%20Up%20on%20Strong%20Data%20After%20Midday"
+    },
+    {
+      "title": "MoneyMasters Bonus Podcast- How the Mideast War Impacts Oil, Gas,  US Stocks",
+      "publisher": "MoneyShow",
+      "date": "2026-03-04",
+      "symbol": "QQQ",
+      "url": "https://news.google.com/search?q=QQQ%20MoneyMasters%20Bonus%20Podcast-%20How%20the%20Mideast%20War%20Impacts%20Oil%2C%20Gas%2C%20%20US%20Stocks",
+      "link": "https://news.google.com/search?q=QQQ%20MoneyMasters%20Bonus%20Podcast-%20How%20the%20Mideast%20War%20Impacts%20Oil%2C%20Gas%2C%20%20US%20Stocks"
+    },
+    {
+      "title": "Exchange-Traded Funds, Equity Futures Higher Pre-Bell Wednesday Amid Potential Middle East Diplomacy Reports",
+      "publisher": "MT Newswires",
+      "date": "2026-03-04",
+      "symbol": "QQQ",
+      "url": "https://news.google.com/search?q=QQQ%20Exchange-Traded%20Funds%2C%20Equity%20Futures%20Higher%20Pre-Bell%20Wednesday%20Amid%20Potential%20Middle%20East%20Diplomacy%20Reports",
+      "link": "https://news.google.com/search?q=QQQ%20Exchange-Traded%20Funds%2C%20Equity%20Futures%20Higher%20Pre-Bell%20Wednesday%20Amid%20Potential%20Middle%20East%20Diplomacy%20Reports"
+    },
+    {
+      "title": "Daily ETF Flows: TLT Scoops Up $914M",
+      "publisher": "etf.com",
+      "date": "2026-03-04",
+      "symbol": "TLT",
+      "url": "https://news.google.com/search?q=TLT%20Daily%20ETF%20Flows%3A%20TLT%20Scoops%20Up%20%24914M",
+      "link": "https://news.google.com/search?q=TLT%20Daily%20ETF%20Flows%3A%20TLT%20Scoops%20Up%20%24914M"
+    },
+    {
+      "title": "LQD Offers Broader Bonds and Higher Yield Than TLT",
+      "publisher": "Motley Fool",
+      "date": "2026-03-04",
+      "symbol": "TLT",
+      "url": "https://news.google.com/search?q=TLT%20LQD%20Offers%20Broader%20Bonds%20and%20Higher%20Yield%20Than%20TLT",
+      "link": "https://news.google.com/search?q=TLT%20LQD%20Offers%20Broader%20Bonds%20and%20Higher%20Yield%20Than%20TLT"
     }
   ]
 }
-

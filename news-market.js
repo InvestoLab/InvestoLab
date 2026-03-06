@@ -21,12 +21,15 @@ function renderHeadlineList(headlines, emptyText = 'No headlines available.') {
     <ul class="investor-list valuation-headlines">
       ${list.length
         ? list
-            .map(
-              (h) =>
-                `<li><strong>${esc(h.title)}</strong><span>${esc(h.symbol || '')}${h.symbol ? ' | ' : ''}${esc(
-                  h.publisher || 'Unknown'
-                )}${h.date ? ` | ${esc(h.date)}` : ''}</span></li>`
-            )
+            .map((h) => {
+              const href = String(h?.url || h?.link || '').trim();
+              const titleHtml = href
+                ? `<a class="news-headline-link" href="${esc(href)}" target="_blank" rel="noopener noreferrer">${esc(h.title)}</a>`
+                : `<strong>${esc(h.title)}</strong>`;
+              return `<li>${titleHtml}<span>${esc(h.symbol || '')}${h.symbol ? ' | ' : ''}${esc(
+                h.publisher || 'Unknown'
+              )}${h.date ? ` | ${esc(h.date)}` : ''}</span></li>`;
+            })
             .join('')
         : `<li>${esc(emptyText)}</li>`}
     </ul>
