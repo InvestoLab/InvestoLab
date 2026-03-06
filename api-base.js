@@ -267,7 +267,33 @@
   );
   const SEARCH_UNIVERSE = Array.from(new Set([...Object.keys(SYMBOL_MARKET_META), ...Object.keys(SYMBOL_FULL_NAMES)]));
 
-  window.__INVESTOLAB_API_BASE = '';
+  function normalizeBaseUrl(raw) {
+    const url = String(raw || '').trim().replace(/\/+$/, '');
+    if (!url) return '';
+    return /^https?:\/\//i.test(url) ? url : '';
+  }
+
+  function resolveApiBases() {
+    const queryBase = (() => {
+      try {
+        return new URLSearchParams(window.location.search).get('apiBase') || '';
+      } catch (_error) {
+        return '';
+      }
+    })();
+    const configured = normalizeBaseUrl(
+      apiBase ||
+        window.INVESTOLAB_API_BASE ||
+        window.__INVESTOLAB_API_BASE ||
+        window.localStorage?.getItem('INVESTOLAB_API_BASE') ||
+        queryBase
+    );
+    const defaults = ['https://investolab.onrender.com', 'https://investolab-api.onrender.com'].map(normalizeBaseUrl);
+    return [...new Set([configured, ...defaults].filter(Boolean))];
+  }
+
+  const API_BASES = resolveApiBases();
+  window.__INVESTOLAB_API_BASE = API_BASES[0] || '';
   const rawFetch = window.fetch.bind(window);
 
   function clamp(v, lo, hi) {
@@ -376,6 +402,47 @@
     if (typeof input === 'string') return input;
     if (input instanceof URL) return input.toString();
     if (input && typeof input.url === 'string') return input.url;
+    return null;
+  }
+
+  function shouldPreferRemoteApi(apiPath) {
+    return (
+      apiPath.startsWith('/api/simulations/') ||
+      apiPath.startsWith('/api/assets/') ||
+      apiPath.startsWith('/api/valuation/') ||
+      apiPath.startsWith('/api/news/investment-of-day') ||
+      apiPath.startsWith('/api/investotype/portfolio')
+    );
+  }
+
+  function isPriceCriticalApi(apiPath) {
+    return (
+      apiPath.startsWith('/api/simulations/') ||
+      apiPath.startsWith('/api/assets/price') ||
+      apiPath.startsWith('/api/valuation/investment') ||
+      apiPath.startsWith('/api/valuation/portfolio') ||
+      apiPath.startsWith('/api/news/investment-of-day')
+    );
+  }
+
+  async function fetchFromRemoteApiBases(apiPath, init) {
+    if (!API_BASES.length) return null;
+    let lastError = null;
+    for (const base of API_BASES) {
+      try {
+        const response = await rawFetch(`${base}${apiPath}`, init);
+        if (response && response.status !== 404 && response.status !== 502 && response.status !== 503) {
+          return response;
+        }
+        lastError = new Error(`Remote API returned ${response?.status || 'unknown'} from ${base}`);
+      } catch (error) {
+        lastError = error;
+      }
+    }
+    if (lastError) {
+      // eslint-disable-next-line no-console
+      console.warn('Remote API fallback failed:', lastError?.message || lastError);
+    }
     return null;
   }
 
@@ -1644,6 +1711,14 @@
     // Local/public API emulation is only for GitHub Pages static mode.
     if (!isGithubPages) {
       return rawFetch(input, init);
+    }
+
+    if (shouldPreferRemoteApi(apiPath)) {
+      const remoteResponse = await fetchFromRemoteApiBases(apiPath, init);
+      if (remoteResponse instanceof Response) return remoteResponse;
+      if (isPriceCriticalApi(apiPath)) {
+        return jsonErrorResponse('Live pricing is temporarily unavailable. Please try again shortly.', 503);
+      }
     }
 
     const localApiResponse = await handleLocalApi(apiPath, init);
