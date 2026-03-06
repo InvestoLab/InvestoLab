@@ -151,10 +151,12 @@ function annualStatsFromHistory(rows) {
   const clean = Array.isArray(rows)
     ? rows.map((r) => Number(r?.close || 0)).filter((n) => Number.isFinite(n) && n > 0)
     : [];
-  if (clean.length < 3) return { drift: 0.07, vol: 0.22 };
+  // Use a recent window so regimes can flip bearish/bullish faster.
+  const recent = clean.slice(-Math.min(clean.length, 252));
+  if (recent.length < 3) return { drift: 0.07, vol: 0.22 };
   const logs = [];
-  for (let i = 1; i < clean.length; i += 1) {
-    logs.push(Math.log(clean[i] / clean[i - 1]));
+  for (let i = 1; i < recent.length; i += 1) {
+    logs.push(Math.log(recent[i] / recent[i - 1]));
   }
   const mean = logs.reduce((s, x) => s + x, 0) / Math.max(1, logs.length);
   const variance = logs.reduce((s, x) => s + (x - mean) ** 2, 0) / Math.max(1, logs.length - 1);
