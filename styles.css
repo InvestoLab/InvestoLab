@@ -6939,10 +6939,11 @@ footer {
   .valuation-preview-track {
     grid-auto-flow: column;
     gap: 0.35rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .valuation-preview-card {
-    min-width: 72px;
+    min-width: 0;
     padding: 0.35rem 0.45rem;
   }
 
@@ -6957,6 +6958,7 @@ footer {
 
   .home-axis-stage {
     min-height: 200px;
+    pointer-events: none;
   }
 
   #homeAxis3dCanvas {
