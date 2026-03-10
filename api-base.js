@@ -698,21 +698,35 @@
       try {
         return await tryRemote('query2.finance.yahoo.com');
       } catch (_error2) {
-        const seed = symbolSeed(sym);
-        const drift = ((seed % 9) - 4) * 0.00008 + 0.00055;
-        const vol = 0.007 + ((seed % 7) * 0.0015);
-        const start = 70 + (seed % 160);
-        const rows = syntheticSeries(addDaysIso(toIsoDate(), -420), 420, start, drift, vol);
-        return {
-          chart: {
-            result: [
-              {
-                timestamp: rows.map((r) => Math.floor(Date.parse(`${r.date}T00:00:00Z`) / 1000)),
-                indicators: { quote: [{ close: rows.map((r) => r.close) }] }
-              }
-            ]
-          }
-        };
+        try {
+          const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(
+            `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?range=${encodeURIComponent(
+              safeRange
+            )}&interval=${encodeURIComponent(safeInterval)}&includePrePost=false&events=div,splits`
+          )}`;
+          const proxied = await rawFetch(proxyUrl, { cache: 'no-store' });
+          if (!proxied.ok) throw new Error(`Proxy failed (${proxied.status || 'unknown'})`);
+          const data = await proxied.json();
+          const rows = extractHistory(data);
+          if (!rows.length) throw new Error('Proxy chart returned no rows.');
+          return data;
+        } catch (_error3) {
+          const seed = symbolSeed(sym);
+          const drift = ((seed % 9) - 4) * 0.00008 + 0.00055;
+          const vol = 0.007 + ((seed % 7) * 0.0015);
+          const start = 70 + (seed % 160);
+          const rows = syntheticSeries(addDaysIso(toIsoDate(), -420), 420, start, drift, vol);
+          return {
+            chart: {
+              result: [
+                {
+                  timestamp: rows.map((r) => Math.floor(Date.parse(`${r.date}T00:00:00Z`) / 1000)),
+                  indicators: { quote: [{ close: rows.map((r) => r.close) }] }
+                }
+              ]
+            }
+          };
+        }
       }
     }
   }
