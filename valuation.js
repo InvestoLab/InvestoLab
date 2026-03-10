@@ -124,12 +124,16 @@ async function searchSymbolOptions(rawInput) {
     if (!list.some((x) => x.symbol === m.symbol)) list.push(m);
   }
   list.sort((a, b) => {
+    const aExact = String(a.symbol || '').toUpperCase() === queryUpper;
+    const bExact = String(b.symbol || '').toUpperCase() === queryUpper;
+    if (aExact && !bExact) return -1;
+    if (bExact && !aExact) return 1;
     const sa = searchScore(queryUpper, a);
     const sb = searchScore(queryUpper, b);
-    if (sb !== sa) return sb - sa;
     const pa = popularityRank(a.symbol);
     const pb = popularityRank(b.symbol);
     if (pa !== pb) return pa - pb;
+    if (sb !== sa) return sb - sa;
     const au = isUsExchange(a.exchange) ? 1 : 0;
     const bu = isUsExchange(b.exchange) ? 1 : 0;
     if (bu !== au) return bu - au;
@@ -296,6 +300,13 @@ function renderInvestmentResult(investment) {
   const summary3 = Array.isArray(valuation.summary3) ? valuation.summary3 : [];
   const recAction = String(recommendation.action || 'HOLD').toUpperCase();
   const recTone = recAction === 'BUY' ? 'buy' : recAction === 'SELL' ? 'sell' : 'hold';
+  const newsFocusLine = headlines.length
+    ? `News focus: ${headlines
+        .slice(0, 2)
+        .map((h) => String(h?.title || '').trim())
+        .filter(Boolean)
+        .join(' • ')}.`
+    : 'News focus: No major headlines found today.';
 
   valuationResult.innerHTML = `
     <section class="valuation-hero ${recTone}">
@@ -349,6 +360,7 @@ function renderInvestmentResult(investment) {
         <h4>AI Summary</h4>
         <ul class="investor-list">
           ${summary3.map((line) => `<li>${escapeHtml(line)}</li>`).join('')}
+          <li>${escapeHtml(newsFocusLine)}</li>
         </ul>
       </section>
     </div>
@@ -367,7 +379,6 @@ function renderInvestmentResult(investment) {
         <h4>Recommended Investor Type</h4>
         <div class="buyer-fit-head">
           <strong>${escapeHtml(buyerFit.type || 'N/A')}</strong>
-          <span>${escapeHtml(buyerFit.code || '-')}</span>
         </div>
         <div class="buyer-fit-chips">
           <span>Risk: ${escapeHtml(buyerFit.axes?.risk || 'N/A')}</span>

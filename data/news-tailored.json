@@ -2,7 +2,7 @@
   "ok": true,
   "asOfDate": "2026-03-05",
   "type": "passive_rational_allocator",
-  "profile": "Passive Rational Allocator",
+  "profile": "Index Strategist",
   "watchlist": [
     "VTI",
     "VOO",
@@ -26,7 +26,7 @@
       "link": "https://news.google.com/search?q=VTI%20Meet%20The%20ETF%20That%20Tracks%20Everything%20and%20Costs%20Almost%20Nothing"
     },
     {
-      "title": "We Told You So — These IBD 50 Stocks Dominate This Year",
+      "title": "We Told You So ??These IBD 50 Stocks Dominate This Year",
       "publisher": "Investor's Business Daily",
       "date": "2026-03-04",
       "symbol": "VOO",
@@ -50,7 +50,7 @@
       "link": "https://news.google.com/search?q=VXUS%20What%20This%20Top%20International%20ETF%20Is%20Buying%20Now"
     },
     {
-      "title": "Vanguard’s VTI ETF Turned $10,000 Into $38,000 Over the Last Decade — Can It Do It Again?",
+      "title": "Vanguard?�s VTI ETF Turned $10,000 Into $38,000 Over the Last Decade ??Can It Do It Again?",
       "publisher": "24/7 Wall St.",
       "date": "2026-03-03",
       "symbol": "VTI",
@@ -106,7 +106,7 @@
       "link": "https://news.google.com/search?q=SCHD%20The%20Silent%20Risk%20of%20Over%20Diversification%20in%20Retirement%20Portfolios"
     },
     {
-      "title": "3 “Set and Forget” ETFs That Could Fund Your Entire Retirement",
+      "title": "3 ?�Set and Forget??ETFs That Could Fund Your Entire Retirement",
       "publisher": "24/7 Wall St.",
       "date": "2026-02-27",
       "symbol": "VTI",
@@ -138,7 +138,7 @@
       "link": "https://news.google.com/search?q=VNQ%20AI%20Disruption%20Hit%20Multiple%20Sector%20ETFs%3A%20Is%20the%20Fear%20Overblown%3F"
     },
     {
-      "title": "Can’t Live on $2k a Month in Social Security? Add These ETFs to Your Retirement Portfolio",
+      "title": "Can?�t Live on $2k a Month in Social Security? Add These ETFs to Your Retirement Portfolio",
       "publisher": "24/7 Wall St.",
       "date": "2026-02-01",
       "symbol": "BND",
@@ -155,3 +155,4 @@
     }
   ]
 }
+

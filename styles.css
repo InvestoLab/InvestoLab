@@ -23,18 +23,27 @@
   box-sizing: border-box;
 }
 
+html,
+body {
+  overflow-x: hidden;
+}
+
 body {
   margin: 0;
   font-family: 'Manrope', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.78;
   color: var(--ink);
   background:
-    radial-gradient(1300px 520px at 8% -10%, #e9fffa 0%, transparent 56%),
-    radial-gradient(1100px 420px at 100% -20%, #eefaff 0%, transparent 56%),
+    radial-gradient(1400px 620px at 8% -12%, #e9fffa 0%, rgba(233, 255, 250, 0) 62%),
     linear-gradient(180deg, #fbfdff 0%, #ffffff 36%),
     var(--bg);
-  background-size: 130% 130%, 130% 130%, 100% 100%, auto;
+  background-size: 150% 150%, 100% 100%, auto;
   animation: pageAtmosphere 18s ease-in-out infinite alternate;
+}
+
+body::after {
+  content: none;
+  display: none;
 }
 
 .taskbar {
@@ -190,7 +199,7 @@ body {
   color: #fff;
   border-color: var(--brand);
   background: var(--brand);
-  box-shadow: 0 8px 20px rgba(15, 118, 110, 0.26);
+  box-shadow: none;
   transform: translateY(-1px);
 }
 .nav-dropdown-menu {
@@ -249,7 +258,7 @@ body {
   color: #fff;
   border-color: var(--brand);
   background: var(--brand);
-  box-shadow: 0 8px 20px rgba(15, 118, 110, 0.26);
+  box-shadow: none;
   transform: translateY(-1px);
 }
 
@@ -267,18 +276,47 @@ body {
 }
 
 .taskbar-cta:hover {
-  filter: brightness(1.03);
-  transform: translateY(-1px);
-  box-shadow: 0 12px 22px rgba(15, 118, 110, 0.3);
+  filter: none;
+  transform: none;
+  box-shadow: none;
 }
 
 .hero {
   padding: 2.2rem 1.2rem 1.35rem;
   text-align: center;
+  position: relative;
+  overflow: hidden;
 }
 
 .page-hero {
   padding-bottom: 0.6rem;
+}
+
+.hero::before,
+.hero::after {
+  content: '';
+  position: absolute;
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  filter: blur(28px);
+  opacity: 0.45;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hero::before {
+  left: -60px;
+  top: -80px;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.35), rgba(56, 189, 248, 0));
+  animation: heroFloat 12s ease-in-out infinite;
+}
+
+.hero::after {
+  right: -120px;
+  top: -90px;
+  background: radial-gradient(circle, rgba(15, 118, 110, 0.35), rgba(15, 118, 110, 0));
+  animation: heroFloat 14s ease-in-out infinite reverse;
 }
 
 .hero h1 {
@@ -288,6 +326,8 @@ body {
   letter-spacing: -0.03em;
   text-wrap: balance;
   animation: revealUp 520ms var(--ease-smooth) both;
+  position: relative;
+  z-index: 1;
 }
 
 .hero p {
@@ -297,6 +337,8 @@ body {
   line-height: 1.68;
   text-wrap: pretty;
   animation: revealUp 620ms var(--ease-smooth) both;
+  position: relative;
+  z-index: 1;
 }
 
 .layout,
@@ -698,6 +740,18 @@ body {
   }
 }
 
+@keyframes heroFloat {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(16px, 10px) scale(1.05);
+  }
+  100% {
+    transform: translate(-6px, 4px) scale(0.98);
+  }
+}
+
 .card {
   background: var(--card);
   border: 1px solid var(--line);
@@ -707,12 +761,28 @@ body {
   background-image: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
   transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
   animation: revealUp 520ms var(--ease-smooth) both;
+  position: relative;
+  overflow: hidden;
+}
+
+.card::after {
+  content: '';
+  position: absolute;
+  inset: -40% -20%;
+  background: radial-gradient(circle at 30% 30%, rgba(56, 189, 248, 0.08), rgba(56, 189, 248, 0) 60%);
+  opacity: 0;
+  transition: opacity 260ms ease;
+  pointer-events: none;
 }
 
 .card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 20px 36px rgba(16, 24, 40, 0.11);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
   border-color: #d2deec;
+}
+
+.card:hover::after {
+  opacity: 0;
 }
 
 .single-layout > .card:hover {
@@ -790,6 +860,18 @@ body {
   width: 100%;
 }
 
+.home-card h2 {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.home-card h2::after {
+  content: none;
+  display: none;
+}
+
 .scroll-reveal {
   opacity: 0;
   transform: translateY(26px) scale(0.985);
@@ -854,6 +936,7 @@ body {
   gap: 0.15rem;
   text-align: left;
   animation: newsCardShift 6s ease-in-out infinite;
+  transition: opacity 240ms ease, transform 240ms ease;
 }
 
 .news-preview-card:nth-child(2) {
@@ -881,6 +964,11 @@ body {
   font-size: 0.7rem;
   color: #64748b;
   font-style: normal;
+}
+
+.news-preview-card.is-swapping {
+  opacity: 0;
+  transform: translateY(-6px);
 }
 
 .news-preview-bar {
@@ -1376,7 +1464,7 @@ body {
   content: '';
   position: absolute;
   inset: 8% 10%;
-  background: radial-gradient(circle at 50% 45%, var(--home-axis-glow, rgba(56, 189, 248, 0.22)), rgba(56, 189, 248, 0));
+  background: radial-gradient(circle at 50% 45%, var(--home-axis-glow, rgba(56, 189, 248, 0.12)), rgba(56, 189, 248, 0));
   filter: blur(18px);
   z-index: 0;
 }
@@ -1416,9 +1504,9 @@ body {
 }
 
 .cta-link:hover {
-  filter: brightness(1.02);
-  transform: translateY(-1px);
-  box-shadow: 0 14px 24px rgba(15, 118, 110, 0.3);
+  filter: none;
+  transform: none;
+  box-shadow: none;
 }
 
 .cta-link::after {
@@ -1701,9 +1789,9 @@ h2, h3 {
 }
 
 .setup-check.done {
-  border-color: var(--brand);
+  border-color: #16a34a;
   color: #ffffff;
-  background: var(--brand);
+  background: #16a34a;
 }
 
 .setup-card-toggle small {
@@ -4201,6 +4289,11 @@ button.ghost:hover {
   background: #eff6ff;
 }
 
+#builderCubeCode,
+#builderAxisCode {
+  display: none !important;
+}
+
 .axis-3d-stage {
   position: relative;
   border: 1px solid #dbe7ff;
@@ -4658,14 +4751,33 @@ button.ghost:hover {
   box-shadow: 0 8px 18px rgba(15, 23, 42, 0.05);
   overflow: hidden;
   transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+  position: relative;
+}
+
+.chart-card::after {
+  content: '';
+  position: absolute;
+  left: -40%;
+  top: -30%;
+  width: 180%;
+  height: 160%;
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0) 40%, rgba(56, 189, 248, 0.12) 50%, rgba(255, 255, 255, 0) 60%);
+  opacity: 0;
+  transform: translateX(-10%);
+  transition: opacity 220ms ease, transform 220ms ease;
+  pointer-events: none;
 }
 
 .chart-card:hover {
-  transform: translateY(-1px);
+  transform: none;
   border-color: #d0def2;
-  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.09);
+  box-shadow: var(--shadow-sm);
 }
 
+.chart-card:hover::after {
+  opacity: 0;
+  transform: none;
+}
 .chart-card.chart-card-interactive {
   position: relative;
 }
@@ -5438,7 +5550,7 @@ footer {
 
   /* Holdings table mobile */
   .holdings-table {
-    overflow-x: auto;
+    overflow-x: hidden;
   }
 
   .holdings-head,
@@ -5948,6 +6060,46 @@ footer {
 }
 
 @media (max-width: 640px) {
+  .about-visual {
+    grid-auto-flow: row;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 0.4rem;
+  }
+
+  .about-node {
+    min-width: 0;
+    width: min(220px, 100%);
+  }
+
+  .about-link {
+    width: 36px;
+  }
+
+  .setup-headline-row {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .setup-headline-row #setupAiComboBtn {
+    margin-inline: auto;
+  }
+
+  .setup-grid {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+
+  .setup-grid label {
+    width: 100%;
+    text-align: center;
+  }
+
+  .setup-grid input,
+  .setup-grid select {
+    text-align: center;
+  }
+
   .valuation-page #investmentValuationForm {
     grid-template-columns: 1fr;
     max-width: 100%;
@@ -6354,7 +6506,7 @@ footer {
 }
 
 .valuation-table-wrap {
-  overflow-x: auto;
+  overflow-x: hidden;
 }
 
 .news-tailored-form {
@@ -6966,7 +7118,7 @@ footer {
   }
 
   .valuation-preview-bars {
-    height: 44px;
+    display: none;
   }
 
   .home-axis-stage {
@@ -7181,13 +7333,13 @@ footer {
 }
 
 .chart-card {
-  overflow-x: auto;
+  overflow-x: hidden;
 }
 
 .valuation-table-wrap,
 .setup-summary-grid,
 .investor-grid {
-  overflow-x: auto;
+  overflow-x: hidden;
 }
 
 .price-chart-svg,

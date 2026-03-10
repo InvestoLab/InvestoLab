@@ -4,13 +4,13 @@
   const MARKET_NEWS_SYMBOLS = ['SPY', 'QQQ', 'AAPL', 'MSFT', 'NVDA', 'AMZN', 'TLT', 'GLD'];
   const TAILORED_NEWS_PROFILES = {
     the_quant: { key: 'the_quant', label: 'The Quant', symbols: ['QQQ', 'NVDA', 'MSFT', 'AVGO', 'AMD', 'SMH'] },
-    active_conviction_investor: { key: 'active_conviction_investor', label: 'Active Conviction Investor', symbols: ['TSLA', 'NVDA', 'META', 'AMZN', 'PLTR', 'SOXL'] },
-    tactical_trend_analyst: { key: 'tactical_trend_analyst', label: 'Tactical Trend Analyst', symbols: ['QQQ', 'SPY', 'XLF', 'XLE', 'GLD', 'IWM'] },
-    aggressive_reactive_trader: { key: 'aggressive_reactive_trader', label: 'Aggressive Reactive Trader', symbols: ['TSLA', 'COIN', 'MSTR', 'SOXL', 'TQQQ', 'BTC-USD'] },
-    conservative_researcher: { key: 'conservative_researcher', label: 'Conservative Researcher', symbols: ['JNJ', 'PG', 'KO', 'XOM', 'JPM', 'VIG'] },
-    defensive_active_allocator: { key: 'defensive_active_allocator', label: 'Defensive Active Allocator', symbols: ['VTI', 'SCHD', 'BND', 'TIP', 'XLV', 'XLP'] },
-    passive_rational_allocator: { key: 'passive_rational_allocator', label: 'Passive Rational Allocator', symbols: ['VTI', 'VOO', 'VXUS', 'BND', 'SCHD', 'VNQ'] },
-    passive_emotional_allocator: { key: 'passive_emotional_allocator', label: 'Passive Emotional Allocator', symbols: ['VTI', 'BND', 'AGG', 'SCHD', 'XLU', 'SHV'] }
+    active_conviction_investor: { key: 'active_conviction_investor', label: 'Portfolio Manager', symbols: ['TSLA', 'NVDA', 'META', 'AMZN', 'PLTR', 'SOXL'] },
+    tactical_trend_analyst: { key: 'tactical_trend_analyst', label: 'Technical Analyst', symbols: ['QQQ', 'SPY', 'XLF', 'XLE', 'GLD', 'IWM'] },
+    aggressive_reactive_trader: { key: 'aggressive_reactive_trader', label: 'Day Trader', symbols: ['TSLA', 'COIN', 'MSTR', 'SOXL', 'TQQQ', 'BTC-USD'] },
+    conservative_researcher: { key: 'conservative_researcher', label: 'Research Analyst', symbols: ['JNJ', 'PG', 'KO', 'XOM', 'JPM', 'VIG'] },
+    defensive_active_allocator: { key: 'defensive_active_allocator', label: 'Risk Manager', symbols: ['VTI', 'SCHD', 'BND', 'TIP', 'XLV', 'XLP'] },
+    passive_rational_allocator: { key: 'passive_rational_allocator', label: 'Index Strategist', symbols: ['VTI', 'VOO', 'VXUS', 'BND', 'SCHD', 'VNQ'] },
+    passive_emotional_allocator: { key: 'passive_emotional_allocator', label: 'Wealth Advisor', symbols: ['VTI', 'BND', 'AGG', 'SCHD', 'XLU', 'SHV'] }
   };
   const AXIS_CODE_TO_PROFILE_KEY = {
     'A-I-R': 'the_quant',
@@ -265,7 +265,11 @@
       'ETH-USD'
     ].map((symbol, idx) => [symbol, idx])
   );
-  const SEARCH_UNIVERSE = Array.from(new Set([...Object.keys(SYMBOL_MARKET_META), ...Object.keys(SYMBOL_FULL_NAMES)]));
+  let SEARCH_UNIVERSE = [];
+  function rebuildSearchUniverse() {
+    SEARCH_UNIVERSE = Array.from(new Set([...Object.keys(SYMBOL_MARKET_META), ...Object.keys(SYMBOL_FULL_NAMES)]));
+  }
+  rebuildSearchUniverse();
 
   function normalizeBaseUrl(raw) {
     const url = String(raw || '').trim().replace(/\/+$/, '');
@@ -308,9 +312,56 @@
     return String(raw || '').trim().toUpperCase();
   }
 
+  const SP500_LIST_PATH = './data/sp500.json';
+  async function loadSp500Universe() {
+    if (window.__INVESTOLAB_SP500_LOADED) return;
+    window.__INVESTOLAB_SP500_LOADED = true;
+    try {
+      const res = await fetch(SP500_LIST_PATH, { cache: 'no-store' });
+      if (!res.ok) return;
+      const list = await res.json();
+      if (!Array.isArray(list)) return;
+      list.forEach((row) => {
+        const sym = normalizeSymbol(row?.symbol);
+        if (!sym) return;
+        if (!SYMBOL_FULL_NAMES[sym]) SYMBOL_FULL_NAMES[sym] = String(row?.name || sym);
+        if (!SYMBOL_MARKET_META[sym]) SYMBOL_MARKET_META[sym] = { exchange: 'US', quoteType: 'EQUITY' };
+      });
+      rebuildSearchUniverse();
+    } catch (_error) {
+      // Ignore S&P 500 load failures in public mode.
+    }
+  }
+  loadSp500Universe();
+
   function fullNameForSymbol(symbol) {
     const key = normalizeSymbol(symbol);
     return SYMBOL_FULL_NAMES[key] || key;
+  }
+
+  function scoreHeadlinesSentiment(headlines = []) {
+    const positives = [
+      'beat', 'beats', 'surge', 'surges', 'rally', 'rallies', 'upgrade', 'upgraded', 'record', 'strong',
+      'growth', 'accelerate', 'optimism', 'bullish', 'outperform', 'profit', 'profits', 'raise', 'raised'
+    ];
+    const negatives = [
+      'miss', 'misses', 'drop', 'drops', 'fall', 'falls', 'downgrade', 'downgraded', 'weak',
+      'decline', 'lawsuit', 'probe', 'risk', 'warning', 'cut', 'cuts', 'bearish', 'underperform', 'loss'
+    ];
+    let score = 0;
+    let hits = 0;
+    headlines.forEach((h) => {
+      const text = String(h?.title || h?.headline || '').toLowerCase();
+      if (!text) return;
+      positives.forEach((w) => {
+        if (text.includes(w)) { score += 1; hits += 1; }
+      });
+      negatives.forEach((w) => {
+        if (text.includes(w)) { score -= 1; hits += 1; }
+      });
+    });
+    if (!hits) return 0;
+    return clamp(score / Math.max(6, hits), -1, 1);
   }
 
   function marketMetaForSymbol(symbol) {
@@ -417,7 +468,9 @@
 
   function shouldForceLocalFirst(apiPath) {
     return (
+      apiPath.startsWith('/api/simulations/') ||
       apiPath.startsWith('/api/assets/resolve') ||
+      apiPath.startsWith('/api/assets/price') ||
       apiPath.startsWith('/api/assets/validate') ||
       apiPath.startsWith('/api/valuation/resolve') ||
       apiPath.startsWith('/api/valuation/investment') ||
@@ -576,8 +629,12 @@
           })
           .filter((row) => row._score > 0);
         cleaned.sort((a, b) => {
-          if (b._score !== a._score) return b._score - a._score;
+          const aExact = a.symbol === q;
+          const bExact = b.symbol === q;
+          if (aExact && !bExact) return -1;
+          if (bExact && !aExact) return 1;
           if (a._pop !== b._pop) return a._pop - b._pop;
+          if (b._score !== a._score) return b._score - a._score;
           return String(a.symbol).localeCompare(String(b.symbol));
         });
         const remoteTop = cleaned.slice(0, 40).map(({ _score, _pop, ...row }) => row);
@@ -602,8 +659,12 @@
     }).filter((row) => row._score > 0);
 
     const sorted = candidates.sort((a, b) => {
-      if (b._score !== a._score) return b._score - a._score;
+      const aExact = a.symbol === q;
+      const bExact = b.symbol === q;
+      if (aExact && !bExact) return -1;
+      if (bExact && !aExact) return 1;
       if (a._pop !== b._pop) return a._pop - b._pop;
+      if (b._score !== a._score) return b._score - a._score;
       return String(a.symbol).localeCompare(String(b.symbol));
     });
 
@@ -798,15 +859,20 @@
     const d252 = trailingReturn(history, 252);
     const vol = annualizedVolatility(history, 252);
     const mdd = maxDrawdown(history, 252);
+    const headlines = await getNewsHeadlines(symbol, 10);
+    const newsSent = scoreHeadlinesSentiment(headlines);
+    const socialSent = clamp(newsSent * 0.6, -1, 1);
+    const sentimentConfidence = clamp(headlines.length / 8, 0.2, 0.9);
     const momentumScore = clamp(50 + d90 * 90 + d252 * 45, 0, 100);
-    const riskPenalty = clamp(vol * 120 + Math.abs(mdd) * 40, 0, 40);
-    const compositeScore = clamp(momentumScore - riskPenalty + 12, 0, 100);
+    const riskPenalty = clamp(vol * 120 + Math.abs(mdd) * 40 + Math.max(0, -newsSent) * 12, 0, 48);
+    const compositeScore = clamp(momentumScore - riskPenalty + 12 + newsSent * 12 + socialSent * 6, 0, 100);
     const label = scoreLabel(compositeScore);
     const action = scoreToAction(compositeScore);
-    const confidence = clamp(0.45 + Math.abs(compositeScore - 50) / 80, 0.35, 0.9);
-    const newsSent = clamp(0.45 + d30 * 1.8, 0.05, 0.95);
-    const socialSent = clamp(0.45 + d90 * 1.2, 0.05, 0.95);
-    const headlines = await getNewsHeadlines(symbol, 8);
+    const confidence = clamp(0.35 + Math.abs(compositeScore - 50) / 75 + sentimentConfidence * 0.2, 0.35, 0.95);
+    const baseTargetPct = clamp(d90 * 0.6 + d252 * 0.3, -0.2, 0.3);
+    const newsTilt = clamp(newsSent * 0.08, -0.12, 0.12);
+    const targetPct = clamp(baseTargetPct + newsTilt, -0.25, 0.4);
+    const targetPrice = last.close * (1 + targetPct);
     const buyerFit = investorFitFromScore(compositeScore, vol);
     return {
       asOfDate: asOfDate || last.date,
@@ -823,7 +889,7 @@
       signals: {
         newsSentiment: newsSent,
         socialSentiment: socialSent,
-        sentimentConfidence: confidence,
+        sentimentConfidence,
         source: 'Yahoo Finance public feed',
         earningsDate: 'N/A',
         headlines
@@ -834,15 +900,20 @@
         summary3: [
           `${symbol} shows ${d90 >= 0 ? 'positive' : 'negative'} 3-month momentum (${(d90 * 100).toFixed(1)}%).`,
           `1Y realized volatility is ${(vol * 100).toFixed(1)}%, with max drawdown ${(mdd * 100).toFixed(1)}%.`,
-          `Signal blend suggests a ${action} stance with ${(confidence * 100).toFixed(0)}% confidence.`
+          `News tilt suggests ${(newsSent * 100).toFixed(0)} sentiment with target ${(targetPct * 100).toFixed(1)}%.`
         ],
         recommendation: {
           action,
           confidence,
+          conviction: clamp(confidence + Math.abs(newsSent) * 0.12, 0.35, 0.98),
+          targetPrice,
+          targetChangePct: targetPct,
+          newsTilt,
           rationale: [
             `Composite score ${compositeScore.toFixed(0)}/100 (${label}).`,
             `Trend profile: 30D ${(d30 * 100).toFixed(1)}%, 90D ${(d90 * 100).toFixed(1)}%, 252D ${(d252 * 100).toFixed(1)}%.`,
-            `Risk profile: volatility ${(vol * 100).toFixed(1)}%, drawdown ${(mdd * 100).toFixed(1)}%.`
+            `Risk profile: volatility ${(vol * 100).toFixed(1)}%, drawdown ${(mdd * 100).toFixed(1)}%.`,
+            `News-driven target: ${fmtMoney(targetPrice)} (${(targetPct * 100).toFixed(1)}% from current).`
           ]
         },
         buyerFit
@@ -1239,8 +1310,13 @@
     if (!symbol || symbol === 'CASH' || symbol === 'SAVINGS') return;
     sim.series = sim.series || {};
     if (sim.series[symbol]) return;
-    const chart = await yahooChart(symbol, '5y', '1d');
-    const rows = extractHistory(chart);
+    let rows = [];
+    try {
+      const chart = await yahooChart(symbol, '5y', '1d');
+      rows = extractHistory(chart);
+    } catch (error) {
+      rows = [];
+    }
     const coversWindow =
       rows.length &&
       String(rows[0]?.date || '') <= String(sim.startDate || '') &&
@@ -1610,7 +1686,7 @@
     const controlInternal = clamp(55 - annualizedVolatility * 25, 0, 100);
     const reactivityEmotional = clamp(45 + Math.abs(maxDd) * 120, 0, 100);
     const investorProfile = {
-      type: riskAggressive >= 60 ? 'Active Conviction Investor' : 'Passive Rational Allocator',
+      type: riskAggressive >= 60 ? 'Portfolio Manager' : 'Index Strategist',
       code: `${riskAggressive >= 50 ? 'A' : 'C'}-${controlInternal >= 50 ? 'I' : 'E'}-${reactivityEmotional >= 50 ? 'E' : 'R'}`,
       axes: {
         risk: riskAggressive >= 50 ? 'Aggressive' : 'Conservative',
@@ -2000,3 +2076,5 @@
     return localApiResponse;
   };
 })();
+
+
