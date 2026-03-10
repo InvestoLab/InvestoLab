@@ -13,7 +13,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>InvestoLab - Home</title>
-  <link rel="stylesheet" href="styles.css?v=20260228b" />
+  <link rel="stylesheet" href="styles.css?v=20260310a" />
   <script src="nav.js?v=20260305i" defer></script>
   <script src="config.js?v=20260227a" defer></script>
   <script src="api-base.js?v=20260307b" defer></script>
@@ -59,27 +59,117 @@
   </header>
 
   <main class="single-layout">
-    <section class="card home-card">
+    <section class="card home-card scroll-reveal">
       <h2>Valuation Lab</h2>
       <p>Check a stock or ETF in seconds: trend, risk, sentiment, and a clear action view.</p>
+      <div class="valuation-preview" aria-hidden="true">
+        <div class="valuation-preview-track">
+          <div class="valuation-preview-card">
+            <span class="vp-symbol">SPY</span>
+            <strong class="vp-price">$432</strong>
+            <em class="vp-change">+1.2%</em>
+          </div>
+          <div class="valuation-preview-card">
+            <span class="vp-symbol">NVDA</span>
+            <strong class="vp-price">$915</strong>
+            <em class="vp-change">+2.8%</em>
+          </div>
+          <div class="valuation-preview-card">
+            <span class="vp-symbol">VTI</span>
+            <strong class="vp-price">$258</strong>
+            <em class="vp-change">+0.6%</em>
+          </div>
+        </div>
+        <div class="valuation-preview-chart">
+          <svg viewBox="0 0 220 90" aria-hidden="true" focusable="false">
+            <polyline class="valuation-preview-line" points="5,70 30,62 55,68 85,46 110,50 140,34 165,40 195,26 215,30" />
+          </svg>
+          <div class="valuation-preview-dots">
+            <span class="valuation-preview-dot d1"></span>
+            <span class="valuation-preview-dot d2"></span>
+            <span class="valuation-preview-dot d3"></span>
+          </div>
+        </div>
+        <div class="valuation-preview-bars">
+          <span style="--h:58%"></span>
+          <span style="--h:78%"></span>
+          <span style="--h:44%"></span>
+          <span style="--h:86%"></span>
+          <span style="--h:62%"></span>
+        </div>
+      </div>
       <a class="cta-link" href="./valuation-lab.html">Open Valuation Lab</a>
     </section>
 
-    <section class="card home-card">
+    <section class="card home-card investotype-card scroll-reveal">
       <h2>InvestoType</h2>
       <p>Learn your decision style, run fast simulations, and get guidance that fits how you actually invest.</p>
+      <div class="home-axis-widget">
+        <div class="investor-cube-head home-axis-head">
+          <span class="home-investotype-stack">
+            <span id="homeInvestotypeName" class="investor-cube-code home-investotype-name is-active">Active Conviction Investor</span>
+            <span id="homeInvestotypeNameAlt" class="investor-cube-code home-investotype-name">Active Conviction Investor</span>
+          </span>
+        </div>
+        <div id="homeAxis3dStage" class="axis-3d-stage home-axis-stage">
+          <canvas id="homeAxis3dCanvas" width="520" height="260"></canvas>
+          <div id="homeAxis3dHoverTip" class="axis-3d-hover hidden"></div>
+        </div>
+        <p id="homeInvestotypeAxis" class="home-axis-values">Risk 82 | Control 74 | Reactivity 72</p>
+      </div>
       <a class="cta-link" href="./investotype.html">Open InvestoType</a>
     </section>
 
-    <section class="card home-card">
+    <section class="card home-card scroll-reveal">
       <h2>News</h2>
       <p>Skip noise with focused feeds: market pulse, tailored headlines, and period-based picks.</p>
+      <div class="news-preview" aria-hidden="true">
+        <div class="news-preview-pulse"></div>
+        <div class="news-preview-stack">
+          <div class="news-preview-card">
+            <span class="news-tag">Market</span>
+            <strong>S&amp;P 500 sentiment flips positive</strong>
+            <em>5m ago</em>
+          </div>
+          <div class="news-preview-card">
+            <span class="news-tag">Tailored</span>
+            <strong>NVDA momentum stays elevated</strong>
+            <em>12m ago</em>
+          </div>
+          <div class="news-preview-card">
+            <span class="news-tag">Weekly</span>
+            <strong>Rates dip as CPI cools</strong>
+            <em>34m ago</em>
+          </div>
+        </div>
+        <div class="news-preview-bar">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
       <a class="cta-link" href="./news.html">Open News</a>
     </section>
 
-    <section class="card home-card">
+    <section class="card home-card scroll-reveal">
       <h2>About</h2>
       <p>See the product philosophy and how each tool turns data into a practical next move.</p>
+      <div class="about-preview" aria-hidden="true">
+        <div class="about-thread">
+          <div class="about-thread-path">
+            <svg viewBox="0 0 260 120" aria-hidden="true" focusable="false">
+              <path d="M10 90 C40 20 80 20 110 60 S170 110 250 30" />
+            </svg>
+          </div>
+          <div class="about-thread-nodes">
+            <div class="about-thread-node n1">Signals</div>
+            <div class="about-thread-node n2">Context</div>
+            <div class="about-thread-node n3">Decision</div>
+          </div>
+          <div class="about-thread-pulse"></div>
+        </div>
+      </div>
       <a class="cta-link" href="./about.html">Open About</a>
     </section>
 
@@ -89,6 +179,7 @@
     <a class="footer-contact-btn" href="mailto:tgrkhwang@gmail.com" aria-label="Contact by email">Contact</a>
     Copyright (c) 2026 InvestoLab. All rights reserved.
   </footer>
+  <script src="home.js?v=20260310a"></script>
 </body>
 </html>
 
