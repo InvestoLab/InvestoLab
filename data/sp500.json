@@ -1,1126 +1,2014 @@
-﻿[
-    {
-        "symbol":  "April1,2011",
-        "name":  "BLK"
-    },
-    {
-        "symbol":  "April1,2020",
-        "name":  "HWM"
-    },
-    {
-        "symbol":  "April1,2024",
-        "name":  "SOLV"
-    },
-    {
-        "symbol":  "April11,2022",
-        "name":  "WBD"
-    },
-    {
-        "symbol":  "April12,1999",
-        "name":  "ACT"
-    },
-    {
-        "symbol":  "April18,2016",
-        "name":  "ULTA"
-    },
-    {
-        "symbol":  "April2,2014",
-        "name":  "ESS"
-    },
-    {
-        "symbol":  "April2,2019",
-        "name":  "DOW"
-    },
-    {
-        "symbol":  "April2,2024",
-        "name":  "GEV"
-    },
-    {
-        "symbol":  "April20,2021",
-        "name":  "PTC"
-    },
-    {
-        "symbol":  "April23,2012",
-        "name":  "PSX"
-    },
-    {
-        "symbol":  "April25,2016",
-        "name":  "GPN"
-    },
-    {
-        "symbol":  "April27,2011",
-        "name":  "CMG"
-    },
-    {
-        "symbol":  "April29,2010",
-        "name":  "CERN"
-    },
-    {
-        "symbol":  "April3,2012",
-        "name":  "FOSL"
-    },
-    {
-        "symbol":  "April3,2014",
-        "name":  "GOOGL"
-    },
-    {
-        "symbol":  "April3,2020",
-        "name":  "OTIS"
-    },
-    {
-        "symbol":  "April30,2013",
-        "name":  "REGN"
-    },
-    {
-        "symbol":  "April4,2016",
-        "name":  "FL"
-    },
-    {
-        "symbol":  "April4,2017",
-        "name":  "DXC"
-    },
-    {
-        "symbol":  "April4,2018",
-        "name":  "MSCI"
-    },
-    {
-        "symbol":  "April4,2022",
-        "name":  "CPT"
-    },
-    {
-        "symbol":  "April5,2017",
-        "name":  "IT"
-    },
-    {
-        "symbol":  "April7,2015",
-        "name":  "O"
-    },
-    {
-        "symbol":  "April8,2016",
-        "name":  "UA"
-    },
-    {
-        "symbol":  "August18,2014",
-        "name":  "MNK"
-    },
-    {
-        "symbol":  "August19,2009",
-        "name":  "FMC"
-    },
-    {
-        "symbol":  "August24,2007",
-        "name":  "LUK"
-    },
-    {
-        "symbol":  "August25,2023",
-        "name":  "KVUE"
-    },
-    {
-        "symbol":  "August26,2010",
-        "name":  "TYC"
-    },
-    {
-        "symbol":  "August28,2015",
-        "name":  "ATVI"
-    },
-    {
-        "symbol":  "August28,2018",
-        "name":  "ANET"
-    },
-    {
-        "symbol":  "August28,2025",
-        "name":  "IBKR"
-    },
-    {
-        "symbol":  "August29,2017",
-        "name":  "Q"
-    },
-    {
-        "symbol":  "August30,2021",
-        "name":  "TECH"
-    },
-    {
-        "symbol":  "August6,2014",
-        "name":  "DISCK"
-    },
-    {
-        "symbol":  "August8,2017",
-        "name":  "BHF"
-    },
-    {
-        "symbol":  "August9,2019",
-        "name":  "LDOS"
-    },
-    {
-        "symbol":  "December1,2015",
-        "name":  "CSRA"
-    },
-    {
-        "symbol":  "December10,2013",
-        "name":  "GGP"
-    },
-    {
-        "symbol":  "December11,1998",
-        "name":  "CPWR"
-    },
-    {
-        "symbol":  "December11,2012",
-        "name":  "GRMN"
-    },
-    {
-        "symbol":  "December11,2025",
-        "name":  "ARES"
-    },
-    {
-        "symbol":  "December12,2011",
-        "name":  "GAS"
-    },
-    {
-        "symbol":  "December13,2007",
-        "name":  "GME"
-    },
-    {
-        "symbol":  "December14,2021",
-        "name":  "EPAM"
-    },
-    {
-        "symbol":  "December15,2022",
-        "name":  "MBC"
-    },
-    {
-        "symbol":  "December16,2011",
-        "name":  "PRGO"
-    },
-    {
-        "symbol":  "December17,2010",
-        "name":  "NFLX"
-    },
-    {
-        "symbol":  "December18,2009",
-        "name":  "V"
-    },
-    {
-        "symbol":  "December18,2023",
-        "name":  "UBER"
-    },
-    {
-        "symbol":  "December19,2022",
-        "name":  "FSLR"
-    },
-    {
-        "symbol":  "December2,2013",
-        "name":  "ALLE"
-    },
-    {
-        "symbol":  "December2,2016",
-        "name":  "MAA"
-    },
-    {
-        "symbol":  "December20,2007",
-        "name":  "RRC"
-    },
-    {
-        "symbol":  "December20,2011",
-        "name":  "TRIP"
-    },
-    {
-        "symbol":  "December20,2021",
-        "name":  "SEDG"
-    },
-    {
-        "symbol":  "December21,2012",
-        "name":  "DLPH"
-    },
-    {
-        "symbol":  "December21,2020",
-        "name":  "TSLA"
-    },
-    {
-        "symbol":  "December22,2022",
-        "name":  "STLD"
-    },
-    {
-        "symbol":  "December22,2025",
-        "name":  "FIX"
-    },
-    {
-        "symbol":  "December23,2013",
-        "name":  "ADS"
-    },
-    {
-        "symbol":  "December23,2019",
-        "name":  "ZBRA"
-    },
-    {
-        "symbol":  "December23,2024",
-        "name":  "APO"
-    },
-    {
-        "symbol":  "December24,2018",
-        "name":  "CE"
-    },
-    {
-        "symbol":  "December29,2015",
-        "name":  "CHD"
-    },
-    {
-        "symbol":  "December3,2012",
-        "name":  "DG"
-    },
-    {
-        "symbol":  "December3,2018",
-        "name":  "MXIM"
-    },
-    {
-        "symbol":  "December31,2008",
-        "name":  "OI"
-    },
-    {
-        "symbol":  "December31,2011",
-        "name":  "WPX"
-    },
-    {
-        "symbol":  "December5,2000",
-        "name":  "ABK"
-    },
-    {
-        "symbol":  "December5,2014",
-        "name":  "RCL"
-    },
-    {
-        "symbol":  "December5,2019",
-        "name":  "WRB"
-    },
-    {
-        "symbol":  "December8,1999",
-        "name":  "YHOO"
-    },
-    {
-        "symbol":  "December9,2019",
-        "name":  "ODFL"
-    },
-    {
-        "symbol":  "February1,2016",
-        "name":  "FRT"
-    },
-    {
-        "symbol":  "February12,2021",
-        "name":  "MPWR"
-    },
-    {
-        "symbol":  "February15,2013",
-        "name":  "PVH"
-    },
-    {
-        "symbol":  "February15,2019",
-        "name":  "ATO"
-    },
-    {
-        "symbol":  "February15,2022",
-        "name":  "NDSN"
-    },
-    {
-        "symbol":  "February2,2022",
-        "name":  "CEG"
-    },
-    {
-        "symbol":  "February22,2016",
-        "name":  "CXO"
-    },
-    {
-        "symbol":  "February25,2011",
-        "name":  "JOYG"
-    },
-    {
-        "symbol":  "February26,2010",
-        "name":  "HP"
-    },
-    {
-        "symbol":  "February27,2019",
-        "name":  "WAB"
-    },
-    {
-        "symbol":  "February28,2011",
-        "name":  "COV"
-    },
-    {
-        "symbol":  "February28,2017",
-        "name":  "INCY"
-    },
-    {
-        "symbol":  "February9,2026",
-        "name":  "CIEN"
-    },
-    {
-        "symbol":  "January10,2007",
-        "name":  "AVB"
-    },
-    {
-        "symbol":  "January18,2019",
-        "name":  "TFX"
-    },
-    {
-        "symbol":  "January19,2016",
-        "name":  "EXR"
-    },
-    {
-        "symbol":  "January2,2013",
-        "name":  "ABBV"
-    },
-    {
-        "symbol":  "January2,2019",
-        "name":  "FRC"
-    },
-    {
-        "symbol":  "January21,2021",
-        "name":  "TRMB"
-    },
-    {
-        "symbol":  "January24,2014",
-        "name":  "TSCO"
-    },
-    {
-        "symbol":  "January27,2015",
-        "name":  "HCA"
-    },
-    {
-        "symbol":  "January28,2020",
-        "name":  "PAYC"
-    },
-    {
-        "symbol":  "January3,2011",
-        "name":  "MMI"
-    },
-    {
-        "symbol":  "January3,2018",
-        "name":  "HII"
-    },
-    {
-        "symbol":  "January4,2023",
-        "name":  "GEHC"
-    },
-    {
-        "symbol":  "January5,2016",
-        "name":  "WLTW"
-    },
-    {
-        "symbol":  "January5,2017",
-        "name":  "IDXX"
-    },
-    {
-        "symbol":  "January7,2021",
-        "name":  "ENPH"
-    },
-    {
-        "symbol":  "July1,1976",
-        "name":  "DIS"
-    },
-    {
-        "symbol":  "July1,2005",
-        "name":  "STZ"
-    },
-    {
-        "symbol":  "July1,2008",
-        "name":  "AKS"
-    },
-    {
-        "symbol":  "July1,2013",
-        "name":  "NWSA"
-    },
-    {
-        "symbol":  "July1,2014",
-        "name":  "AMG"
-    },
-    {
-        "symbol":  "July1,2015",
-        "name":  "JBHT"
-    },
-    {
-        "symbol":  "July1,2016",
-        "name":  "LNT"
-    },
-    {
-        "symbol":  "July1,2019",
-        "name":  "MKTX"
-    },
-    {
-        "symbol":  "July14,2010",
-        "name":  "CB"
-    },
-    {
-        "symbol":  "July15,2019",
-        "name":  "TMUS"
-    },
-    {
-        "symbol":  "July18,2025",
-        "name":  "TTD"
-    },
-    {
-        "symbol":  "July2,2007",
-        "name":  "DFS"
-    },
-    {
-        "symbol":  "July2,2012",
-        "name":  "STX"
-    },
-    {
-        "symbol":  "July2,2014",
-        "name":  "MLM"
-    },
-    {
-        "symbol":  "July2,2015",
-        "name":  "CPGX"
-    },
-    {
-        "symbol":  "July2,2018",
-        "name":  "CPRT"
-    },
-    {
-        "symbol":  "July20,2015",
-        "name":  "PYPL"
-    },
-    {
-        "symbol":  "July21,2021",
-        "name":  "MRNA"
-    },
-    {
-        "symbol":  "July23,2025",
-        "name":  "XYZ"
-    },
-    {
-        "symbol":  "July26,2017",
-        "name":  "RMD"
-    },
-    {
-        "symbol":  "July27,2000",
-        "name":  "JDSU"
-    },
-    {
-        "symbol":  "July29,2015",
-        "name":  "SIG"
-    },
-    {
-        "symbol":  "July31,2012",
-        "name":  "ESV"
-    },
-    {
-        "symbol":  "July5,2011",
-        "name":  "ACN"
-    },
-    {
-        "symbol":  "July5,2016",
-        "name":  "FTV"
-    },
-    {
-        "symbol":  "July6,2015",
-        "name":  "KHC"
-    },
-    {
-        "symbol":  "July7,2017",
-        "name":  "BKR"
-    },
-    {
-        "symbol":  "July8,2013",
-        "name":  "NLSN"
-    },
-    {
-        "symbol":  "July8,2015",
-        "name":  "AAP"
-    },
-    {
-        "symbol":  "July9,2025",
-        "name":  "DDOG"
-    },
-    {
-        "symbol":  "June1,2011",
-        "name":  "ANR"
-    },
-    {
-        "symbol":  "June10,2008",
-        "name":  "LO"
-    },
-    {
-        "symbol":  "June11,2015",
-        "name":  "QRVO"
-    },
-    {
-        "symbol":  "June11,2019",
-        "name":  "AMCR"
-    },
-    {
-        "symbol":  "June12,2000",
-        "name":  "CVG"
-    },
-    {
-        "symbol":  "June17,1997",
-        "name":  "CCR"
-    },
-    {
-        "symbol":  "June18,2018",
-        "name":  "HFC"
-    },
-    {
-        "symbol":  "June19,2017",
-        "name":  "RE"
-    },
-    {
-        "symbol":  "June2,2006",
-        "name":  "JNPR"
-    },
-    {
-        "symbol":  "June2,2017",
-        "name":  "INFO"
-    },
-    {
-        "symbol":  "June20,2014",
-        "name":  "XEC"
-    },
-    {
-        "symbol":  "June20,2018",
-        "name":  "FLT"
-    },
-    {
-        "symbol":  "June20,2023",
-        "name":  "PANW"
-    },
-    {
-        "symbol":  "June21,2013",
-        "name":  "ZTS"
-    },
-    {
-        "symbol":  "June21,2022",
-        "name":  "KDP"
-    },
-    {
-        "symbol":  "June22,2016",
-        "name":  "FBHS"
-    },
-    {
-        "symbol":  "June22,2020",
-        "name":  "TYL"
-    },
-    {
-        "symbol":  "June23,2008",
-        "name":  "COG"
-    },
-    {
-        "symbol":  "June24,2024",
-        "name":  "GDDY"
-    },
-    {
-        "symbol":  "June28,2010",
-        "name":  "KMX"
-    },
-    {
-        "symbol":  "June29,2009",
-        "name":  "PCS"
-    },
-    {
-        "symbol":  "June29,2012",
-        "name":  "MNST"
-    },
-    {
-        "symbol":  "June3,2016",
-        "name":  "TDG"
-    },
-    {
-        "symbol":  "June3,2019",
-        "name":  "DD"
-    },
-    {
-        "symbol":  "June3,2021",
-        "name":  "OGN"
-    },
-    {
-        "symbol":  "June30,2010",
-        "name":  "QEP"
-    },
-    {
-        "symbol":  "June30,2011",
-        "name":  "MPC"
-    },
-    {
-        "symbol":  "June5,2009",
-        "name":  "FTI"
-    },
-    {
-        "symbol":  "June5,2012",
-        "name":  "LRCX"
-    },
-    {
-        "symbol":  "June5,2018",
-        "name":  "EVRG"
-    },
-    {
-        "symbol":  "June6,2013",
-        "name":  "GM"
-    },
-    {
-        "symbol":  "June7,2000",
-        "name":  "SBUX"
-    },
-    {
-        "symbol":  "June7,2018",
-        "name":  "TWTR"
-    },
-    {
-        "symbol":  "June7,2019",
-        "name":  "BMS"
-    },
-    {
-        "symbol":  "June8,2022",
-        "name":  "VICI"
-    },
-    {
-        "symbol":  "June9,1999",
-        "name":  "WLP"
-    },
-    {
-        "symbol":  "March1,2017",
-        "name":  "CBOE"
-    },
-    {
-        "symbol":  "March12,2015",
-        "name":  "SWKS"
-    },
-    {
-        "symbol":  "March13,2012",
-        "name":  "CCI"
-    },
-    {
-        "symbol":  "March13,2017",
-        "name":  "DISH"
-    },
-    {
-        "symbol":  "March15,2023",
-        "name":  "PODD"
-    },
-    {
-        "symbol":  "March16,2017",
-        "name":  "SNPS"
-    },
-    {
-        "symbol":  "March18,2015",
-        "name":  "HSIC"
-    },
-    {
-        "symbol":  "March18,2024",
-        "name":  "DECK"
-    },
-    {
-        "symbol":  "March19,2018",
-        "name":  "TTWO"
-    },
-    {
-        "symbol":  "March19,2019",
-        "name":  "FOXA"
-    },
-    {
-        "symbol":  "March2,2017",
-        "name":  "REG"
-    },
-    {
-        "symbol":  "March2,2020",
-        "name":  "IR"
-    },
-    {
-        "symbol":  "March2,2022",
-        "name":  "MOH"
-    },
-    {
-        "symbol":  "March20,2017",
-        "name":  "ARE"
-    },
-    {
-        "symbol":  "March20,2023",
-        "name":  "FICO"
-    },
-    {
-        "symbol":  "March21,2014",
-        "name":  "GMCR"
-    },
-    {
-        "symbol":  "March22,2021",
-        "name":  "GNRC"
-    },
-    {
-        "symbol":  "March23,2015",
-        "name":  "SLG"
-    },
-    {
-        "symbol":  "March24,2025",
-        "name":  "EXE"
-    },
-    {
-        "symbol":  "March3,2009",
-        "name":  "VTR"
-    },
-    {
-        "symbol":  "March30,2007",
-        "name":  "KFT"
-    },
-    {
-        "symbol":  "March30,2016",
-        "name":  "CNC"
-    },
-    {
-        "symbol":  "March31,2011",
-        "name":  "EW"
-    },
-    {
-        "symbol":  "March4,2016",
-        "name":  "AWK"
-    },
-    {
-        "symbol":  "March7,2016",
-        "name":  "UDR"
-    },
-    {
-        "symbol":  "March7,2018",
-        "name":  "IPGP"
-    },
-    {
-        "symbol":  "May1,2014",
-        "name":  "UA"
-    },
-    {
-        "symbol":  "May12,2020",
-        "name":  "DPZ"
-    },
-    {
-        "symbol":  "May13,2016",
-        "name":  "ALK"
-    },
-    {
-        "symbol":  "May14,2021",
-        "name":  "CRL"
-    },
-    {
-        "symbol":  "May17,2012",
-        "name":  "KMI"
-    },
-    {
-        "symbol":  "May18,2016",
-        "name":  "DLR"
-    },
-    {
-        "symbol":  "May19,2025",
-        "name":  "COIN"
-    },
-    {
-        "symbol":  "May21,2012",
-        "name":  "ALXN"
-    },
-    {
-        "symbol":  "May22,2020",
-        "name":  "WST"
-    },
-    {
-        "symbol":  "May23,2013",
-        "name":  "KSU"
-    },
-    {
-        "symbol":  "May23,2016",
-        "name":  "LKQ"
-    },
-    {
-        "symbol":  "May3,2016",
-        "name":  "AYI"
-    },
-    {
-        "symbol":  "May31,2016",
-        "name":  "AJG"
-    },
-    {
-        "symbol":  "May31,2018",
-        "name":  "ABMD"
-    },
-    {
-        "symbol":  "May4,2023",
-        "name":  "AXON"
-    },
-    {
-        "symbol":  "May8,2013",
-        "name":  "MAC"
-    },
-    {
-        "symbol":  "May8,2014",
-        "name":  "AVGO"
-    },
-    {
-        "symbol":  "May8,2024",
-        "name":  "VST"
-    },
-    {
-        "symbol":  "November1,2016",
-        "name":  "ARNC"
-    },
-    {
-        "symbol":  "November1,2022",
-        "name":  "ACGL"
-    },
-    {
-        "symbol":  "November13,2013",
-        "name":  "KORS"
-    },
-    {
-        "symbol":  "November13,2018",
-        "name":  "JKHY"
-    },
-    {
-        "symbol":  "November17,2010",
-        "name":  "IR"
-    },
-    {
-        "symbol":  "November18,2005",
-        "name":  "AMZN"
-    },
-    {
-        "symbol":  "November18,2011",
-        "name":  "CBE"
-    },
-    {
-        "symbol":  "November18,2015",
-        "name":  "SYF"
-    },
-    {
-        "symbol":  "November19,2015",
-        "name":  "ILMN"
-    },
-    {
-        "symbol":  "November2,2015",
-        "name":  "HPE"
-    },
-    {
-        "symbol":  "November21,2019",
-        "name":  "NOW"
-    },
-    {
-        "symbol":  "November26,2024",
-        "name":  "TPL"
-    },
-    {
-        "symbol":  "November28,2025",
-        "name":  "SNDK"
-    },
-    {
-        "symbol":  "November3,2009",
-        "name":  "PCLN"
-    },
-    {
-        "symbol":  "November3,2025",
-        "name":  "Q"
-    },
-    {
-        "symbol":  "November5,2014",
-        "name":  "LVLT"
-    },
-    {
-        "symbol":  "November6,2018",
-        "name":  "KEYS"
-    },
-    {
-        "symbol":  "October1,2007",
-        "name":  "TDC"
-    },
-    {
-        "symbol":  "October1,2012",
-        "name":  "ADT"
-    },
-    {
-        "symbol":  "October1,2018",
-        "name":  "ROL"
-    },
-    {
-        "symbol":  "October10,2012",
-        "name":  "PETM"
-    },
-    {
-        "symbol":  "October11,2018",
-        "name":  "FTNT"
-    },
-    {
-        "symbol":  "October12,2022",
-        "name":  "TRGP"
-    },
-    {
-        "symbol":  "October13,2017",
-        "name":  "NCLH"
-    },
-    {
-        "symbol":  "October14,2011",
-        "name":  "TEL"
-    },
-    {
-        "symbol":  "October18,2023",
-        "name":  "HUBB"
-    },
-    {
-        "symbol":  "October2,2007",
-        "name":  "EXPE"
-    },
-    {
-        "symbol":  "October2,2012",
-        "name":  "MDLZ"
-    },
-    {
-        "symbol":  "October2,2023",
-        "name":  "VLTO"
-    },
-    {
-        "symbol":  "October26,2007",
-        "name":  "JEC"
-    },
-    {
-        "symbol":  "October29,2013",
-        "name":  "RIG"
-    },
-    {
-        "symbol":  "October3,2019",
-        "name":  "LVS"
-    },
-    {
-        "symbol":  "October3,2022",
-        "name":  "PCG"
-    },
-    {
-        "symbol":  "October30,2025",
-        "name":  "SOLS"
-    },
-    {
-        "symbol":  "October31,2011",
-        "name":  "XYL"
-    },
-    {
-        "symbol":  "October7,2015",
-        "name":  "VRSK"
-    },
-    {
-        "symbol":  "October7,2020",
-        "name":  "POOL"
-    },
-    {
-        "symbol":  "October9,2020",
-        "name":  "VNT"
-    },
-    {
-        "symbol":  "September1,2017",
-        "name":  "SBAC"
-    },
-    {
-        "symbol":  "September10,2013",
-        "name":  "DAL"
-    },
-    {
-        "symbol":  "September12,2008",
-        "name":  "CRM"
-    },
-    {
-        "symbol":  "September14,2018",
-        "name":  "WCG"
-    },
-    {
-        "symbol":  "September16,2008",
-        "name":  "HRS"
-    },
-    {
-        "symbol":  "September18,2015",
-        "name":  "FOX"
-    },
-    {
-        "symbol":  "September18,2017",
-        "name":  "CDNS"
-    },
-    {
-        "symbol":  "September18,2023",
-        "name":  "ABNB"
-    },
-    {
-        "symbol":  "September19,2022",
-        "name":  "CSGP"
-    },
-    {
-        "symbol":  "September2,2015",
-        "name":  "UAL"
-    },
-    {
-        "symbol":  "September20,2013",
-        "name":  "AME"
-    },
-    {
-        "symbol":  "September20,2014",
-        "name":  "URI"
-    },
-    {
-        "symbol":  "September20,2021",
-        "name":  "CDAY"
-    },
-    {
-        "symbol":  "September21,2020",
-        "name":  "ETSY"
-    },
-    {
-        "symbol":  "September22,2016",
-        "name":  "COO"
-    },
-    {
-        "symbol":  "September22,2025",
-        "name":  "APP"
-    },
-    {
-        "symbol":  "September23,2011",
-        "name":  "MOS"
-    },
-    {
-        "symbol":  "September23,2019",
-        "name":  "CDW"
-    },
-    {
-        "symbol":  "September23,2024",
-        "name":  "DELL"
-    },
-    {
-        "symbol":  "September25,2003",
-        "name":  "ESRX"
-    },
-    {
-        "symbol":  "September26,2007",
-        "name":  "ICE"
-    },
-    {
-        "symbol":  "September26,2019",
-        "name":  "NVR"
-    },
-    {
-        "symbol":  "September27,2007",
-        "name":  "TSO"
-    },
-    {
-        "symbol":  "September28,2009",
-        "name":  "ARG"
-    },
-    {
-        "symbol":  "September30,1994",
-        "name":  "NCC"
-    },
-    {
-        "symbol":  "September30,2016",
-        "name":  "COTY"
-    },
-    {
-        "symbol":  "September30,2024",
-        "name":  "AMTM"
-    },
-    {
-        "symbol":  "September5,2012",
-        "name":  "LYB"
-    },
-    {
-        "symbol":  "September6,2016",
-        "name":  "MTD"
-    },
-    {
-        "symbol":  "September8,2016",
-        "name":  "CHTR"
-    }
+[
+  {
+    "symbol": "MMM",
+    "name": "3M"
+  },
+  {
+    "symbol": "AOS",
+    "name": "A. O. Smith"
+  },
+  {
+    "symbol": "ABT",
+    "name": "Abbott Laboratories"
+  },
+  {
+    "symbol": "ABBV",
+    "name": "AbbVie"
+  },
+  {
+    "symbol": "ACN",
+    "name": "Accenture"
+  },
+  {
+    "symbol": "ADBE",
+    "name": "Adobe Inc."
+  },
+  {
+    "symbol": "AMD",
+    "name": "Advanced Micro Devices"
+  },
+  {
+    "symbol": "AES",
+    "name": "AES Corporation"
+  },
+  {
+    "symbol": "AFL",
+    "name": "Aflac"
+  },
+  {
+    "symbol": "A",
+    "name": "Agilent Technologies"
+  },
+  {
+    "symbol": "APD",
+    "name": "Air Products"
+  },
+  {
+    "symbol": "ABNB",
+    "name": "Airbnb"
+  },
+  {
+    "symbol": "AKAM",
+    "name": "Akamai Technologies"
+  },
+  {
+    "symbol": "ALB",
+    "name": "Albemarle Corporation"
+  },
+  {
+    "symbol": "ARE",
+    "name": "Alexandria Real Estate Equities"
+  },
+  {
+    "symbol": "ALGN",
+    "name": "Align Technology"
+  },
+  {
+    "symbol": "ALLE",
+    "name": "Allegion"
+  },
+  {
+    "symbol": "LNT",
+    "name": "Alliant Energy"
+  },
+  {
+    "symbol": "ALL",
+    "name": "Allstate"
+  },
+  {
+    "symbol": "GOOGL",
+    "name": "Alphabet Inc. (Class A)"
+  },
+  {
+    "symbol": "GOOG",
+    "name": "Alphabet Inc. (Class C)"
+  },
+  {
+    "symbol": "MO",
+    "name": "Altria"
+  },
+  {
+    "symbol": "AMZN",
+    "name": "Amazon"
+  },
+  {
+    "symbol": "AMCR",
+    "name": "Amcor"
+  },
+  {
+    "symbol": "AEE",
+    "name": "Ameren"
+  },
+  {
+    "symbol": "AEP",
+    "name": "American Electric Power"
+  },
+  {
+    "symbol": "AXP",
+    "name": "American Express"
+  },
+  {
+    "symbol": "AIG",
+    "name": "American International Group"
+  },
+  {
+    "symbol": "AMT",
+    "name": "American Tower"
+  },
+  {
+    "symbol": "AWK",
+    "name": "American Water Works"
+  },
+  {
+    "symbol": "AMP",
+    "name": "Ameriprise Financial"
+  },
+  {
+    "symbol": "AME",
+    "name": "Ametek"
+  },
+  {
+    "symbol": "AMGN",
+    "name": "Amgen"
+  },
+  {
+    "symbol": "APH",
+    "name": "Amphenol"
+  },
+  {
+    "symbol": "ADI",
+    "name": "Analog Devices"
+  },
+  {
+    "symbol": "AON",
+    "name": "Aon plc"
+  },
+  {
+    "symbol": "APA",
+    "name": "APA Corporation"
+  },
+  {
+    "symbol": "APO",
+    "name": "Apollo Global Management"
+  },
+  {
+    "symbol": "AAPL",
+    "name": "Apple Inc."
+  },
+  {
+    "symbol": "AMAT",
+    "name": "Applied Materials"
+  },
+  {
+    "symbol": "APP",
+    "name": "AppLovin"
+  },
+  {
+    "symbol": "APTV",
+    "name": "Aptiv"
+  },
+  {
+    "symbol": "ACGL",
+    "name": "Arch Capital Group"
+  },
+  {
+    "symbol": "ADM",
+    "name": "Archer Daniels Midland"
+  },
+  {
+    "symbol": "ARES",
+    "name": "Ares Management"
+  },
+  {
+    "symbol": "ANET",
+    "name": "Arista Networks"
+  },
+  {
+    "symbol": "AJG",
+    "name": "Arthur J. Gallagher & Co."
+  },
+  {
+    "symbol": "AIZ",
+    "name": "Assurant"
+  },
+  {
+    "symbol": "T",
+    "name": "AT&T"
+  },
+  {
+    "symbol": "ATO",
+    "name": "Atmos Energy"
+  },
+  {
+    "symbol": "ADSK",
+    "name": "Autodesk"
+  },
+  {
+    "symbol": "ADP",
+    "name": "Automatic Data Processing"
+  },
+  {
+    "symbol": "AZO",
+    "name": "AutoZone"
+  },
+  {
+    "symbol": "AVB",
+    "name": "AvalonBay Communities"
+  },
+  {
+    "symbol": "AVY",
+    "name": "Avery Dennison"
+  },
+  {
+    "symbol": "AXON",
+    "name": "Axon Enterprise"
+  },
+  {
+    "symbol": "BKR",
+    "name": "Baker Hughes"
+  },
+  {
+    "symbol": "BALL",
+    "name": "Ball Corporation"
+  },
+  {
+    "symbol": "BAC",
+    "name": "Bank of America"
+  },
+  {
+    "symbol": "BAX",
+    "name": "Baxter International"
+  },
+  {
+    "symbol": "BDX",
+    "name": "Becton Dickinson"
+  },
+  {
+    "symbol": "BRK.B",
+    "name": "Berkshire Hathaway"
+  },
+  {
+    "symbol": "BBY",
+    "name": "Best Buy"
+  },
+  {
+    "symbol": "TECH",
+    "name": "Bio-Techne"
+  },
+  {
+    "symbol": "BIIB",
+    "name": "Biogen"
+  },
+  {
+    "symbol": "BLK",
+    "name": "BlackRock"
+  },
+  {
+    "symbol": "BX",
+    "name": "Blackstone Inc."
+  },
+  {
+    "symbol": "XYZ",
+    "name": "Block, Inc."
+  },
+  {
+    "symbol": "BK",
+    "name": "BNY Mellon"
+  },
+  {
+    "symbol": "BA",
+    "name": "Boeing"
+  },
+  {
+    "symbol": "BKNG",
+    "name": "Booking Holdings"
+  },
+  {
+    "symbol": "BSX",
+    "name": "Boston Scientific"
+  },
+  {
+    "symbol": "BMY",
+    "name": "Bristol Myers Squibb"
+  },
+  {
+    "symbol": "AVGO",
+    "name": "Broadcom"
+  },
+  {
+    "symbol": "BR",
+    "name": "Broadridge Financial Solutions"
+  },
+  {
+    "symbol": "BRO",
+    "name": "Brown & Brown"
+  },
+  {
+    "symbol": "BF.B",
+    "name": "Brown–Forman"
+  },
+  {
+    "symbol": "BLDR",
+    "name": "Builders FirstSource"
+  },
+  {
+    "symbol": "BG",
+    "name": "Bunge Global"
+  },
+  {
+    "symbol": "BXP",
+    "name": "BXP, Inc."
+  },
+  {
+    "symbol": "CHRW",
+    "name": "C.H. Robinson"
+  },
+  {
+    "symbol": "CDNS",
+    "name": "Cadence Design Systems"
+  },
+  {
+    "symbol": "CPT",
+    "name": "Camden Property Trust"
+  },
+  {
+    "symbol": "CPB",
+    "name": "Campbell's Company (The)"
+  },
+  {
+    "symbol": "COF",
+    "name": "Capital One"
+  },
+  {
+    "symbol": "CAH",
+    "name": "Cardinal Health"
+  },
+  {
+    "symbol": "CCL",
+    "name": "Carnival"
+  },
+  {
+    "symbol": "CARR",
+    "name": "Carrier Global"
+  },
+  {
+    "symbol": "CVNA",
+    "name": "Carvana"
+  },
+  {
+    "symbol": "CAT",
+    "name": "Caterpillar Inc."
+  },
+  {
+    "symbol": "CBOE",
+    "name": "Cboe Global Markets"
+  },
+  {
+    "symbol": "CBRE",
+    "name": "CBRE Group"
+  },
+  {
+    "symbol": "CDW",
+    "name": "CDW Corporation"
+  },
+  {
+    "symbol": "COR",
+    "name": "Cencora"
+  },
+  {
+    "symbol": "CNC",
+    "name": "Centene Corporation"
+  },
+  {
+    "symbol": "CNP",
+    "name": "CenterPoint Energy"
+  },
+  {
+    "symbol": "CF",
+    "name": "CF Industries"
+  },
+  {
+    "symbol": "CRL",
+    "name": "Charles River Laboratories"
+  },
+  {
+    "symbol": "SCHW",
+    "name": "Charles Schwab Corporation"
+  },
+  {
+    "symbol": "CHTR",
+    "name": "Charter Communications"
+  },
+  {
+    "symbol": "CVX",
+    "name": "Chevron Corporation"
+  },
+  {
+    "symbol": "CMG",
+    "name": "Chipotle Mexican Grill"
+  },
+  {
+    "symbol": "CB",
+    "name": "Chubb Limited"
+  },
+  {
+    "symbol": "CHD",
+    "name": "Church & Dwight"
+  },
+  {
+    "symbol": "CIEN",
+    "name": "Ciena"
+  },
+  {
+    "symbol": "CI",
+    "name": "Cigna"
+  },
+  {
+    "symbol": "CINF",
+    "name": "Cincinnati Financial"
+  },
+  {
+    "symbol": "CTAS",
+    "name": "Cintas"
+  },
+  {
+    "symbol": "CSCO",
+    "name": "Cisco"
+  },
+  {
+    "symbol": "C",
+    "name": "Citigroup"
+  },
+  {
+    "symbol": "CFG",
+    "name": "Citizens Financial Group"
+  },
+  {
+    "symbol": "CLX",
+    "name": "Clorox"
+  },
+  {
+    "symbol": "CME",
+    "name": "CME Group"
+  },
+  {
+    "symbol": "CMS",
+    "name": "CMS Energy"
+  },
+  {
+    "symbol": "KO",
+    "name": "Coca-Cola Company (The)"
+  },
+  {
+    "symbol": "CTSH",
+    "name": "Cognizant"
+  },
+  {
+    "symbol": "COIN",
+    "name": "Coinbase"
+  },
+  {
+    "symbol": "CL",
+    "name": "Colgate-Palmolive"
+  },
+  {
+    "symbol": "CMCSA",
+    "name": "Comcast"
+  },
+  {
+    "symbol": "FIX",
+    "name": "Comfort Systems USA"
+  },
+  {
+    "symbol": "CAG",
+    "name": "Conagra Brands"
+  },
+  {
+    "symbol": "COP",
+    "name": "ConocoPhillips"
+  },
+  {
+    "symbol": "ED",
+    "name": "Consolidated Edison"
+  },
+  {
+    "symbol": "STZ",
+    "name": "Constellation Brands"
+  },
+  {
+    "symbol": "CEG",
+    "name": "Constellation Energy"
+  },
+  {
+    "symbol": "COO",
+    "name": "Cooper Companies (The)"
+  },
+  {
+    "symbol": "CPRT",
+    "name": "Copart"
+  },
+  {
+    "symbol": "GLW",
+    "name": "Corning Inc."
+  },
+  {
+    "symbol": "CPAY",
+    "name": "Corpay"
+  },
+  {
+    "symbol": "CTVA",
+    "name": "Corteva"
+  },
+  {
+    "symbol": "CSGP",
+    "name": "CoStar Group"
+  },
+  {
+    "symbol": "COST",
+    "name": "Costco"
+  },
+  {
+    "symbol": "CTRA",
+    "name": "Coterra"
+  },
+  {
+    "symbol": "CRH",
+    "name": "CRH plc"
+  },
+  {
+    "symbol": "CRWD",
+    "name": "CrowdStrike"
+  },
+  {
+    "symbol": "CCI",
+    "name": "Crown Castle"
+  },
+  {
+    "symbol": "CSX",
+    "name": "CSX Corporation"
+  },
+  {
+    "symbol": "CMI",
+    "name": "Cummins"
+  },
+  {
+    "symbol": "CVS",
+    "name": "CVS Health"
+  },
+  {
+    "symbol": "DHR",
+    "name": "Danaher Corporation"
+  },
+  {
+    "symbol": "DRI",
+    "name": "Darden Restaurants"
+  },
+  {
+    "symbol": "DDOG",
+    "name": "Datadog"
+  },
+  {
+    "symbol": "DVA",
+    "name": "DaVita"
+  },
+  {
+    "symbol": "DECK",
+    "name": "Deckers Brands"
+  },
+  {
+    "symbol": "DE",
+    "name": "Deere & Company"
+  },
+  {
+    "symbol": "DELL",
+    "name": "Dell Technologies"
+  },
+  {
+    "symbol": "DAL",
+    "name": "Delta Air Lines"
+  },
+  {
+    "symbol": "DVN",
+    "name": "Devon Energy"
+  },
+  {
+    "symbol": "DXCM",
+    "name": "Dexcom"
+  },
+  {
+    "symbol": "FANG",
+    "name": "Diamondback Energy"
+  },
+  {
+    "symbol": "DLR",
+    "name": "Digital Realty"
+  },
+  {
+    "symbol": "DG",
+    "name": "Dollar General"
+  },
+  {
+    "symbol": "DLTR",
+    "name": "Dollar Tree"
+  },
+  {
+    "symbol": "D",
+    "name": "Dominion Energy"
+  },
+  {
+    "symbol": "DPZ",
+    "name": "Domino's"
+  },
+  {
+    "symbol": "DASH",
+    "name": "DoorDash"
+  },
+  {
+    "symbol": "DOV",
+    "name": "Dover Corporation"
+  },
+  {
+    "symbol": "DOW",
+    "name": "Dow Inc."
+  },
+  {
+    "symbol": "DHI",
+    "name": "D. R. Horton"
+  },
+  {
+    "symbol": "DTE",
+    "name": "DTE Energy"
+  },
+  {
+    "symbol": "DUK",
+    "name": "Duke Energy"
+  },
+  {
+    "symbol": "DD",
+    "name": "DuPont"
+  },
+  {
+    "symbol": "ETN",
+    "name": "Eaton Corporation"
+  },
+  {
+    "symbol": "EBAY",
+    "name": "eBay Inc."
+  },
+  {
+    "symbol": "ECL",
+    "name": "Ecolab"
+  },
+  {
+    "symbol": "EIX",
+    "name": "Edison International"
+  },
+  {
+    "symbol": "EW",
+    "name": "Edwards Lifesciences"
+  },
+  {
+    "symbol": "EA",
+    "name": "Electronic Arts"
+  },
+  {
+    "symbol": "ELV",
+    "name": "Elevance Health"
+  },
+  {
+    "symbol": "EME",
+    "name": "Emcor"
+  },
+  {
+    "symbol": "EMR",
+    "name": "Emerson Electric"
+  },
+  {
+    "symbol": "ETR",
+    "name": "Entergy"
+  },
+  {
+    "symbol": "EOG",
+    "name": "EOG Resources"
+  },
+  {
+    "symbol": "EPAM",
+    "name": "EPAM Systems"
+  },
+  {
+    "symbol": "EQT",
+    "name": "EQT Corporation"
+  },
+  {
+    "symbol": "EFX",
+    "name": "Equifax"
+  },
+  {
+    "symbol": "EQIX",
+    "name": "Equinix"
+  },
+  {
+    "symbol": "EQR",
+    "name": "Equity Residential"
+  },
+  {
+    "symbol": "ERIE",
+    "name": "Erie Indemnity"
+  },
+  {
+    "symbol": "ESS",
+    "name": "Essex Property Trust"
+  },
+  {
+    "symbol": "EL",
+    "name": "Estée Lauder Companies (The)"
+  },
+  {
+    "symbol": "EG",
+    "name": "Everest Group"
+  },
+  {
+    "symbol": "EVRG",
+    "name": "Evergy"
+  },
+  {
+    "symbol": "ES",
+    "name": "Eversource Energy"
+  },
+  {
+    "symbol": "EXC",
+    "name": "Exelon"
+  },
+  {
+    "symbol": "EXE",
+    "name": "Expand Energy"
+  },
+  {
+    "symbol": "EXPE",
+    "name": "Expedia Group"
+  },
+  {
+    "symbol": "EXPD",
+    "name": "Expeditors International"
+  },
+  {
+    "symbol": "EXR",
+    "name": "Extra Space Storage"
+  },
+  {
+    "symbol": "XOM",
+    "name": "ExxonMobil"
+  },
+  {
+    "symbol": "FFIV",
+    "name": "F5, Inc."
+  },
+  {
+    "symbol": "FDS",
+    "name": "FactSet"
+  },
+  {
+    "symbol": "FICO",
+    "name": "Fair Isaac"
+  },
+  {
+    "symbol": "FAST",
+    "name": "Fastenal"
+  },
+  {
+    "symbol": "FRT",
+    "name": "Federal Realty Investment Trust"
+  },
+  {
+    "symbol": "FDX",
+    "name": "FedEx"
+  },
+  {
+    "symbol": "FIS",
+    "name": "Fidelity National Information Services"
+  },
+  {
+    "symbol": "FITB",
+    "name": "Fifth Third Bancorp"
+  },
+  {
+    "symbol": "FSLR",
+    "name": "First Solar"
+  },
+  {
+    "symbol": "FE",
+    "name": "FirstEnergy"
+  },
+  {
+    "symbol": "FISV",
+    "name": "Fiserv"
+  },
+  {
+    "symbol": "F",
+    "name": "Ford Motor Company"
+  },
+  {
+    "symbol": "FTNT",
+    "name": "Fortinet"
+  },
+  {
+    "symbol": "FTV",
+    "name": "Fortive"
+  },
+  {
+    "symbol": "FOXA",
+    "name": "Fox Corporation (Class A)"
+  },
+  {
+    "symbol": "FOX",
+    "name": "Fox Corporation (Class B)"
+  },
+  {
+    "symbol": "BEN",
+    "name": "Franklin Resources"
+  },
+  {
+    "symbol": "FCX",
+    "name": "Freeport-McMoRan"
+  },
+  {
+    "symbol": "GRMN",
+    "name": "Garmin"
+  },
+  {
+    "symbol": "IT",
+    "name": "Gartner"
+  },
+  {
+    "symbol": "GE",
+    "name": "GE Aerospace"
+  },
+  {
+    "symbol": "GEHC",
+    "name": "GE HealthCare"
+  },
+  {
+    "symbol": "GEV",
+    "name": "GE Vernova"
+  },
+  {
+    "symbol": "GEN",
+    "name": "Gen Digital"
+  },
+  {
+    "symbol": "GNRC",
+    "name": "Generac"
+  },
+  {
+    "symbol": "GD",
+    "name": "General Dynamics"
+  },
+  {
+    "symbol": "GIS",
+    "name": "General Mills"
+  },
+  {
+    "symbol": "GM",
+    "name": "General Motors"
+  },
+  {
+    "symbol": "GPC",
+    "name": "Genuine Parts Company"
+  },
+  {
+    "symbol": "GILD",
+    "name": "Gilead Sciences"
+  },
+  {
+    "symbol": "GPN",
+    "name": "Global Payments"
+  },
+  {
+    "symbol": "GL",
+    "name": "Globe Life"
+  },
+  {
+    "symbol": "GDDY",
+    "name": "GoDaddy"
+  },
+  {
+    "symbol": "GS",
+    "name": "Goldman Sachs"
+  },
+  {
+    "symbol": "HAL",
+    "name": "Halliburton"
+  },
+  {
+    "symbol": "HIG",
+    "name": "Hartford (The)"
+  },
+  {
+    "symbol": "HAS",
+    "name": "Hasbro"
+  },
+  {
+    "symbol": "HCA",
+    "name": "HCA Healthcare"
+  },
+  {
+    "symbol": "DOC",
+    "name": "Healthpeak Properties"
+  },
+  {
+    "symbol": "HSIC",
+    "name": "Henry Schein"
+  },
+  {
+    "symbol": "HSY",
+    "name": "Hershey Company (The)"
+  },
+  {
+    "symbol": "HPE",
+    "name": "Hewlett Packard Enterprise"
+  },
+  {
+    "symbol": "HLT",
+    "name": "Hilton Worldwide"
+  },
+  {
+    "symbol": "HOLX",
+    "name": "Hologic"
+  },
+  {
+    "symbol": "HD",
+    "name": "Home Depot (The)"
+  },
+  {
+    "symbol": "HON",
+    "name": "Honeywell"
+  },
+  {
+    "symbol": "HRL",
+    "name": "Hormel Foods"
+  },
+  {
+    "symbol": "HST",
+    "name": "Host Hotels & Resorts"
+  },
+  {
+    "symbol": "HWM",
+    "name": "Howmet Aerospace"
+  },
+  {
+    "symbol": "HPQ",
+    "name": "HP Inc."
+  },
+  {
+    "symbol": "HUBB",
+    "name": "Hubbell Incorporated"
+  },
+  {
+    "symbol": "HUM",
+    "name": "Humana"
+  },
+  {
+    "symbol": "HBAN",
+    "name": "Huntington Bancshares"
+  },
+  {
+    "symbol": "HII",
+    "name": "Huntington Ingalls Industries"
+  },
+  {
+    "symbol": "IBM",
+    "name": "IBM"
+  },
+  {
+    "symbol": "IEX",
+    "name": "IDEX Corporation"
+  },
+  {
+    "symbol": "IDXX",
+    "name": "Idexx Laboratories"
+  },
+  {
+    "symbol": "ITW",
+    "name": "Illinois Tool Works"
+  },
+  {
+    "symbol": "INCY",
+    "name": "Incyte"
+  },
+  {
+    "symbol": "IR",
+    "name": "Ingersoll Rand"
+  },
+  {
+    "symbol": "PODD",
+    "name": "Insulet Corporation"
+  },
+  {
+    "symbol": "INTC",
+    "name": "Intel"
+  },
+  {
+    "symbol": "IBKR",
+    "name": "Interactive Brokers"
+  },
+  {
+    "symbol": "ICE",
+    "name": "Intercontinental Exchange"
+  },
+  {
+    "symbol": "IFF",
+    "name": "International Flavors & Fragrances"
+  },
+  {
+    "symbol": "IP",
+    "name": "International Paper"
+  },
+  {
+    "symbol": "INTU",
+    "name": "Intuit"
+  },
+  {
+    "symbol": "ISRG",
+    "name": "Intuitive Surgical"
+  },
+  {
+    "symbol": "IVZ",
+    "name": "Invesco"
+  },
+  {
+    "symbol": "INVH",
+    "name": "Invitation Homes"
+  },
+  {
+    "symbol": "IQV",
+    "name": "IQVIA"
+  },
+  {
+    "symbol": "IRM",
+    "name": "Iron Mountain"
+  },
+  {
+    "symbol": "JBHT",
+    "name": "J.B. Hunt"
+  },
+  {
+    "symbol": "JBL",
+    "name": "Jabil"
+  },
+  {
+    "symbol": "JKHY",
+    "name": "Jack Henry & Associates"
+  },
+  {
+    "symbol": "J",
+    "name": "Jacobs Solutions"
+  },
+  {
+    "symbol": "JNJ",
+    "name": "Johnson & Johnson"
+  },
+  {
+    "symbol": "JCI",
+    "name": "Johnson Controls"
+  },
+  {
+    "symbol": "JPM",
+    "name": "JPMorgan Chase"
+  },
+  {
+    "symbol": "KVUE",
+    "name": "Kenvue"
+  },
+  {
+    "symbol": "KDP",
+    "name": "Keurig Dr Pepper"
+  },
+  {
+    "symbol": "KEY",
+    "name": "KeyCorp"
+  },
+  {
+    "symbol": "KEYS",
+    "name": "Keysight Technologies"
+  },
+  {
+    "symbol": "KMB",
+    "name": "Kimberly-Clark"
+  },
+  {
+    "symbol": "KIM",
+    "name": "Kimco Realty"
+  },
+  {
+    "symbol": "KMI",
+    "name": "Kinder Morgan"
+  },
+  {
+    "symbol": "KKR",
+    "name": "KKR & Co."
+  },
+  {
+    "symbol": "KLAC",
+    "name": "KLA Corporation"
+  },
+  {
+    "symbol": "KHC",
+    "name": "Kraft Heinz"
+  },
+  {
+    "symbol": "KR",
+    "name": "Kroger"
+  },
+  {
+    "symbol": "LHX",
+    "name": "L3Harris"
+  },
+  {
+    "symbol": "LH",
+    "name": "Labcorp"
+  },
+  {
+    "symbol": "LRCX",
+    "name": "Lam Research"
+  },
+  {
+    "symbol": "LW",
+    "name": "Lamb Weston"
+  },
+  {
+    "symbol": "LVS",
+    "name": "Las Vegas Sands"
+  },
+  {
+    "symbol": "LDOS",
+    "name": "Leidos"
+  },
+  {
+    "symbol": "LEN",
+    "name": "Lennar"
+  },
+  {
+    "symbol": "LII",
+    "name": "Lennox International"
+  },
+  {
+    "symbol": "LLY",
+    "name": "Lilly (Eli)"
+  },
+  {
+    "symbol": "LIN",
+    "name": "Linde plc"
+  },
+  {
+    "symbol": "LYV",
+    "name": "Live Nation Entertainment"
+  },
+  {
+    "symbol": "LMT",
+    "name": "Lockheed Martin"
+  },
+  {
+    "symbol": "L",
+    "name": "Loews Corporation"
+  },
+  {
+    "symbol": "LOW",
+    "name": "Lowe's"
+  },
+  {
+    "symbol": "LULU",
+    "name": "Lululemon Athletica"
+  },
+  {
+    "symbol": "LYB",
+    "name": "LyondellBasell"
+  },
+  {
+    "symbol": "MTB",
+    "name": "M&T Bank"
+  },
+  {
+    "symbol": "MPC",
+    "name": "Marathon Petroleum"
+  },
+  {
+    "symbol": "MAR",
+    "name": "Marriott International"
+  },
+  {
+    "symbol": "MRSH",
+    "name": "Marsh McLennan"
+  },
+  {
+    "symbol": "MLM",
+    "name": "Martin Marietta Materials"
+  },
+  {
+    "symbol": "MAS",
+    "name": "Masco"
+  },
+  {
+    "symbol": "MA",
+    "name": "Mastercard"
+  },
+  {
+    "symbol": "MTCH",
+    "name": "Match Group"
+  },
+  {
+    "symbol": "MKC",
+    "name": "McCormick & Company"
+  },
+  {
+    "symbol": "MCD",
+    "name": "McDonald's"
+  },
+  {
+    "symbol": "MCK",
+    "name": "McKesson Corporation"
+  },
+  {
+    "symbol": "MDT",
+    "name": "Medtronic"
+  },
+  {
+    "symbol": "MRK",
+    "name": "Merck & Co."
+  },
+  {
+    "symbol": "META",
+    "name": "Meta Platforms"
+  },
+  {
+    "symbol": "MET",
+    "name": "MetLife"
+  },
+  {
+    "symbol": "MTD",
+    "name": "Mettler Toledo"
+  },
+  {
+    "symbol": "MGM",
+    "name": "MGM Resorts"
+  },
+  {
+    "symbol": "MCHP",
+    "name": "Microchip Technology"
+  },
+  {
+    "symbol": "MU",
+    "name": "Micron Technology"
+  },
+  {
+    "symbol": "MSFT",
+    "name": "Microsoft"
+  },
+  {
+    "symbol": "MAA",
+    "name": "Mid-America Apartment Communities"
+  },
+  {
+    "symbol": "MRNA",
+    "name": "Moderna"
+  },
+  {
+    "symbol": "MOH",
+    "name": "Molina Healthcare"
+  },
+  {
+    "symbol": "TAP",
+    "name": "Molson Coors Beverage Company"
+  },
+  {
+    "symbol": "MDLZ",
+    "name": "Mondelez International"
+  },
+  {
+    "symbol": "MPWR",
+    "name": "Monolithic Power Systems"
+  },
+  {
+    "symbol": "MNST",
+    "name": "Monster Beverage"
+  },
+  {
+    "symbol": "MCO",
+    "name": "Moody's Corporation"
+  },
+  {
+    "symbol": "MS",
+    "name": "Morgan Stanley"
+  },
+  {
+    "symbol": "MOS",
+    "name": "Mosaic Company (The)"
+  },
+  {
+    "symbol": "MSI",
+    "name": "Motorola Solutions"
+  },
+  {
+    "symbol": "MSCI",
+    "name": "MSCI Inc."
+  },
+  {
+    "symbol": "NDAQ",
+    "name": "Nasdaq, Inc."
+  },
+  {
+    "symbol": "NTAP",
+    "name": "NetApp"
+  },
+  {
+    "symbol": "NFLX",
+    "name": "Netflix"
+  },
+  {
+    "symbol": "NEM",
+    "name": "Newmont"
+  },
+  {
+    "symbol": "NWSA",
+    "name": "News Corp (Class A)"
+  },
+  {
+    "symbol": "NWS",
+    "name": "News Corp (Class B)"
+  },
+  {
+    "symbol": "NEE",
+    "name": "NextEra Energy"
+  },
+  {
+    "symbol": "NKE",
+    "name": "Nike, Inc."
+  },
+  {
+    "symbol": "NI",
+    "name": "NiSource"
+  },
+  {
+    "symbol": "NDSN",
+    "name": "Nordson Corporation"
+  },
+  {
+    "symbol": "NSC",
+    "name": "Norfolk Southern"
+  },
+  {
+    "symbol": "NTRS",
+    "name": "Northern Trust"
+  },
+  {
+    "symbol": "NOC",
+    "name": "Northrop Grumman"
+  },
+  {
+    "symbol": "NCLH",
+    "name": "Norwegian Cruise Line Holdings"
+  },
+  {
+    "symbol": "NRG",
+    "name": "NRG Energy"
+  },
+  {
+    "symbol": "NUE",
+    "name": "Nucor"
+  },
+  {
+    "symbol": "NVDA",
+    "name": "Nvidia"
+  },
+  {
+    "symbol": "NVR",
+    "name": "NVR, Inc."
+  },
+  {
+    "symbol": "NXPI",
+    "name": "NXP Semiconductors"
+  },
+  {
+    "symbol": "ORLY",
+    "name": "O’Reilly Automotive"
+  },
+  {
+    "symbol": "OXY",
+    "name": "Occidental Petroleum"
+  },
+  {
+    "symbol": "ODFL",
+    "name": "Old Dominion"
+  },
+  {
+    "symbol": "OMC",
+    "name": "Omnicom Group"
+  },
+  {
+    "symbol": "ON",
+    "name": "ON Semiconductor"
+  },
+  {
+    "symbol": "OKE",
+    "name": "Oneok"
+  },
+  {
+    "symbol": "ORCL",
+    "name": "Oracle Corporation"
+  },
+  {
+    "symbol": "OTIS",
+    "name": "Otis Worldwide"
+  },
+  {
+    "symbol": "PCAR",
+    "name": "Paccar"
+  },
+  {
+    "symbol": "PKG",
+    "name": "Packaging Corporation of America"
+  },
+  {
+    "symbol": "PLTR",
+    "name": "Palantir Technologies"
+  },
+  {
+    "symbol": "PANW",
+    "name": "Palo Alto Networks"
+  },
+  {
+    "symbol": "PSKY",
+    "name": "Paramount Skydance Corporation"
+  },
+  {
+    "symbol": "PH",
+    "name": "Parker Hannifin"
+  },
+  {
+    "symbol": "PAYX",
+    "name": "Paychex"
+  },
+  {
+    "symbol": "PAYC",
+    "name": "Paycom"
+  },
+  {
+    "symbol": "PYPL",
+    "name": "PayPal"
+  },
+  {
+    "symbol": "PNR",
+    "name": "Pentair"
+  },
+  {
+    "symbol": "PEP",
+    "name": "PepsiCo"
+  },
+  {
+    "symbol": "PFE",
+    "name": "Pfizer"
+  },
+  {
+    "symbol": "PCG",
+    "name": "PG&E Corporation"
+  },
+  {
+    "symbol": "PM",
+    "name": "Philip Morris International"
+  },
+  {
+    "symbol": "PSX",
+    "name": "Phillips 66"
+  },
+  {
+    "symbol": "PNW",
+    "name": "Pinnacle West Capital"
+  },
+  {
+    "symbol": "PNC",
+    "name": "PNC Financial Services"
+  },
+  {
+    "symbol": "POOL",
+    "name": "Pool Corporation"
+  },
+  {
+    "symbol": "PPG",
+    "name": "PPG Industries"
+  },
+  {
+    "symbol": "PPL",
+    "name": "PPL Corporation"
+  },
+  {
+    "symbol": "PFG",
+    "name": "Principal Financial Group"
+  },
+  {
+    "symbol": "PG",
+    "name": "Procter & Gamble"
+  },
+  {
+    "symbol": "PGR",
+    "name": "Progressive Corporation"
+  },
+  {
+    "symbol": "PLD",
+    "name": "Prologis"
+  },
+  {
+    "symbol": "PRU",
+    "name": "Prudential Financial"
+  },
+  {
+    "symbol": "PEG",
+    "name": "Public Service Enterprise Group"
+  },
+  {
+    "symbol": "PTC",
+    "name": "PTC Inc."
+  },
+  {
+    "symbol": "PSA",
+    "name": "Public Storage"
+  },
+  {
+    "symbol": "PHM",
+    "name": "PulteGroup"
+  },
+  {
+    "symbol": "PWR",
+    "name": "Quanta Services"
+  },
+  {
+    "symbol": "QCOM",
+    "name": "Qualcomm"
+  },
+  {
+    "symbol": "DGX",
+    "name": "Quest Diagnostics"
+  },
+  {
+    "symbol": "Q",
+    "name": "Qnity Electronics"
+  },
+  {
+    "symbol": "RL",
+    "name": "Ralph Lauren Corporation"
+  },
+  {
+    "symbol": "RJF",
+    "name": "Raymond James Financial"
+  },
+  {
+    "symbol": "RTX",
+    "name": "RTX Corporation"
+  },
+  {
+    "symbol": "O",
+    "name": "Realty Income"
+  },
+  {
+    "symbol": "REG",
+    "name": "Regency Centers"
+  },
+  {
+    "symbol": "REGN",
+    "name": "Regeneron Pharmaceuticals"
+  },
+  {
+    "symbol": "RF",
+    "name": "Regions Financial Corporation"
+  },
+  {
+    "symbol": "RSG",
+    "name": "Republic Services"
+  },
+  {
+    "symbol": "RMD",
+    "name": "ResMed"
+  },
+  {
+    "symbol": "RVTY",
+    "name": "Revvity"
+  },
+  {
+    "symbol": "HOOD",
+    "name": "Robinhood Markets"
+  },
+  {
+    "symbol": "ROK",
+    "name": "Rockwell Automation"
+  },
+  {
+    "symbol": "ROL",
+    "name": "Rollins, Inc."
+  },
+  {
+    "symbol": "ROP",
+    "name": "Roper Technologies"
+  },
+  {
+    "symbol": "ROST",
+    "name": "Ross Stores"
+  },
+  {
+    "symbol": "RCL",
+    "name": "Royal Caribbean Group"
+  },
+  {
+    "symbol": "SPGI",
+    "name": "S&P Global"
+  },
+  {
+    "symbol": "CRM",
+    "name": "Salesforce"
+  },
+  {
+    "symbol": "SNDK",
+    "name": "Sandisk"
+  },
+  {
+    "symbol": "SBAC",
+    "name": "SBA Communications"
+  },
+  {
+    "symbol": "SLB",
+    "name": "Schlumberger"
+  },
+  {
+    "symbol": "STX",
+    "name": "Seagate Technology"
+  },
+  {
+    "symbol": "SRE",
+    "name": "Sempra"
+  },
+  {
+    "symbol": "NOW",
+    "name": "ServiceNow"
+  },
+  {
+    "symbol": "SHW",
+    "name": "Sherwin-Williams"
+  },
+  {
+    "symbol": "SPG",
+    "name": "Simon Property Group"
+  },
+  {
+    "symbol": "SWKS",
+    "name": "Skyworks Solutions"
+  },
+  {
+    "symbol": "SJM",
+    "name": "J.M. Smucker Company (The)"
+  },
+  {
+    "symbol": "SW",
+    "name": "Smurfit Westrock"
+  },
+  {
+    "symbol": "SNA",
+    "name": "Snap-on"
+  },
+  {
+    "symbol": "SOLV",
+    "name": "Solventum"
+  },
+  {
+    "symbol": "SO",
+    "name": "Southern Company"
+  },
+  {
+    "symbol": "LUV",
+    "name": "Southwest Airlines"
+  },
+  {
+    "symbol": "SWK",
+    "name": "Stanley Black & Decker"
+  },
+  {
+    "symbol": "SBUX",
+    "name": "Starbucks"
+  },
+  {
+    "symbol": "STT",
+    "name": "State Street Corporation"
+  },
+  {
+    "symbol": "STLD",
+    "name": "Steel Dynamics"
+  },
+  {
+    "symbol": "STE",
+    "name": "Steris"
+  },
+  {
+    "symbol": "SYK",
+    "name": "Stryker Corporation"
+  },
+  {
+    "symbol": "SMCI",
+    "name": "Supermicro"
+  },
+  {
+    "symbol": "SYF",
+    "name": "Synchrony Financial"
+  },
+  {
+    "symbol": "SNPS",
+    "name": "Synopsys"
+  },
+  {
+    "symbol": "SYY",
+    "name": "Sysco"
+  },
+  {
+    "symbol": "TMUS",
+    "name": "T-Mobile US"
+  },
+  {
+    "symbol": "TROW",
+    "name": "T. Rowe Price"
+  },
+  {
+    "symbol": "TTWO",
+    "name": "Take-Two Interactive"
+  },
+  {
+    "symbol": "TPR",
+    "name": "Tapestry, Inc."
+  },
+  {
+    "symbol": "TRGP",
+    "name": "Targa Resources"
+  },
+  {
+    "symbol": "TGT",
+    "name": "Target Corporation"
+  },
+  {
+    "symbol": "TEL",
+    "name": "TE Connectivity"
+  },
+  {
+    "symbol": "TDY",
+    "name": "Teledyne Technologies"
+  },
+  {
+    "symbol": "TER",
+    "name": "Teradyne"
+  },
+  {
+    "symbol": "TSLA",
+    "name": "Tesla, Inc."
+  },
+  {
+    "symbol": "TXN",
+    "name": "Texas Instruments"
+  },
+  {
+    "symbol": "TPL",
+    "name": "Texas Pacific Land Corporation"
+  },
+  {
+    "symbol": "TXT",
+    "name": "Textron"
+  },
+  {
+    "symbol": "TMO",
+    "name": "Thermo Fisher Scientific"
+  },
+  {
+    "symbol": "TJX",
+    "name": "TJX Companies"
+  },
+  {
+    "symbol": "TKO",
+    "name": "TKO Group Holdings"
+  },
+  {
+    "symbol": "TTD",
+    "name": "Trade Desk (The)"
+  },
+  {
+    "symbol": "TSCO",
+    "name": "Tractor Supply"
+  },
+  {
+    "symbol": "TT",
+    "name": "Trane Technologies"
+  },
+  {
+    "symbol": "TDG",
+    "name": "TransDigm Group"
+  },
+  {
+    "symbol": "TRV",
+    "name": "Travelers Companies (The)"
+  },
+  {
+    "symbol": "TRMB",
+    "name": "Trimble Inc."
+  },
+  {
+    "symbol": "TFC",
+    "name": "Truist Financial"
+  },
+  {
+    "symbol": "TYL",
+    "name": "Tyler Technologies"
+  },
+  {
+    "symbol": "TSN",
+    "name": "Tyson Foods"
+  },
+  {
+    "symbol": "USB",
+    "name": "U.S. Bancorp"
+  },
+  {
+    "symbol": "UBER",
+    "name": "Uber"
+  },
+  {
+    "symbol": "UDR",
+    "name": "UDR, Inc."
+  },
+  {
+    "symbol": "ULTA",
+    "name": "Ulta Beauty"
+  },
+  {
+    "symbol": "UNP",
+    "name": "Union Pacific Corporation"
+  },
+  {
+    "symbol": "UAL",
+    "name": "United Airlines Holdings"
+  },
+  {
+    "symbol": "UPS",
+    "name": "United Parcel Service"
+  },
+  {
+    "symbol": "URI",
+    "name": "United Rentals"
+  },
+  {
+    "symbol": "UNH",
+    "name": "UnitedHealth Group"
+  },
+  {
+    "symbol": "UHS",
+    "name": "Universal Health Services"
+  },
+  {
+    "symbol": "VLO",
+    "name": "Valero Energy"
+  },
+  {
+    "symbol": "VTR",
+    "name": "Ventas"
+  },
+  {
+    "symbol": "VLTO",
+    "name": "Veralto"
+  },
+  {
+    "symbol": "VRSN",
+    "name": "Verisign"
+  },
+  {
+    "symbol": "VRSK",
+    "name": "Verisk Analytics"
+  },
+  {
+    "symbol": "VZ",
+    "name": "Verizon"
+  },
+  {
+    "symbol": "VRTX",
+    "name": "Vertex Pharmaceuticals"
+  },
+  {
+    "symbol": "VTRS",
+    "name": "Viatris"
+  },
+  {
+    "symbol": "VICI",
+    "name": "Vici Properties"
+  },
+  {
+    "symbol": "V",
+    "name": "Visa Inc."
+  },
+  {
+    "symbol": "VST",
+    "name": "Vistra Corp."
+  },
+  {
+    "symbol": "VMC",
+    "name": "Vulcan Materials Company"
+  },
+  {
+    "symbol": "WRB",
+    "name": "W. R. Berkley Corporation"
+  },
+  {
+    "symbol": "GWW",
+    "name": "W. W. Grainger"
+  },
+  {
+    "symbol": "WAB",
+    "name": "Wabtec"
+  },
+  {
+    "symbol": "WMT",
+    "name": "Walmart"
+  },
+  {
+    "symbol": "DIS",
+    "name": "Walt Disney Company (The)"
+  },
+  {
+    "symbol": "WBD",
+    "name": "Warner Bros. Discovery"
+  },
+  {
+    "symbol": "WM",
+    "name": "Waste Management"
+  },
+  {
+    "symbol": "WAT",
+    "name": "Waters Corporation"
+  },
+  {
+    "symbol": "WEC",
+    "name": "WEC Energy Group"
+  },
+  {
+    "symbol": "WFC",
+    "name": "Wells Fargo"
+  },
+  {
+    "symbol": "WELL",
+    "name": "Welltower"
+  },
+  {
+    "symbol": "WST",
+    "name": "West Pharmaceutical Services"
+  },
+  {
+    "symbol": "WDC",
+    "name": "Western Digital"
+  },
+  {
+    "symbol": "WY",
+    "name": "Weyerhaeuser"
+  },
+  {
+    "symbol": "WSM",
+    "name": "Williams-Sonoma, Inc."
+  },
+  {
+    "symbol": "WMB",
+    "name": "Williams Companies"
+  },
+  {
+    "symbol": "WTW",
+    "name": "Willis Towers Watson"
+  },
+  {
+    "symbol": "WDAY",
+    "name": "Workday, Inc."
+  },
+  {
+    "symbol": "WYNN",
+    "name": "Wynn Resorts"
+  },
+  {
+    "symbol": "XEL",
+    "name": "Xcel Energy"
+  },
+  {
+    "symbol": "XYL",
+    "name": "Xylem Inc."
+  },
+  {
+    "symbol": "YUM",
+    "name": "Yum! Brands"
+  },
+  {
+    "symbol": "ZBRA",
+    "name": "Zebra Technologies"
+  },
+  {
+    "symbol": "ZBH",
+    "name": "Zimmer Biomet"
+  },
+  {
+    "symbol": "ZTS",
+    "name": "Zoetis"
+  }
 ]

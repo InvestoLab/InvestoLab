@@ -5524,7 +5524,8 @@ footer {
 
   /* Holdings table mobile */
   .holdings-table {
-    overflow-x: hidden;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .holdings-head,
