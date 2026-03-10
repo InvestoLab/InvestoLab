@@ -376,45 +376,8 @@ if (homeAxisStage && homeAxisCanvas) {
     window.requestAnimationFrame(tick);
   };
 
-  const initInteractivity = () => {
-    if (homeAxisStage.dataset.bound === '1') return;
-    homeAxisStage.dataset.bound = '1';
-    homeAxisStage.addEventListener('pointerdown', (e) => {
-      e.preventDefault();
-      state.dragging = true;
-      state.startX = e.clientX;
-      state.startY = e.clientY;
-      state.baseRotX = state.rotX;
-      state.baseRotY = state.rotY;
-      homeAxisStage.classList.add('dragging');
-      homeAxisStage.setPointerCapture?.(e.pointerId);
-    });
-    homeAxisStage.addEventListener('pointermove', (e) => {
-      if (state.dragging) {
-        e.preventDefault();
-        const dx = e.clientX - state.startX;
-        const dy = e.clientY - state.startY;
-        state.rotY = state.baseRotY + dx * 0.34;
-        state.rotX = Math.max(-80, Math.min(80, state.baseRotX - dy * 0.28));
-        render();
-        hideHover();
-        return;
-      }
-      updateHover(e.clientX, e.clientY);
-    });
-    const stop = () => {
-      state.dragging = false;
-      homeAxisStage.classList.remove('dragging');
-    };
-    homeAxisStage.addEventListener('pointerup', stop);
-    homeAxisStage.addEventListener('pointercancel', stop);
-    homeAxisStage.addEventListener('mouseleave', () => {
-      stop();
-      hideHover();
-    });
-  };
-
-  initInteractivity();
+  // Intentionally non-interactive on the overview page.
+  hideHover();
   updateLabels(false);
   render();
   window.requestAnimationFrame(tick);
