@@ -129,7 +129,7 @@ function renderResult(payload) {
     const react = Number(payload?.axisScores?.reactivityEmotional || 0).toFixed(1);
     typeMeta.textContent = `Risk ${risk}% | Control ${control}% | Reactivity ${react}%`;
   }
-  if (axisCode) axisCode.textContent = String(payload?.profile?.axisCode || 'C-E-R');
+  if (axisCode) axisCode.textContent = '';
 
   const allocationRows = (payload?.allocation || []).map((row) => `${row.bucket}: ${Number(row.weight || 0).toFixed(1)}%`);
   const tickerRows = Array.isArray(payload?.tickerMix) ? payload.tickerMix : [];
@@ -377,7 +377,7 @@ function updateCubeCode() {
   const r = cubeState.scores.aggressive >= 50 ? 'A' : 'C';
   const c = cubeState.scores.internal >= 50 ? 'I' : 'E';
   const e = cubeState.scores.emotional >= 50 ? 'E' : 'R';
-  if (builderCubeCode) builderCubeCode.textContent = `${r}-${c}-${e}`;
+  if (builderCubeCode) builderCubeCode.textContent = '';
 }
 
 function updateCubeHover(clientX, clientY) {

@@ -1970,7 +1970,7 @@
       },
       "buyerFit": {
         "code": "C-I-R",
-        "type": "Conservative Researcher",
+        "type": "Research Analyst",
         "axes": {
           "risk": "Conservative",
           "control": "Internal/Active",
@@ -1994,3 +1994,4 @@
     "AAPL"
   ]
 }
+

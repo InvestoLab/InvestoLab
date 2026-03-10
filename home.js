@@ -7,12 +7,14 @@ const homeAxisValues = document.getElementById('homeInvestotypeAxis');
 
 if (homeAxisStage && homeAxisCanvas) {
   const axisTypes = [
-    { label: 'Active Conviction Investor', glow: [56, 189, 248, 0.24], scores: { aggressive: 82, internal: 74, emotional: 72 } },
+    { label: 'Portfolio Manager', glow: [56, 189, 248, 0.24], scores: { aggressive: 82, internal: 74, emotional: 72 } },
     { label: 'The Quant', glow: [99, 102, 241, 0.22], scores: { aggressive: 74, internal: 76, emotional: 30 } },
-    { label: 'Aggressive Reactive Trader', glow: [248, 113, 113, 0.22], scores: { aggressive: 86, internal: 34, emotional: 78 } },
-    { label: 'Conservative Researcher', glow: [34, 197, 94, 0.2], scores: { aggressive: 26, internal: 74, emotional: 26 } },
-    { label: 'Passive Rational Allocator', glow: [148, 163, 184, 0.22], scores: { aggressive: 24, internal: 30, emotional: 24 } },
-    { label: 'Passive Emotional Allocator', glow: [251, 146, 60, 0.22], scores: { aggressive: 22, internal: 28, emotional: 72 } }
+    { label: 'Technical Analyst', glow: [14, 165, 233, 0.22], scores: { aggressive: 78, internal: 36, emotional: 32 } },
+    { label: 'Day Trader', glow: [248, 113, 113, 0.22], scores: { aggressive: 86, internal: 34, emotional: 78 } },
+    { label: 'Research Analyst', glow: [34, 197, 94, 0.2], scores: { aggressive: 26, internal: 74, emotional: 26 } },
+    { label: 'Risk Manager', glow: [59, 130, 246, 0.2], scores: { aggressive: 28, internal: 72, emotional: 74 } },
+    { label: 'Index Strategist', glow: [148, 163, 184, 0.22], scores: { aggressive: 24, internal: 30, emotional: 24 } },
+    { label: 'Wealth Advisor', glow: [251, 146, 60, 0.22], scores: { aggressive: 22, internal: 28, emotional: 72 } }
   ];
 
   const state = {
@@ -388,9 +390,9 @@ const previewCards = Array.from(document.querySelectorAll('.valuation-preview-ca
 if (previewCards.length) {
   const portfolios = [
     [
-      { symbol: 'SPY', price: '$432', change: '+1.2%', tone: 'up' },
-      { symbol: 'NVDA', price: '$915', change: '+2.8%', tone: 'up' },
-      { symbol: 'VTI', price: '$258', change: '+0.6%', tone: 'up' }
+      { symbol: 'SPY', price: '$678.27', change: '+0.89%', tone: 'up' },
+      { symbol: 'NVDA', price: '$182.65', change: '+2.62%', tone: 'up' },
+      { symbol: 'VTI', price: '$334.28', change: '+0.89%', tone: 'up' }
     ],
     [
       { symbol: 'TLT', price: '$96', change: '-0.4%', tone: 'down' },
@@ -435,6 +437,67 @@ if (previewCards.length) {
 
   applyPortfolio();
   window.setInterval(swapPortfolio, 3200);
+}
+
+const newsCards = Array.from(document.querySelectorAll('.news-preview-card'));
+if (newsCards.length) {
+  let newsIndex = 0;
+  let newsItems = newsCards.map((card) => ({
+    tag: card.querySelector('.news-tag')?.textContent || 'Market',
+    title: card.querySelector('strong')?.textContent || '',
+    meta: card.querySelector('em')?.textContent || ''
+  }));
+
+  const applyNews = () => {
+    if (!newsItems.length) return;
+    newsCards.forEach((card, idx) => {
+      const item = newsItems[(newsIndex + idx) % newsItems.length];
+      const tagEl = card.querySelector('.news-tag');
+      const titleEl = card.querySelector('strong');
+      const metaEl = card.querySelector('em');
+      if (tagEl) tagEl.textContent = item.tag || 'Market';
+      if (titleEl) titleEl.textContent = item.title || '';
+      if (metaEl) metaEl.textContent = item.meta || '';
+    });
+  };
+
+  const swapNews = () => {
+    newsCards.forEach((card) => card.classList.add('is-swapping'));
+    window.setTimeout(() => {
+      newsIndex = (newsIndex + 1) % Math.max(1, newsItems.length);
+      applyNews();
+      newsCards.forEach((card) => card.classList.remove('is-swapping'));
+    }, 240);
+  };
+
+  const fetchNews = async () => {
+    try {
+      const res = await fetch('/api/news/market', { cache: 'no-store' });
+      const data = await res.json();
+      const rows = Array.isArray(data?.headlines) ? data.headlines : [];
+      const mapped = rows
+        .filter((h) => h && h.title)
+        .slice(0, 12)
+        .map((h) => ({
+          tag: (h.symbol || 'Market').toUpperCase(),
+          title: String(h.title || '').trim(),
+          meta: String(h.publisher || h.date || '').trim()
+        }))
+        .filter((h) => h.title);
+      if (mapped.length) {
+        newsItems = mapped;
+        newsIndex = 0;
+        applyNews();
+      }
+    } catch (_error) {
+      // keep existing headlines
+    }
+  };
+
+  applyNews();
+  fetchNews();
+  window.setInterval(swapNews, 3600);
+  window.setInterval(fetchNews, 180000);
 }
 
 const revealTargets = Array.from(document.querySelectorAll('.scroll-reveal'));

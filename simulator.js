@@ -1,4 +1,4 @@
-﻿const simStartForm = document.getElementById('simStartForm');
+const simStartForm = document.getElementById('simStartForm');
 const simStartSubmitBtn = simStartForm?.querySelector('button[type="submit"]');
 const commentaryLead = document.getElementById('commentaryLead');
 const commentaryStatus = document.getElementById('commentaryStatus');
@@ -173,52 +173,52 @@ function addAxisQuestions(axis, questions) {
 
 // risk axis
 addAxisQuestions('risk', [
-  { text: 'I can stay confident during big ups and downs if the long-term upside is strong.', pos: 'Agree', neg: 'Disagree' },
-  { text: 'I avoid uncertain outcomes even when the possible reward is high.', pos: 'Disagree', neg: 'Agree' },
-  { text: 'In everyday life, I enjoy choices with uncertain but potentially big payoff.', pos: 'Agree', neg: 'Disagree' },
-  { text: 'A short-term loss makes me question my whole plan quickly.', pos: 'Disagree', neg: 'Agree' },
-  { text: 'I would rather risk being wrong than miss a rare big opportunity.', pos: 'Agree', neg: 'Disagree' }
+  { text: 'I would take a 60% chance to double my money in 6 months, even if the 40% loss is severe.', pos: 'Agree', neg: 'Disagree' },
+  { text: 'I avoid uncertain outcomes even when the upside is exceptional.', pos: 'Disagree', neg: 'Agree' },
+  { text: 'I am comfortable holding a volatile position through a 25% drawdown if the thesis is intact.', pos: 'Agree', neg: 'Disagree' },
+  { text: 'A sudden 15% loss makes me want to exit immediately.', pos: 'Disagree', neg: 'Agree' },
+  { text: 'I would rather risk being early and wrong than miss a rare high‑upside move.', pos: 'Agree', neg: 'Disagree' }
 ]);
 
 // control axis
 addAxisQuestions('control', [
-  { text: 'I prefer making key decisions myself instead of delegating them.', pos: 'Agree', neg: 'Disagree' },
-  { text: 'I am comfortable following a simple system without constant adjustments.', pos: 'Disagree', neg: 'Agree' },
-  { text: 'In group projects, I naturally take ownership of final decisions.', pos: 'Agree', neg: 'Disagree' },
-  { text: 'Automation and checklists usually improve my decision quality.', pos: 'Disagree', neg: 'Agree' },
-  { text: 'I often tweak plans as soon as new information appears.', pos: 'Agree', neg: 'Disagree' }
+  { text: 'I prefer to override a model if my intuition disagrees with it.', pos: 'Agree', neg: 'Disagree' },
+  { text: 'I am comfortable following a strict system even when it feels wrong in the moment.', pos: 'Disagree', neg: 'Agree' },
+  { text: 'In a high‑stakes decision, I want final say rather than consensus.', pos: 'Agree', neg: 'Disagree' },
+  { text: 'Automation and checklists improve outcomes more than constant judgment calls.', pos: 'Disagree', neg: 'Agree' },
+  { text: 'I immediately revise plans when new data appears, even if it breaks the original thesis.', pos: 'Agree', neg: 'Disagree' }
 ]);
 
 // reactivity axis
 addAxisQuestions('reactivity', [
-  { text: 'Strong emotions often push me to act faster than planned.', pos: 'Agree', neg: 'Disagree' },
-  { text: 'I can stay calm and objective when outcomes turn against me.', pos: 'Disagree', neg: 'Agree' },
-  { text: 'Headlines and social buzz can quickly change my decisions.', pos: 'Agree', neg: 'Disagree' },
-  { text: 'When stress rises, I still follow my original plan.', pos: 'Disagree', neg: 'Agree' },
-  { text: 'After a big win or loss, I feel an urge to do something immediately.', pos: 'Agree', neg: 'Disagree' }
+  { text: 'A breaking headline can change my decision within minutes.', pos: 'Agree', neg: 'Disagree' },
+  { text: 'I can stay calm and objective even if a position moves sharply against me.', pos: 'Disagree', neg: 'Agree' },
+  { text: 'After a big win or loss, I feel an urgent need to act.', pos: 'Agree', neg: 'Disagree' },
+  { text: 'When stress rises, I still follow the plan I set earlier.', pos: 'Disagree', neg: 'Agree' },
+  { text: 'I am drawn to act fast when volatility spikes.', pos: 'Agree', neg: 'Disagree' }
 ]);
 
 // general behavioral/psychological questions (not scored)
 [
   {
-    text: 'A friend cancels important plans at the last minute. What is your first reaction?',
-    options: ['React immediately and strongly', 'Show frustration quickly', 'Stay neutral until I understand context', 'Pause and ask questions first', 'Respond calmly and revisit later']
+    text: 'You discover a major market shock 10 minutes before a big meeting. What do you do first?',
+    options: ['Act immediately to reduce risk', 'Make a quick hedge and move on', 'Pause and scan for confirmation', 'Ask for a short delay to assess', 'Hold action until full clarity']
   },
   {
-    text: 'How do you usually handle an unexpected setback at work or school?',
-    options: ['Jump in and improvise fast', 'Act quickly with partial information', 'Take a short pause then decide', 'Make a checklist before acting', 'Wait for full clarity before acting']
+    text: 'Your largest position gaps down 12% overnight. What is most like you?',
+    options: ['Exit fast to stop further damage', 'Trim quickly, reassess later', 'Wait for the open then decide', 'Review the thesis and data before acting', 'Do nothing until a full plan is rebuilt']
   },
   {
-    text: 'When you receive conflicting advice from people you trust, what do you do?',
-    options: ['Pick one quickly and commit', 'Go with my instinct after brief review', 'Mix both views and test', 'Gather more evidence first', 'Delay action until consensus is clear']
+    text: 'You get two strong but opposing recommendations from experts. What do you do?',
+    options: ['Pick one and commit now', 'Go with my instinct after a quick scan', 'Test a small position first', 'Gather more evidence before deciding', 'Wait until a clearer consensus forms']
   },
   {
-    text: 'In uncertain situations, which statement sounds most like you?',
-    options: ['Action creates clarity', 'Early action beats perfect analysis', 'Balance action and reflection', 'Careful analysis reduces regret', 'I avoid acting until uncertainty drops']
+    text: 'Which statement is closest to you under uncertainty?',
+    options: ['Action creates clarity', 'Early action beats perfect analysis', 'Balance action with reflection', 'Careful analysis reduces regret', 'I avoid acting until uncertainty drops']
   },
   {
-    text: 'When you make a mistake in public, what is most like you?',
-    options: ['Recover fast and move on', 'Own it and correct quickly', 'Reflect before responding', 'Need time before re-engaging', 'Withdraw until confidence returns']
+    text: 'After a public mistake, what is most like you?',
+    options: ['Recover fast and move on', 'Own it and correct quickly', 'Reflect before responding', 'Need time before re‑engaging', 'Step back until confidence returns']
   }
 ].forEach((q) => {
   quizQuestions.push({
@@ -431,7 +431,7 @@ function updateSetupChecks() {
   const apply = (el, ok) => {
     if (!el) return;
     el.classList.toggle('done', !!ok);
-    el.textContent = ok ? 'OK' : '--';
+    el.textContent = ok ? '✓' : '--';
   };
 
   apply(checkSettings, setupValidated.settings && settingsOk);
@@ -1087,7 +1087,7 @@ function getInvestorTypePlaybook(type) {
           'Limit complexity to what you can execute consistently.'
         ]
       };
-    case 'Active Conviction Investor':
+    case 'Portfolio Manager':
       return {
         summary:
           'Aggressive and highly self-directed, but emotionally reactive under stress. You move fast on conviction and can swing hard.',
@@ -1122,7 +1122,7 @@ function getInvestorTypePlaybook(type) {
           'Split entries/exits into staged decisions.'
         ]
       };
-    case 'Tactical Trend Analyst':
+    case 'Technical Analyst':
       return {
         summary:
           'Aggressive with an external/trend lens and rational execution. You adapt quickly without losing structure.',
@@ -1157,7 +1157,7 @@ function getInvestorTypePlaybook(type) {
           'Limit turnover and avoid reacting to single-day noise.'
         ]
       };
-    case 'Aggressive Reactive Trader':
+    case 'Day Trader':
       return {
         summary:
           'Aggressive, externally influenced, and emotionally reactive. You are the highest-upside and highest-whipsaw profile.',
@@ -1192,7 +1192,7 @@ function getInvestorTypePlaybook(type) {
           'Keep a non-negotiable passive core for stability.'
         ]
       };
-    case 'Conservative Researcher':
+    case 'Research Analyst':
       return {
         summary:
           'Conservative, internally driven, and rational. You research deeply, move carefully, and prioritize long-term capital protection.',
@@ -1227,7 +1227,7 @@ function getInvestorTypePlaybook(type) {
           'Avoid excessive cash drag in persistent uptrends.'
         ]
       };
-    case 'Defensive Active Allocator':
+    case 'Risk Manager':
       return {
         summary:
           'Conservative and self-directed, but emotionally sensitive under stress. You want control and safety, yet volatility can still pull reactions.',
@@ -1262,7 +1262,7 @@ function getInvestorTypePlaybook(type) {
           'Set stress-time rules before volatility starts.'
         ]
       };
-    case 'Passive Rational Allocator':
+    case 'Index Strategist':
       return {
         summary:
           'Conservative, externally anchored, and rational. You are ideal for long-horizon, low-friction compounding.',
@@ -1297,7 +1297,7 @@ function getInvestorTypePlaybook(type) {
           'Use automation for contributions and allocation maintenance.'
         ]
       };
-    case 'Passive Emotional Allocator':
+    case 'Wealth Advisor':
       return {
         summary:
           'Conservative, externally guided, and emotionally reactive. Simplicity and emotional protection should be top priorities.',
@@ -1372,8 +1372,8 @@ function getInvestorTypePlaybook(type) {
 
 function getInvestorTone(type) {
   const t = String(type || '');
-  if (['Conservative Researcher', 'Passive Rational Allocator', 'Passive Emotional Allocator', 'Defensive Active Allocator'].includes(t)) return 'calm';
-  if (['The Quant', 'Active Conviction Investor', 'Tactical Trend Analyst', 'Aggressive Reactive Trader'].includes(t)) return 'bold';
+  if (['Research Analyst', 'Index Strategist', 'Wealth Advisor', 'Risk Manager'].includes(t)) return 'calm';
+  if (['The Quant', 'Portfolio Manager', 'Technical Analyst', 'Day Trader'].includes(t)) return 'bold';
   return 'balanced';
 }
 
@@ -1395,7 +1395,7 @@ function getInvestorTypeInvestmentPlan(type) {
           '10% Tactical sleeve (quant rules, strict risk budget)'
         ]
       };
-    case 'Active Conviction Investor':
+    case 'Portfolio Manager':
       return {
         bestFit: [
           'Invesco QQQ Trust (QQQ).',
@@ -1411,7 +1411,7 @@ function getInvestorTypeInvestmentPlan(type) {
           '10% Cash buffer for drawdown control'
         ]
       };
-    case 'Tactical Trend Analyst':
+    case 'Technical Analyst':
       return {
         bestFit: [
           'SPDR S&P 500 ETF Trust (SPY).',
@@ -1427,7 +1427,7 @@ function getInvestorTypeInvestmentPlan(type) {
           '10% Cash for tactical entry opportunities'
         ]
       };
-    case 'Aggressive Reactive Trader':
+    case 'Day Trader':
       return {
         bestFit: [
           'Technology Select Sector SPDR Fund (XLK).',
@@ -1444,7 +1444,7 @@ function getInvestorTypeInvestmentPlan(type) {
           '5% Speculative sleeve cap (crypto/options-like)'
         ]
       };
-    case 'Conservative Researcher':
+    case 'Research Analyst':
       return {
         bestFit: [
           'Schwab U.S. Dividend Equity ETF (SCHD).',
@@ -1460,7 +1460,7 @@ function getInvestorTypeInvestmentPlan(type) {
           '5% Cash reserve'
         ]
       };
-    case 'Defensive Active Allocator':
+    case 'Risk Manager':
       return {
         bestFit: [
           'iShares Core U.S. Aggregate Bond ETF (AGG).',
@@ -1476,7 +1476,7 @@ function getInvestorTypeInvestmentPlan(type) {
           '10% Cash for emotional stability during volatility'
         ]
       };
-    case 'Passive Rational Allocator':
+    case 'Index Strategist':
       return {
         bestFit: [
           'Vanguard Total Stock Market ETF (VTI).',
@@ -1491,7 +1491,7 @@ function getInvestorTypeInvestmentPlan(type) {
           '5% Cash for short-term flexibility'
         ]
       };
-    case 'Passive Emotional Allocator':
+    case 'Wealth Advisor':
       return {
         bestFit: [
           'iShares Core Conservative Allocation ETF (AOK).',
@@ -2027,7 +2027,7 @@ function setAxisGridScores(axisScores, axisCodes, metrics = {}) {
 function renderInvestorTypePage(result) {
   if (!result) return;
   const isQuizAnalysis = String(result?.analysisSource || '').toLowerCase() === 'quiz' || !!quizResultSection;
-  const type = String(result?.investorProfile?.type || 'Passive Rational Allocator');
+  const type = String(result?.investorProfile?.type || 'Index Strategist');
   const code = String(result?.investorProfile?.code || '').trim();
   const axes = result?.investorProfile?.axes || {};
   const axisCodes = getAxisCodes(result?.investorProfile || {});
@@ -6135,7 +6135,7 @@ function drawDonutChart(canvas, weights, labelMap, options = {}) {
         const color = colors[i % colors.length];
         const amount = Number(amountMap[symbol] || 0);
         const amountText = amount > 0 ? toCurrency(amount) : '-';
-        return `<span class="legend-item"><span class="legend-dot" style="background:${color}"></span><span class="legend-main">${escapeHtml(label)}</span><span class="legend-metrics">${toPercent(weight)} 쨌 ${amountText}</span></span>`;
+        return `<span class="legend-item"><span class="legend-dot" style="background:${color}"></span><span class="legend-main">${escapeHtml(label)}</span><span class="legend-metrics">${toPercent(weight)} · ${amountText}</span></span>`;
       })
       .join('');
   } else {
@@ -7296,3 +7296,5 @@ setReplayStatus('Replay: paused');
 updateHoldOnlyButton();
 updateAutoPlayButton();
 showSlide('setup');
+
+

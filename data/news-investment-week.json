@@ -1940,7 +1940,7 @@
           "link": "https://news.google.com/search?q=AAPL%20Major%20Tech%20Group%20Reportedly%20Voices%20Concern%20Over%20Anthropic's%20'Supply%20Chain%20Risk'%20Label"
         },
         {
-          "title": "Broadcomâ€™s AI Business Is Booming. The Rest Is Complicated.",
+          "title": "Broadcom?™s AI Business Is Booming. The Rest Is Complicated.",
           "publisher": "The Wall Street Journal",
           "date": "2026-03-05",
           "symbol": "AAPL",
@@ -1970,7 +1970,7 @@
       },
       "buyerFit": {
         "code": "C-I-R",
-        "type": "Conservative Researcher",
+        "type": "Research Analyst",
         "axes": {
           "risk": "Conservative",
           "control": "Internal/Active",
@@ -1994,3 +1994,4 @@
     "NVDA"
   ]
 }
+

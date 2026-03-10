@@ -1,4 +1,4 @@
-﻿const riskRange = document.getElementById('typesRiskRange');
+const riskRange = document.getElementById('typesRiskRange');
 const controlRange = document.getElementById('typesControlRange');
 const reactRange = document.getElementById('typesReactRange');
 const riskValue = document.getElementById('typesRiskValue');
@@ -247,13 +247,13 @@ function updateCodeLabel() {
   const code = `${r}-${c}-${e}`;
   const typeLabel = {
     'A-I-R': 'The Quant',
-    'A-I-E': 'Active Conviction Investor',
-    'A-E-R': 'Tactical Trend Analyst',
-    'A-E-E': 'Aggressive Reactive Trader',
-    'C-I-R': 'Conservative Researcher',
-    'C-I-E': 'Defensive Active Allocator',
-    'C-E-R': 'Passive Rational Allocator',
-    'C-E-E': 'Passive Emotional Allocator'
+    'A-I-E': 'Portfolio Manager',
+    'A-E-R': 'Technical Analyst',
+    'A-E-E': 'Day Trader',
+    'C-I-R': 'Research Analyst',
+    'C-I-E': 'Risk Manager',
+    'C-E-R': 'Index Strategist',
+    'C-E-E': 'Wealth Advisor'
   }[code] || 'Investor Type';
   if (cubeCode) cubeCode.textContent = typeLabel;
 }
@@ -340,4 +340,6 @@ function init() {
 }
 
 init();
+
+
 
