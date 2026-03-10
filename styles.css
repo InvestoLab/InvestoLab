@@ -6944,7 +6944,19 @@ footer {
 
   .valuation-preview-card {
     min-width: 0;
-    padding: 0.35rem 0.45rem;
+    padding: 0.42rem 0.5rem;
+  }
+
+  .valuation-preview-card span {
+    font-size: 0.76rem;
+  }
+
+  .valuation-preview-card strong {
+    font-size: 0.94rem;
+  }
+
+  .valuation-preview-card em {
+    font-size: 0.74rem;
   }
 
   .valuation-preview-chart {
