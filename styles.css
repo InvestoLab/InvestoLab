@@ -33,12 +33,7 @@ body {
   font-family: 'Manrope', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.78;
   color: var(--ink);
-  background:
-    radial-gradient(1400px 620px at 8% -12%, #e9fffa 0%, rgba(233, 255, 250, 0) 62%),
-    linear-gradient(180deg, #fbfdff 0%, #ffffff 36%),
-    var(--bg);
-  background-size: 150% 150%, 100% 100%, auto;
-  animation: pageAtmosphere 18s ease-in-out infinite alternate;
+  background: linear-gradient(180deg, #fbfdff 0%, #ffffff 36%);
 }
 
 body::after {
@@ -294,29 +289,8 @@ body::after {
 
 .hero::before,
 .hero::after {
-  content: '';
-  position: absolute;
-  width: 240px;
-  height: 240px;
-  border-radius: 50%;
-  filter: blur(28px);
-  opacity: 0.45;
-  z-index: 0;
-  pointer-events: none;
-}
-
-.hero::before {
-  left: -60px;
-  top: -80px;
-  background: radial-gradient(circle, rgba(56, 189, 248, 0.35), rgba(56, 189, 248, 0));
-  animation: heroFloat 12s ease-in-out infinite;
-}
-
-.hero::after {
-  right: -120px;
-  top: -90px;
-  background: radial-gradient(circle, rgba(15, 118, 110, 0.35), rgba(15, 118, 110, 0));
-  animation: heroFloat 14s ease-in-out infinite reverse;
+  content: none;
+  display: none;
 }
 
 .hero h1 {
@@ -7079,6 +7053,14 @@ footer {
   textarea {
     font-size: 0.88rem;
   }
+
+  .card,
+  .home-card,
+  .chart-card,
+  .single-layout > .card {
+    border: 1px solid #d8e5f5;
+    box-shadow: none;
+  }
 }
 
 @media (max-width: 640px) {
@@ -7118,7 +7100,7 @@ footer {
   }
 
   .valuation-preview-bars {
-    display: none;
+    display: grid;
   }
 
   .home-axis-stage {
