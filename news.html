@@ -13,7 +13,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>InvestoLab - News</title>
-  <link rel="stylesheet" href="styles.css?v=20260228b" />
+  <link rel="stylesheet" href="styles.css?v=20260312b" />
   <script src="nav.js?v=20260305i" defer></script>
   <script src="config.js?v=20260227a" defer></script>
   <script src="api-base.js?v=20260307b" defer></script>
@@ -62,24 +62,100 @@
     <section class="card home-card">
       <h2>Company News Insight</h2>
       <p>Analyze one company with AI-style reasoning based on price trend, index relative strength, and headline sentiment.</p>
+      <div class="feature-preview company-preview" aria-hidden="true">
+        <div class="company-badge">AAPL</div>
+        <div class="company-rings">
+          <svg viewBox="0 0 120 120" focusable="false" aria-hidden="true">
+            <circle class="company-ring r1" cx="60" cy="60" r="44"></circle>
+            <circle class="company-ring r2" cx="60" cy="60" r="30"></circle>
+            <circle class="company-ring r3" cx="60" cy="60" r="16"></circle>
+          </svg>
+        </div>
+        <div class="company-sentiment">
+          <span class="dot pos"></span>
+          <span class="dot mid"></span>
+          <span class="dot pos"></span>
+          <span class="dot neg"></span>
+        </div>
+      </div>
       <a class="cta-link" href="./news-company-insight.html">Open Company Insight</a>
     </section>
 
     <section class="card home-card">
       <h2>Market News</h2>
       <p>See top market headlines and overall sentiment.</p>
+      <div class="feature-preview market-preview" aria-hidden="true">
+        <div class="market-stack">
+          <div class="market-core">
+            <span class="market-orbit-ring r1"></span>
+            <span class="market-orbit-ring r2"></span>
+            <svg viewBox="0 0 140 140" focusable="false" aria-hidden="true">
+              <circle class="globe-core" cx="70" cy="70" r="48"></circle>
+              <path class="globe-line" d="M22 70 H118"></path>
+              <path class="globe-line" d="M70 22 V118"></path>
+              <path class="globe-line" d="M34 40 C58 52 82 52 106 40"></path>
+              <path class="globe-line" d="M34 100 C58 88 82 88 106 100"></path>
+            </svg>
+            <div class="market-core-label">Market</div>
+          </div>
+          <div class="market-bars-lite">
+            <span style="--h:62%"></span>
+            <span style="--h:48%"></span>
+            <span style="--h:74%"></span>
+            <span style="--h:56%"></span>
+          </div>
+        </div>
+      </div>
       <a class="cta-link" href="./news-market.html">Open Market News</a>
     </section>
 
     <section class="card home-card">
       <h2>Tailored News</h2>
       <p>See news picked for your investor type.</p>
+      <div class="feature-preview tailored-news-preview" aria-hidden="true">
+        <div class="tailored-burst">
+          <div class="tailored-burst-core">You</div>
+          <span class="tailored-burst-ring r1"></span>
+          <span class="tailored-burst-ring r2"></span>
+          <span class="tailored-burst-ring r3"></span>
+        </div>
+        <div class="tailored-chips-row">
+          <span>Signal</span>
+          <span>Bias</span>
+          <span>Move</span>
+        </div>
+        <div class="tailored-scan">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
       <a class="cta-link" href="./news-tailored.html">Open Tailored News</a>
     </section>
 
     <section class="card home-card">
       <h2>Investment Of The Day/Week/Month/Year</h2>
       <p>Open curated investment picks by period.</p>
+      <div class="feature-preview period-news-preview" aria-hidden="true">
+        <div class="period-calendar">
+          <span>D</span>
+          <span>W</span>
+          <span>M</span>
+          <span>Y</span>
+        </div>
+        <div class="period-checks">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <div class="period-spark">
+          <svg viewBox="0 0 200 50" focusable="false" aria-hidden="true">
+            <polyline points="4,38 34,32 60,36 96,26 132,30 166,20 196,24"></polyline>
+          </svg>
+        </div>
+      </div>
       <div class="news-period-links">
         <a class="cta-link" href="./news-investment-day.html">Day</a>
         <a class="cta-link" href="./news-investment-week.html">Week</a>
