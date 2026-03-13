@@ -54,11 +54,23 @@ async function loadInvestmentOfPeriod() {
     const readJsonWithFallback = async (primaryUrl, fallbackUrl) => {
       const readJson = async (url) => {
         const response = await fetch(url);
-        const contentType = String(response.headers.get('content-type') || '').toLowerCase();
-        if (!contentType.includes('application/json')) {
-          throw new Error('Response was not valid JSON.');
+        const responseClone = response.clone();
+        let data = null;
+        try {
+          data = await response.json();
+        } catch (_error) {
+          let raw = '';
+          try {
+            raw = await responseClone.text();
+          } catch (_textError) {
+            raw = '';
+          }
+          const snippet = String(raw || '').trim().slice(0, 240);
+          const status = Number(response.status || 0) || 'unknown';
+          throw new Error(
+            `Response was not valid JSON (status ${status}).${snippet ? ` Body: ${snippet}` : ''}`
+          );
         }
-        const data = await response.json();
         if (!response.ok) {
           throw new Error(data?.error || 'Failed to load investment pick.');
         }
@@ -67,9 +79,6 @@ async function loadInvestmentOfPeriod() {
       try {
         return await readJson(primaryUrl);
       } catch (primaryError) {
-        if (window.__INVESTOLAB_DISABLE_STATIC) {
-          throw primaryError;
-        }
         if (!fallbackUrl) throw primaryError;
         return readJson(fallbackUrl);
       }
