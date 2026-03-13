@@ -8850,11 +8850,14 @@ footer {
     flex-wrap: wrap;
     gap: 0.3rem;
     padding-inline: 0.4rem;
+    justify-content: center;
   }
 
   .news-period-links .cta-link {
     min-width: 0;
     flex: 1 1 calc(50% - 0.3rem);
+    min-width: 140px;
+    width: 100%;
   }
 
   .portfolio-preview .alloc-bars {

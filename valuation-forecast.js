@@ -45,6 +45,15 @@ function setStep2Error(message) {
   forecastStep2Error.classList.remove('hidden');
 }
 
+function normalizePresetError(error) {
+  const raw = String(error?.message || error || '').trim();
+  if (!raw) return 'Unable to apply AI preset.';
+  if (/response was not valid json/i.test(raw) || /unexpected token/i.test(raw)) {
+    return 'Live data is unavailable right now. Please try again in a moment.';
+  }
+  return raw;
+}
+
 function fmtMoney(v) {
   const n = Number(v || 0);
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }).format(n);
@@ -518,7 +527,7 @@ async function handlePresetClick(preset) {
     await ensureBaselineLoaded();
     applyAiPreset(preset);
   } catch (error) {
-    setStep2Error(error?.message || 'Unable to apply AI preset.');
+    setStep2Error(normalizePresetError(error));
   }
 }
 
