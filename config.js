@@ -1,7 +1,10 @@
 (() => {
   // Set this once to your deployed backend URL (no trailing slash).
   // Example: https://investolab-api.onrender.com
-  window.INVESTOLAB_API_BASE = window.INVESTOLAB_API_BASE || window.localStorage?.getItem('INVESTOLAB_API_BASE') || '';
+  window.INVESTOLAB_API_BASE =
+    window.INVESTOLAB_API_BASE ||
+    window.localStorage?.getItem('INVESTOLAB_API_BASE') ||
+    'https://investolab.onrender.com';
 
   // Dev-only: bust stylesheet cache on localhost so changes show immediately.
   const host = String(window.location.hostname || '');

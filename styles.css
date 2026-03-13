@@ -827,7 +827,7 @@ body::after {
 .feature-home-grid > .home-card p {
   font-size: 0.97rem;
   min-height: 0;
-  margin: 0.55rem 0 0;
+  margin: -0.75rem 0 0;
   line-height: 1.55;
   text-align: center;
 }
@@ -859,7 +859,7 @@ body::after {
 .news-home-grid > .home-card p {
   font-size: 0.97rem;
   min-height: 0;
-  margin: 0.55rem 0 0;
+  margin: -0.75rem 0 0;
   line-height: 1.55;
   text-align: center;
 }
@@ -8245,7 +8245,7 @@ footer {
   display: flex;
   flex-wrap: nowrap;
   justify-content: center;
-  gap: 0.08rem;
+  gap: 0.35rem;
 }
 
 .feature-home-grid .news-period-links,
@@ -8268,10 +8268,10 @@ footer {
   margin-top: 0;
   margin-left: 0;
   margin-right: 0;
-  min-width: 0;
+  min-width: 96px;
   width: auto;
-  padding: 0.36rem 0.68rem;
-  font-size: 0.84rem;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.92rem;
   border-radius: 8px;
 }
 
@@ -8805,11 +8805,13 @@ footer {
   .news-home-grid > .home-card h2 {
     margin: 0;
     line-height: 1.2;
+    margin-bottom: -0.4rem;
   }
 
   .feature-home-grid > .home-card p,
   .news-home-grid > .home-card p {
     margin: 0;
+    margin-top: -0.6rem;
     line-height: 1.4;
   }
 
