@@ -1023,7 +1023,7 @@ function ensureStartTransitionOverlay() {
   el.innerHTML = `
     <div class="time-warp-core">
       <div class="time-warp-title">Simulating Time...</div>
-      <div class="time-warp-sub">Loading market movement across your timeline</div>
+      <div class="time-warp-sub loading-ellipsis">Loading market movement across your timeline</div>
       <div class="time-warp-track"><div class="time-warp-fill"></div></div>
     </div>
   `;
@@ -2241,7 +2241,10 @@ function playInvestorTypeReveal(options = {}) {
   let dotsTimer = null;
 
   if (titleEl) titleEl.textContent = `${titleBase}${dots[dotIdx]}`;
-  if (subEl) subEl.textContent = subtitle;
+  if (subEl) {
+    subEl.textContent = subtitle;
+    subEl.classList.toggle('loading-ellipsis', /^loading/i.test(subtitle));
+  }
   if (trackEl) trackEl.style.display = '';
   dotsTimer = setInterval(() => {
     dotIdx = (dotIdx + 1) % dots.length;
@@ -2260,7 +2263,11 @@ function playInvestorTypeReveal(options = {}) {
       setTimeout(() => {
         overlay.classList.add('hidden');
         if (titleEl) titleEl.textContent = prevTitle || 'Simulating Time...';
-        if (subEl) subEl.textContent = prevSub || 'Loading market movement across your timeline';
+        if (subEl) {
+          const nextSub = prevSub || 'Loading market movement across your timeline';
+          subEl.textContent = nextSub;
+          subEl.classList.toggle('loading-ellipsis', /^loading/i.test(nextSub));
+        }
         if (trackEl) trackEl.style.display = prevTrackDisplay;
         resolve();
       }, fadeMs);

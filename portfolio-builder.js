@@ -54,6 +54,18 @@ function fmtNum(v, digits = 2) {
   return Number(v).toFixed(digits);
 }
 
+function setLoadingLabel(el, text) {
+  if (!el) return;
+  el.textContent = text;
+  el.classList.add('loading-ellipsis');
+}
+
+function setLabel(el, text) {
+  if (!el) return;
+  el.textContent = text;
+  el.classList.remove('loading-ellipsis');
+}
+
 function normalizeAmountMode(rawMode) {
   const mode = String(rawMode || '').trim().toLowerCase();
   if (mode === 'unit' || mode === 'units') return 'units';
@@ -463,10 +475,10 @@ function ensureAddHoldingModal() {
   const syncUnitInline = (loading = false) => {
     if (!unitInline) return;
     if (loading) {
-      unitInline.textContent = 'Unit Price: Loading...';
+      setLoadingLabel(unitInline, 'Unit Price: Loading');
       return;
     }
-    unitInline.textContent = state.unitPrice ? `Unit Price: ${fmtMoney(state.unitPrice)} / unit` : 'Unit Price: -';
+    setLabel(unitInline, state.unitPrice ? `Unit Price: ${fmtMoney(state.unitPrice)} / unit` : 'Unit Price: -');
   };
 
   const getAmountAsDollars = () => {

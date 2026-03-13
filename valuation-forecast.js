@@ -39,10 +39,19 @@ function setStep2Error(message) {
   if (!msg) {
     forecastStep2Error.textContent = '';
     forecastStep2Error.classList.add('hidden');
+    forecastStep2Error.classList.remove('loading-ellipsis');
     return;
   }
   forecastStep2Error.textContent = msg;
   forecastStep2Error.classList.remove('hidden');
+  forecastStep2Error.classList.toggle('loading-ellipsis', /^loading/i.test(msg));
+}
+
+function setForecastStatus(message) {
+  if (!forecastStatus) return;
+  const msg = String(message || '').trim();
+  forecastStatus.textContent = msg;
+  forecastStatus.classList.toggle('loading-ellipsis', /^loading/i.test(msg));
 }
 
 function normalizePresetError(error) {
@@ -457,7 +466,7 @@ function applyAiPreset(preset) {
   setControlValue(forecastMacroInput, forecastMacroRange, Math.round(clamp(macroIdx * 100, -100, 100)));
   setControlValue(forecastMeanRevInput, forecastMeanRevRange, Math.round(clamp(meanRev * 100, 0, 100)));
   updateQuickSummary();
-  forecastStatus.textContent = `AI ${preset === 'auto' ? 'Auto' : preset} assumptions applied.`;
+  setForecastStatus(`AI ${preset === 'auto' ? 'Auto' : preset} assumptions applied.`);
 }
 
 async function fetchBaseline(symbol) {
@@ -514,7 +523,7 @@ async function ensureBaselineLoaded() {
     return currentBaseline;
   }
   const symbol = requestedSymbol;
-  forecastStatus.textContent = `Loading baseline data for ${symbol}...`;
+  setForecastStatus(`Loading baseline data for ${symbol}`);
   currentBaseline = await fetchBaseline(symbol);
   forecastSelectedSymbol = currentBaseline.symbol;
   if (forecastQueryInput) forecastQueryInput.value = currentBaseline.symbol;
@@ -522,7 +531,7 @@ async function ensureBaselineLoaded() {
 }
 
 async function handlePresetClick(preset) {
-  setStep2Error('Loading baseline data...');
+  setStep2Error('Loading baseline data');
   try {
     await ensureBaselineLoaded();
     applyAiPreset(preset);
@@ -754,10 +763,10 @@ forecastForm?.addEventListener('submit', async (event) => {
   event.preventDefault();
   const query = String(forecastQueryInput?.value || '').trim();
   if (!query) {
-    forecastStatus.textContent = 'Enter an investment.';
+    setForecastStatus('Enter an investment.');
     return;
   }
-  forecastStatus.textContent = 'Loading historical data and news signals...';
+  setForecastStatus('Loading historical data and news signals');
   forecastResult.classList.add('hidden');
 
   try {
@@ -774,7 +783,7 @@ forecastForm?.addEventListener('submit', async (event) => {
     }
     updateQuickSummary();
 
-    forecastStatus.textContent = 'Running AI simulation paths...';
+    setForecastStatus('Running AI simulation paths');
     const simulation = runSimulation(currentBaseline, {
       horizonUnits: Number(forecastYearsInput?.value || 36),
       interval: String(forecastIntervalSelect?.value || 'monthly'),
@@ -786,9 +795,9 @@ forecastForm?.addEventListener('submit', async (event) => {
       meanReversionPct: Number(forecastMeanRevInput?.value || 25)
     });
     renderResult(currentBaseline, simulation);
-    forecastStatus.textContent = `Simulation complete for ${currentBaseline.symbol}.`;
+    setForecastStatus(`Simulation complete for ${currentBaseline.symbol}.`);
   } catch (error) {
-    forecastStatus.textContent = `Unable to run simulation: ${error?.message || 'Unknown error'}`;
+    setForecastStatus(`Unable to run simulation: ${error?.message || 'Unknown error'}`);
     forecastResult.classList.add('hidden');
   }
 });

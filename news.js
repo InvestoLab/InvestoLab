@@ -7,6 +7,18 @@ const tailoredTypeSelect = document.getElementById('tailoredTypeSelect');
 const tailoredNewsDateLabel = document.getElementById('tailoredNewsDateLabel');
 const tailoredNewsResult = document.getElementById('tailoredNewsResult');
 
+function setLoadingLabel(el, text) {
+  if (!el) return;
+  el.textContent = text;
+  el.classList.add('loading-ellipsis');
+}
+
+function setLabel(el, text) {
+  if (!el) return;
+  el.textContent = text;
+  el.classList.remove('loading-ellipsis');
+}
+
 function fmtMoney(v) {
   const n = Number(v || 0);
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }).format(n);
@@ -87,9 +99,10 @@ async function readJsonWithFallback(primaryUrl, fallbackUrl, failMessage) {
 
 async function loadMarketNews() {
   try {
+    setLoadingLabel(marketNewsDateLabel, 'Loading market feed');
     const data = await readJsonWithFallback('./api/news/market', './data/news-market.json', 'Failed to load market news.');
 
-    marketNewsDateLabel.textContent = `Date: ${esc(data?.asOfDate || '')}`;
+    setLabel(marketNewsDateLabel, `Date: ${esc(data?.asOfDate || '')}`);
     marketNewsResult.innerHTML = `
       ${renderNewsSignalCards(data.sentiment)}
       <section class="chart-card">
@@ -102,21 +115,21 @@ async function loadMarketNews() {
       </section>
     `;
   } catch (error) {
-    marketNewsDateLabel.textContent = 'Unable to load market news.';
+    setLabel(marketNewsDateLabel, 'Unable to load market news.');
     marketNewsResult.innerHTML = `<section class="chart-card"><p>${esc(error.message || 'Unknown error')}</p></section>`;
   }
 }
 
 async function loadTailoredNews(typeKey) {
   try {
-    tailoredNewsDateLabel.textContent = 'Loading tailored feed...';
+    setLoadingLabel(tailoredNewsDateLabel, 'Loading tailored feed');
     const data = await readJsonWithFallback(
       `./api/news/tailored?type=${encodeURIComponent(typeKey || '')}`,
       './data/news-tailored.json',
       'Failed to load tailored news.'
     );
 
-    tailoredNewsDateLabel.textContent = `Date: ${esc(data?.asOfDate || '')} | Profile: ${esc(data?.profile || '')}`;
+    setLabel(tailoredNewsDateLabel, `Date: ${esc(data?.asOfDate || '')} | Profile: ${esc(data?.profile || '')}`);
     tailoredNewsResult.innerHTML = `
       ${renderNewsSignalCards(data.sentiment)}
       <section class="chart-card">
@@ -129,7 +142,7 @@ async function loadTailoredNews(typeKey) {
       </section>
     `;
   } catch (error) {
-    tailoredNewsDateLabel.textContent = 'Unable to load tailored news.';
+    setLabel(tailoredNewsDateLabel, 'Unable to load tailored news.');
     tailoredNewsResult.innerHTML = `<section class="chart-card"><p>${esc(error.message || 'Unknown error')}</p></section>`;
   }
 }
@@ -150,7 +163,7 @@ async function loadInvestmentOfDay() {
     const summary3 = Array.isArray(valuation?.summary3) ? valuation.summary3 : [];
     const alternatives = Array.isArray(data?.alternatives) ? data.alternatives : [];
 
-    newsDateLabel.textContent = `Date: ${esc(data?.asOfDate || '')}`;
+    setLabel(newsDateLabel, `Date: ${esc(data?.asOfDate || '')}`);
 
     newsResult.innerHTML = `
       <section class="valuation-hero ${String(rec.action || 'HOLD').toLowerCase()}">
@@ -198,7 +211,7 @@ async function loadInvestmentOfDay() {
       </section>
     `;
   } catch (error) {
-    newsDateLabel.textContent = "Unable to load today's pick.";
+    setLabel(newsDateLabel, "Unable to load today's pick.");
     newsResult.innerHTML = `<section class="chart-card"><p>${esc(error.message || 'Unknown error')}</p></section>`;
   }
 }

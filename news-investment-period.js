@@ -100,6 +100,7 @@ async function loadInvestmentOfPeriod() {
     if (investmentPeriodTitle) {
       investmentPeriodTitle.textContent = String(data?.title || `Investment Of The ${periodLabel}`);
     }
+    newsDateLabel.classList.remove('loading-ellipsis');
     newsDateLabel.textContent = `Date: ${esc(data?.asOfDate || '')} | Period: ${esc(periodLabel.toUpperCase())}`;
 
     newsResult.innerHTML = `
@@ -148,6 +149,7 @@ async function loadInvestmentOfPeriod() {
       </section>
     `;
   } catch (error) {
+    newsDateLabel.classList.remove('loading-ellipsis');
     newsDateLabel.textContent = 'Unable to load investment pick.';
     newsResult.innerHTML = `<section class="chart-card"><p>${esc(error.message || 'Unknown error')}</p></section>`;
   }
