@@ -2,6 +2,18 @@
 const portfolioResultMeta = document.getElementById('portfolioResultMeta');
 const portfolioResult = document.getElementById('portfolioResult');
 
+function setLoadingLabel(el, text) {
+  if (!el) return;
+  el.textContent = text;
+  el.classList.add('loading-ellipsis');
+}
+
+function setLabel(el, text) {
+  if (!el) return;
+  el.textContent = text;
+  el.classList.remove('loading-ellipsis');
+}
+
 function fmtMoney(v) {
   const n = Number(v || 0);
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }).format(n);
@@ -519,11 +531,9 @@ function loadPortfolioResult() {
       portfolioResultMeta.textContent = `As of ${asOfDate || '-'} | Holdings: ${holdings.length}`;
     }
     renderPortfolioResult(parsed?.payload || {});
-    if (portfolioResultStatus) portfolioResultStatus.textContent = 'Portfolio valuation completed.';
+    setLabel(portfolioResultStatus, 'Portfolio valuation completed.');
   } catch (_error) {
-    if (portfolioResultStatus) {
-      portfolioResultStatus.textContent = 'No portfolio results found. Run an evaluation first.';
-    }
+    setLabel(portfolioResultStatus, 'No portfolio results found. Run an evaluation first.');
     if (portfolioResultMeta) {
       portfolioResultMeta.textContent = 'Run valuation from Portfolio Valuation page.';
     }

@@ -3,6 +3,18 @@ const tailoredTypeSelect = document.getElementById('tailoredTypeSelect');
 const tailoredNewsDateLabel = document.getElementById('tailoredNewsDateLabel');
 const tailoredNewsResult = document.getElementById('tailoredNewsResult');
 
+function setLoadingLabel(el, text) {
+  if (!el) return;
+  el.textContent = text;
+  el.classList.add('loading-ellipsis');
+}
+
+function setLabel(el, text) {
+  if (!el) return;
+  el.textContent = text;
+  el.classList.remove('loading-ellipsis');
+}
+
 function fmtPct(v, digits = 2) {
   if (v == null || Number.isNaN(Number(v))) return 'N/A';
   return `${(Number(v) * 100).toFixed(digits)}%`;
@@ -51,7 +63,7 @@ function renderNewsSignalCards(sentiment) {
 
 async function loadTailoredNews(typeKey) {
   try {
-    tailoredNewsDateLabel.textContent = 'Loading tailored feed...';
+    setLoadingLabel(tailoredNewsDateLabel, 'Loading tailored feed');
     const readJsonWithFallback = async (primaryUrl, fallbackUrl) => {
       const readJson = async (url) => {
         const response = await fetch(url);
@@ -78,7 +90,7 @@ async function loadTailoredNews(typeKey) {
       './data/news-tailored.json'
     );
 
-    tailoredNewsDateLabel.textContent = `Date: ${esc(data?.asOfDate || '')} | Profile: ${esc(data?.profile || '')}`;
+    setLabel(tailoredNewsDateLabel, `Date: ${esc(data?.asOfDate || '')} | Profile: ${esc(data?.profile || '')}`);
     tailoredNewsResult.innerHTML = `
       ${renderNewsSignalCards(data.sentiment)}
       <section class="chart-card">
@@ -91,7 +103,7 @@ async function loadTailoredNews(typeKey) {
       </section>
     `;
   } catch (error) {
-    tailoredNewsDateLabel.textContent = 'Unable to load tailored news.';
+    setLabel(tailoredNewsDateLabel, 'Unable to load tailored news.');
     tailoredNewsResult.innerHTML = `<section class="chart-card"><p>${esc(error.message || 'Unknown error')}</p></section>`;
   }
 }

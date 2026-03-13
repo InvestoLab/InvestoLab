@@ -2,6 +2,7 @@
   const isGithubPages = /\.github\.io$/i.test(window.location.hostname);
   window.__INVESTOLAB_DISABLE_STATIC = isGithubPages;
   const FORCE_PUBLIC_API = true;
+  const USE_REMOTE_ON_GITHUB = false;
   const apiBase = '';
   const MARKET_NEWS_SYMBOLS = ['SPY', 'QQQ', 'AAPL', 'MSFT', 'NVDA', 'AMZN', 'TLT', 'GLD'];
   const TAILORED_NEWS_PROFILES = {
@@ -606,6 +607,36 @@
     return n;
   }
 
+  const CORS_PROXIES = [
+    (url) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+    (url) => `https://bypass.cors.rest/${url}`,
+    (url) => `https://thingproxy.freeboard.io/fetch/${url}`,
+    (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
+  ];
+
+  async function fetchJsonWithCors(url, options = {}) {
+    const targets = isGithubPages ? CORS_PROXIES.map((fn) => fn(url)) : [url, ...CORS_PROXIES.map((fn) => fn(url))];
+    let lastError = null;
+    for (const target of targets) {
+      try {
+        const response = await rawFetch(target, options);
+        if (!response.ok) {
+          lastError = new Error(`Request failed (${response.status || 'unknown'})`);
+          continue;
+        }
+        try {
+          return await response.json();
+        } catch (_jsonError) {
+          const text = await response.text();
+          return JSON.parse(text);
+        }
+      } catch (error) {
+        lastError = error;
+      }
+    }
+    throw lastError || new Error('Unable to load data.');
+  }
+
   async function yahooSearch(query, _quotesCount = 10, _newsCount = 0) {
     const q = String(query || '').trim().toUpperCase();
     if (!q) return { quotes: [], news: [] };
@@ -613,39 +644,35 @@
       const remoteUrl = `https://query1.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(
         q
       )}&quotesCount=100&newsCount=0`;
-      const remoteRes = await rawFetch(remoteUrl);
-      const ct = String(remoteRes.headers.get('content-type') || '').toLowerCase();
-      if (remoteRes.ok && ct.includes('application/json')) {
-        const remoteData = await remoteRes.json();
-        const remoteQuotes = Array.isArray(remoteData?.quotes) ? remoteData.quotes : [];
-        const cleaned = remoteQuotes
-          .filter((row) => row && row.symbol)
-          .map((row) => {
-            const symbol = normalizeSymbol(row.symbol);
-            const longname = String(row.longname || row.shortname || fullNameForSymbol(symbol));
-            return {
-              symbol,
-              shortname: String(row.shortname || longname),
-              longname,
-              exchange: String(row.exchange || row.exchDisp || marketMetaForSymbol(symbol).exchange || 'GLOBAL'),
-              quoteType: String(row.quoteType || marketMetaForSymbol(symbol).quoteType || 'EQUITY'),
-              _score: searchScore(q, symbol, longname),
-              _pop: popularityRank(symbol)
-            };
-          })
-          .filter((row) => row._score > 0);
-        cleaned.sort((a, b) => {
-          const aExact = a.symbol === q;
-          const bExact = b.symbol === q;
-          if (aExact && !bExact) return -1;
-          if (bExact && !aExact) return 1;
-          if (a._pop !== b._pop) return a._pop - b._pop;
-          if (b._score !== a._score) return b._score - a._score;
-          return String(a.symbol).localeCompare(String(b.symbol));
-        });
-        const remoteTop = cleaned.slice(0, 40).map(({ _score, _pop, ...row }) => row);
-        if (remoteTop.length) return { quotes: remoteTop, news: [] };
-      }
+      const remoteData = await fetchJsonWithCors(remoteUrl, { cache: 'no-store' });
+      const remoteQuotes = Array.isArray(remoteData?.quotes) ? remoteData.quotes : [];
+      const cleaned = remoteQuotes
+        .filter((row) => row && row.symbol)
+        .map((row) => {
+          const symbol = normalizeSymbol(row.symbol);
+          const longname = String(row.longname || row.shortname || fullNameForSymbol(symbol));
+          return {
+            symbol,
+            shortname: String(row.shortname || longname),
+            longname,
+            exchange: String(row.exchange || row.exchDisp || marketMetaForSymbol(symbol).exchange || 'GLOBAL'),
+            quoteType: String(row.quoteType || marketMetaForSymbol(symbol).quoteType || 'EQUITY'),
+            _score: searchScore(q, symbol, longname),
+            _pop: popularityRank(symbol)
+          };
+        })
+        .filter((row) => row._score > 0);
+      cleaned.sort((a, b) => {
+        const aExact = a.symbol === q;
+        const bExact = b.symbol === q;
+        if (aExact && !bExact) return -1;
+        if (bExact && !aExact) return 1;
+        if (a._pop !== b._pop) return a._pop - b._pop;
+        if (b._score !== a._score) return b._score - a._score;
+        return String(a.symbol).localeCompare(String(b.symbol));
+      });
+      const remoteTop = cleaned.slice(0, 40).map(({ _score, _pop, ...row }) => row);
+      if (remoteTop.length) return { quotes: remoteTop, news: [] };
     } catch (_error) {
       // Fall back to local universe when remote search is unavailable.
     }
@@ -687,12 +714,7 @@
       const url = `https://${host}/v8/finance/chart/${encodeURIComponent(sym)}?range=${encodeURIComponent(
         safeRange
       )}&interval=${encodeURIComponent(safeInterval)}&includePrePost=false&events=div,splits`;
-      const response = await rawFetch(url, { cache: 'no-store' });
-      const contentType = String(response.headers.get('content-type') || '').toLowerCase();
-      if (!response.ok || !contentType.includes('application/json')) {
-        throw new Error(`Yahoo chart failed (${response.status || 'unknown'})`);
-      }
-      const data = await response.json();
+      const data = await fetchJsonWithCors(url, { cache: 'no-store' });
       const rows = extractHistory(data);
       if (!rows.length) throw new Error('Yahoo chart returned no rows.');
       return data;
@@ -710,9 +732,7 @@
               safeRange
             )}&interval=${encodeURIComponent(safeInterval)}&includePrePost=false&events=div,splits`
           )}`;
-          const proxied = await rawFetch(proxyUrl, { cache: 'no-store' });
-          if (!proxied.ok) throw new Error(`Proxy failed (${proxied.status || 'unknown'})`);
-          const data = await proxied.json();
+          const data = await fetchJsonWithCors(proxyUrl, { cache: 'no-store' });
           const rows = extractHistory(data);
           if (!rows.length) throw new Error('Proxy chart returned no rows.');
           return data;
@@ -2066,7 +2086,7 @@
     // local handlers first. Remote backend failures/4xx should not break UX.
     // However, price-critical endpoints should try the backend first when available
     // to keep live pricing up to date.
-    if (isGithubPages && API_BASES.length && isPriceCriticalApi(apiPath)) {
+    if (USE_REMOTE_ON_GITHUB && isGithubPages && API_BASES.length && isPriceCriticalApi(apiPath)) {
       const remoteFirst = await fetchFromRemoteApiBases(apiPath, init);
       if (remoteFirst instanceof Response && remoteFirst.status < 500) return remoteFirst;
     }

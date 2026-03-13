@@ -1,6 +1,18 @@
 const marketNewsDateLabel = document.getElementById('marketNewsDateLabel');
 const marketNewsResult = document.getElementById('marketNewsResult');
 
+function setLoadingLabel(el, text) {
+  if (!el) return;
+  el.textContent = text;
+  el.classList.add('loading-ellipsis');
+}
+
+function setLabel(el, text) {
+  if (!el) return;
+  el.textContent = text;
+  el.classList.remove('loading-ellipsis');
+}
+
 function fmtPct(v, digits = 2) {
   if (v == null || Number.isNaN(Number(v))) return 'N/A';
   return `${(Number(v) * 100).toFixed(digits)}%`;
@@ -49,6 +61,7 @@ function renderNewsSignalCards(sentiment) {
 
 async function loadMarketNews() {
   try {
+    setLoadingLabel(marketNewsDateLabel, 'Loading market feed');
     const readJsonWithFallback = async (primaryUrl, fallbackUrl) => {
       const readJson = async (url) => {
         const response = await fetch(url);
@@ -72,7 +85,7 @@ async function loadMarketNews() {
     };
     const data = await readJsonWithFallback('./api/news/market', './data/news-market.json');
 
-    marketNewsDateLabel.textContent = `Date: ${esc(data?.asOfDate || '')}`;
+    setLabel(marketNewsDateLabel, `Date: ${esc(data?.asOfDate || '')}`);
     marketNewsResult.innerHTML = `
       ${renderNewsSignalCards(data.sentiment)}
       <section class="chart-card">
@@ -85,7 +98,7 @@ async function loadMarketNews() {
       </section>
     `;
   } catch (error) {
-    marketNewsDateLabel.textContent = 'Unable to load market news.';
+    setLabel(marketNewsDateLabel, 'Unable to load market news.');
     marketNewsResult.innerHTML = `<section class="chart-card"><p>${esc(error.message || 'Unknown error')}</p></section>`;
   }
 }
