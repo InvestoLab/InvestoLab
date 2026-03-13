@@ -73,6 +73,9 @@ async function readJsonWithFallback(primaryUrl, fallbackUrl, failMessage) {
   try {
     return await readJson(primaryUrl);
   } catch (primaryError) {
+    if (window.__INVESTOLAB_DISABLE_STATIC) {
+      throw new Error(failMessage || primaryError?.message || 'Live data unavailable.');
+    }
     if (!fallbackUrl) throw primaryError;
     try {
       return await readJson(fallbackUrl);
