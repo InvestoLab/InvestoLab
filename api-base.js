@@ -1,24 +1,9 @@
 (() => {
   const isGithubPages = /\.github\.io$/i.test(window.location.hostname);
+  window.__INVESTOLAB_DISABLE_STATIC = isGithubPages;
   const FORCE_PUBLIC_API = true;
   const apiBase = '';
   const MARKET_NEWS_SYMBOLS = ['SPY', 'QQQ', 'AAPL', 'MSFT', 'NVDA', 'AMZN', 'TLT', 'GLD'];
-  const TWELVE_DATA_KEY = '728526d16a8a412cbd959154f9c6ce9f';
-  const TWELVE_DATA_BASE = 'https://api.twelvedata.com';
-  const TWELVE_DATA_CACHE_TTL_MS = 60 * 1000;
-  const TWELVE_DATA_RPS = 1;
-  const twelveDataCache = new Map();
-  let twelveDataLastHit = 0;
-
-  async function throttleTwelveData() {
-    const minGap = Math.max(1, Math.floor(1000 / TWELVE_DATA_RPS));
-    const now = Date.now();
-    const wait = Math.max(0, minGap - (now - twelveDataLastHit));
-    if (wait > 0) {
-      await new Promise((resolve) => setTimeout(resolve, wait));
-    }
-    twelveDataLastHit = Date.now();
-  }
   const TAILORED_NEWS_PROFILES = {
     the_quant: { key: 'the_quant', label: 'The Quant', symbols: ['QQQ', 'NVDA', 'MSFT', 'AVGO', 'AMD', 'SMH'] },
     active_conviction_investor: { key: 'active_conviction_investor', label: 'Portfolio Manager', symbols: ['TSLA', 'NVDA', 'META', 'AMZN', 'PLTR', 'SOXL'] },
@@ -697,47 +682,6 @@
     const sym = normalizeSymbol(symbol || 'SPY');
     const safeRange = String(range || '3y').trim() || '3y';
     const safeInterval = String(interval || '1d').trim() || '1d';
-    const intervalMap = { '1d': '1day', '1wk': '1week', '1mo': '1month' };
-    const twelveInterval = intervalMap[safeInterval] || '1day';
-
-    const tryTwelveData = async () => {
-      if (!TWELVE_DATA_KEY) return null;
-      const url = `${TWELVE_DATA_BASE}/time_series?symbol=${encodeURIComponent(sym)}&interval=${encodeURIComponent(
-        twelveInterval
-      )}&outputsize=500&format=JSON&apikey=${encodeURIComponent(TWELVE_DATA_KEY)}`;
-      const cached = twelveDataCache.get(url);
-      if (cached && Date.now() - cached.ts < TWELVE_DATA_CACHE_TTL_MS) {
-        return cached.data;
-      }
-      await throttleTwelveData();
-      const response = await rawFetch(url, { cache: 'no-store' });
-      if (!response.ok) throw new Error(`Twelve Data failed (${response.status || 'unknown'})`);
-      const data = await response.json();
-      const values = Array.isArray(data?.values) ? data.values : [];
-      if (!values.length) throw new Error('Twelve Data returned no rows.');
-      const rows = values
-        .map((row) => {
-          const dt = String(row.datetime || '').slice(0, 10);
-          const close = Number(row.close);
-          if (!dt || !Number.isFinite(close)) return null;
-          return { date: dt, close };
-        })
-        .filter(Boolean)
-        .reverse();
-      if (!rows.length) throw new Error('Twelve Data returned no usable rows.');
-      const payload = {
-        chart: {
-          result: [
-            {
-              timestamp: rows.map((r) => Math.floor(Date.parse(`${r.date}T00:00:00Z`) / 1000)),
-              indicators: { quote: [{ close: rows.map((r) => r.close) }] }
-            }
-          ]
-        }
-      };
-      twelveDataCache.set(url, { ts: Date.now(), data: payload });
-      return payload;
-    };
 
     const tryRemote = async (host) => {
       const url = `https://${host}/v8/finance/chart/${encodeURIComponent(sym)}?range=${encodeURIComponent(
@@ -753,13 +697,6 @@
       if (!rows.length) throw new Error('Yahoo chart returned no rows.');
       return data;
     };
-
-    try {
-      const td = await tryTwelveData();
-      if (td) return td;
-    } catch (_error0) {
-      // Fall through to Yahoo.
-    }
 
     try {
       return await tryRemote('query1.finance.yahoo.com');

@@ -2,6 +2,7 @@ const forecastForm = document.getElementById('forecastForm');
 const forecastQueryInput = document.getElementById('forecastQuery');
 const forecastSearchDropdown = document.getElementById('forecastSearchDropdown');
 const forecastSelectionState = document.getElementById('forecastSelectionState');
+const forecastStep2Error = document.getElementById('forecastStep2Error');
 const forecastStatus = document.getElementById('forecastStatus');
 const forecastResult = document.getElementById('forecastResult');
 const forecastYearsInput = document.getElementById('forecastYears');
@@ -31,6 +32,18 @@ let forecastSearchIndex = -1;
 let forecastSearchTimer = null;
 let forecastSelectedSymbol = '';
 let currentBaseline = null;
+
+function setStep2Error(message) {
+  if (!forecastStep2Error) return;
+  const msg = String(message || '').trim();
+  if (!msg) {
+    forecastStep2Error.textContent = '';
+    forecastStep2Error.classList.add('hidden');
+    return;
+  }
+  forecastStep2Error.textContent = msg;
+  forecastStep2Error.classList.remove('hidden');
+}
 
 function fmtMoney(v) {
   const n = Number(v || 0);
@@ -369,9 +382,10 @@ function bindNumberRange(numberInput, rangeInput, options = {}) {
 
 function applyAiPreset(preset) {
   if (!currentBaseline) {
-    forecastStatus.textContent = 'Load an investment first, then apply AI presets.';
+    setStep2Error('Enter an investment first.');
     return;
   }
+  setStep2Error('');
   const drift = currentBaseline.annualDrift;
   const vol = currentBaseline.annualVol;
   const score = Number(currentBaseline.compositeScore || 50);
@@ -499,11 +513,12 @@ async function ensureBaselineLoaded() {
 }
 
 async function handlePresetClick(preset) {
+  setStep2Error('Loading baseline data...');
   try {
     await ensureBaselineLoaded();
     applyAiPreset(preset);
   } catch (error) {
-    forecastStatus.textContent = error?.message || 'Unable to apply AI preset.';
+    setStep2Error(error?.message || 'Unable to apply AI preset.');
   }
 }
 

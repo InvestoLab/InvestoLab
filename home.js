@@ -411,6 +411,44 @@ if (previewCards.length) {
     ]
   ];
   let portfolioIndex = 0;
+  const liveMap = new Map();
+  const fmtMoney = (v) =>
+    new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }).format(Number(v || 0));
+  const fmtPct = (v) => `${(Number(v || 0) * 100).toFixed(2)}%`;
+
+  const fetchLivePreview = async () => {
+    const symbols = Array.from(
+      new Set(
+        portfolios
+          .flat()
+          .map((row) => row.symbol)
+          .filter(Boolean)
+      )
+    );
+    for (const symbol of symbols) {
+      try {
+        const response = await fetch('/api/valuation/investment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: symbol })
+        });
+        const data = await response.json();
+        if (!response.ok) continue;
+        const investment = data?.investment || {};
+        const price = Number(investment?.market?.price || 0);
+        const d30 = Number(investment?.market?.trailingReturns?.d30 || 0);
+        if (Number.isFinite(price)) {
+          liveMap.set(symbol, {
+            price,
+            change: d30,
+            tone: d30 < 0 ? 'down' : 'up'
+          });
+        }
+      } catch (_error) {
+        // keep static fallback
+      }
+    }
+  };
 
   const applyPortfolio = () => {
     previewCards.forEach((card, idx) => {
@@ -420,9 +458,16 @@ if (previewCards.length) {
       const change = card.querySelector('.vp-change');
       if (!sym || !price || !change) return;
       sym.textContent = data.symbol;
-      price.textContent = data.price;
-      change.textContent = data.change;
-      change.style.color = data.tone === 'down' ? '#dc2626' : '#0f766e';
+      const live = liveMap.get(data.symbol);
+      if (live) {
+        price.textContent = fmtMoney(live.price);
+        change.textContent = `${live.change >= 0 ? '+' : ''}${fmtPct(live.change)}`;
+        change.style.color = live.tone === 'down' ? '#dc2626' : '#0f766e';
+      } else {
+        price.textContent = data.price;
+        change.textContent = data.change;
+        change.style.color = data.tone === 'down' ? '#dc2626' : '#0f766e';
+      }
     });
   };
 
@@ -436,6 +481,8 @@ if (previewCards.length) {
   };
 
   applyPortfolio();
+  fetchLivePreview();
+  window.setInterval(fetchLivePreview, 300000);
   window.setInterval(swapPortfolio, 3200);
 }
 
