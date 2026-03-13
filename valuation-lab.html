@@ -13,7 +13,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>InvestoLab - Valuation Lab</title>
-  <link rel="stylesheet" href="styles.css?v=20260228b" />
+  <link rel="stylesheet" href="styles.css?v=20260312b" />
   <script src="nav.js?v=20260305i" defer></script>
   <script src="config.js?v=20260227a" defer></script>
   <script src="api-base.js?v=20260307b" defer></script>
@@ -62,24 +62,110 @@
     <section class="card home-card">
       <h2>Prediction Lab</h2>
       <p>Run AI-assisted Monte Carlo scenarios using historical and news-based signals.</p>
+      <div class="feature-preview forecast-preview" aria-hidden="true">
+        <div class="feature-preview-body">
+          <div class="forecast-fan">
+            <svg viewBox="0 0 240 120" focusable="false" aria-hidden="true">
+              <path class="fan-band band-1" d="M10 92 C60 40 120 44 230 12 L230 34 C120 64 60 62 10 102 Z"></path>
+              <path class="fan-band band-2" d="M10 98 C60 54 120 56 230 32 L230 50 C120 74 60 72 10 108 Z"></path>
+              <path class="fan-band band-3" d="M10 104 C60 70 120 68 230 52 L230 66 C120 84 60 84 10 114 Z"></path>
+              <polyline class="fan-line" points="10,102 48,84 86,88 120,70 156,74 190,56 230,42"></polyline>
+            </svg>
+          </div>
+          <div class="forecast-metrics">
+            <span>Paths 1,200</span>
+            <span>Drift 6.4%</span>
+            <span>Vol 18%</span>
+          </div>
+        </div>
+      </div>
       <a class="cta-link" href="./valuation-forecast.html">Open Prediction Lab</a>
     </section>
 
     <section class="card home-card">
       <h2>Investment Valuation</h2>
       <p>Search any ticker and get a score, recommendation, and key reasons.</p>
+      <div class="feature-preview score-preview" aria-hidden="true">
+        <div class="feature-preview-body">
+          <div class="score-ring">
+            <svg viewBox="0 0 120 120" focusable="false" aria-hidden="true">
+              <circle class="score-track" cx="60" cy="60" r="46"></circle>
+              <circle class="score-progress" cx="60" cy="60" r="46"></circle>
+            </svg>
+            <div class="score-value">82</div>
+            <div class="score-label">Strong</div>
+          </div>
+          <div class="score-cards">
+            <div class="score-card">
+              <span>Trend</span>
+              <strong>+0.8%</strong>
+            </div>
+            <div class="score-card">
+              <span>Sentiment</span>
+              <strong>Positive</strong>
+            </div>
+            <div class="score-card">
+              <span>Risk</span>
+              <strong>Medium</strong>
+            </div>
+          </div>
+        </div>
+      </div>
       <a class="cta-link" href="./valuation.html">Open Investment Valuation</a>
     </section>
 
     <section class="card home-card">
       <h2>Portfolio Valuation</h2>
       <p>Add your holdings and see portfolio score, risk, and diversification in one view.</p>
+      <div class="feature-preview portfolio-preview" aria-hidden="true">
+        <div class="feature-preview-body">
+          <div class="alloc-grid">
+            <div class="alloc-chip">Tech 32%</div>
+            <div class="alloc-chip">Health 18%</div>
+            <div class="alloc-chip">Defensive 22%</div>
+            <div class="alloc-chip">Cash 8%</div>
+          </div>
+          <div class="alloc-bars">
+            <span style="--h:64%"></span>
+            <span style="--h:48%"></span>
+            <span style="--h:72%"></span>
+            <span style="--h:38%"></span>
+          </div>
+        </div>
+      </div>
       <a class="cta-link" href="./portfolio-builder.html">Open Portfolio Valuation</a>
     </section>
 
     <section class="card home-card">
       <h2>Investment of the Day/Week/Month/Year</h2>
       <p>Explore curated picks by time horizon.</p>
+      <div class="feature-preview period-preview" aria-hidden="true">
+        <div class="period-visual">
+          <div class="period-badges">
+            <span>D</span>
+            <span>W</span>
+            <span>M</span>
+            <span>Y</span>
+          </div>
+          <div class="period-arc">
+            <svg viewBox="0 0 220 80" focusable="false" aria-hidden="true">
+              <path d="M10 60 Q60 16 110 30 T210 20" />
+            </svg>
+            <div class="period-arc-dots">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+          <div class="period-cards-mini">
+            <div class="period-card-mini">Day</div>
+            <div class="period-card-mini">Week</div>
+            <div class="period-card-mini">Month</div>
+            <div class="period-card-mini">Year</div>
+          </div>
+        </div>
+      </div>
       <div class="news-period-links">
         <a class="cta-link" href="./news-investment-day.html">Day</a>
         <a class="cta-link" href="./news-investment-week.html">Week</a>

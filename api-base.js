@@ -1,5 +1,6 @@
 (() => {
   const isGithubPages = /\.github\.io$/i.test(window.location.hostname);
+  const FORCE_PUBLIC_API = true;
   const apiBase = '';
   const MARKET_NEWS_SYMBOLS = ['SPY', 'QQQ', 'AAPL', 'MSFT', 'NVDA', 'AMZN', 'TLT', 'GLD'];
   const TAILORED_NEWS_PROFILES = {
@@ -293,6 +294,7 @@
         queryBase
     );
     const defaults = ['https://investolab.onrender.com', 'https://investolab-api.onrender.com'].map(normalizeBaseUrl);
+    if (FORCE_PUBLIC_API) return [...new Set([configured, ...defaults].filter(Boolean))];
     return [...new Set([configured, ...defaults].filter(Boolean))];
   }
 
@@ -457,6 +459,7 @@
   }
 
   function shouldPreferRemoteApi(apiPath) {
+    if (FORCE_PUBLIC_API) return false;
     return (
       apiPath.startsWith('/api/simulations/') ||
       apiPath.startsWith('/api/assets/') ||
@@ -485,7 +488,9 @@
       apiPath.startsWith('/api/valuation/investment') ||
       apiPath.startsWith('/api/valuation/portfolio') ||
       apiPath.startsWith('/api/news/investment-of-day') ||
-      apiPath.startsWith('/api/news/company-insight')
+      apiPath.startsWith('/api/news/company-insight') ||
+      apiPath.startsWith('/api/news/market') ||
+      apiPath.startsWith('/api/news/tailored')
     );
   }
 
@@ -2058,11 +2063,19 @@
 
     // On GitHub Pages, keep core search/AI actions deterministic by using
     // local handlers first. Remote backend failures/4xx should not break UX.
+    // However, price-critical endpoints should try the backend first when available
+    // to keep live pricing up to date.
+    if (isGithubPages && API_BASES.length && isPriceCriticalApi(apiPath)) {
+      const remoteFirst = await fetchFromRemoteApiBases(apiPath, init);
+      if (remoteFirst instanceof Response && remoteFirst.status < 500) return remoteFirst;
+    }
     if (shouldForceLocalFirst(apiPath)) {
       const localFirst = await handleLocalApi(apiPath, init);
       if (localFirst instanceof Response && localFirst.status < 500) return localFirst;
-      const remoteFallback = await fetchFromRemoteApiBases(apiPath, init);
-      if (remoteFallback instanceof Response) return remoteFallback;
+      if (!FORCE_PUBLIC_API) {
+        const remoteFallback = await fetchFromRemoteApiBases(apiPath, init);
+        if (remoteFallback instanceof Response) return remoteFallback;
+      }
       if (localFirst instanceof Response) return localFirst;
       return jsonErrorResponse('Local-first API handler failed.', 500);
     }

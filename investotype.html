@@ -13,7 +13,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>InvestoLab - InvestoType</title>
-  <link rel="stylesheet" href="styles.css?v=20260228b" />
+  <link rel="stylesheet" href="styles.css?v=20260313a" />
   <script src="nav.js?v=20260305i" defer></script>
   <script src="config.js?v=20260227a" defer></script>
   <script src="api-base.js?v=20260307b" defer></script>
@@ -62,30 +62,111 @@
     <section class="card home-card">
       <h2>Investor Type Guide</h2>
       <p>See all investor types, what each means, and what to do next.</p>
+      <div class="feature-preview typeguide-preview" aria-hidden="true">
+        <div class="typeguide-radar">
+          <svg viewBox="0 0 160 120" focusable="false" aria-hidden="true">
+            <polygon class="radar-base" points="80,8 152,44 128,112 32,112 8,44"></polygon>
+            <polygon class="radar-fill" points="80,18 138,50 116,98 44,98 22,50"></polygon>
+          </svg>
+        </div>
+        <div class="typeguide-bars">
+          <span style="--h:74%"></span>
+          <span style="--h:52%"></span>
+          <span style="--h:68%"></span>
+        </div>
+      </div>
       <a class="cta-link" href="./investor-types.html">Explore Types</a>
     </section>
 
     <section class="card home-card">
       <h2>Investor Profile Quiz</h2>
       <p>Answer simple questions to find your risk style and decision style.</p>
+      <div class="feature-preview quiz-preview" aria-hidden="true">
+        <div class="quiz-stack">
+          <div class="quiz-card">Q1</div>
+          <div class="quiz-card">Q2</div>
+          <div class="quiz-card">Q3</div>
+        </div>
+        <div class="quiz-meter">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <div class="quiz-ring">
+          <svg viewBox="0 0 80 80" focusable="false" aria-hidden="true">
+            <circle class="quiz-track" cx="40" cy="40" r="30"></circle>
+            <circle class="quiz-progress" cx="40" cy="40" r="30"></circle>
+          </svg>
+        </div>
+      </div>
       <a class="cta-link" href="./quiz.html">Take Quiz</a>
     </section>
 
     <section class="card home-card">
       <h2>Decision Arena</h2>
       <p>Play scenario rounds that stress-test your choices and infer your 3-axis InvestoType from behavior.</p>
+      <div class="feature-preview arena-preview" aria-hidden="true">
+        <div class="arena-grid">
+          <div class="arena-panel">Scenario</div>
+          <div class="arena-panel">Signal</div>
+          <div class="arena-panel">Action</div>
+        </div>
+        <div class="arena-dial">
+          <svg viewBox="0 0 120 120" focusable="false" aria-hidden="true">
+            <circle class="arena-dial-track" cx="60" cy="60" r="44"></circle>
+            <circle class="arena-dial-progress" cx="60" cy="60" r="44"></circle>
+            <line class="arena-needle" x1="60" y1="60" x2="92" y2="46"></line>
+          </svg>
+        </div>
+      </div>
       <a class="cta-link" href="./investotype-lab.html">Start Arena</a>
     </section>
 
     <section class="card home-card">
       <h2>Simulation (Demo)</h2>
       <p>Test your portfolio ideas on past market data and see the results clearly.</p>
+      <div class="feature-preview sim-preview" aria-hidden="true">
+        <div class="sim-arc">
+          <svg viewBox="0 0 240 80" focusable="false" aria-hidden="true">
+            <path d="M6 60 C40 30 80 44 120 26 C160 10 200 20 234 14" />
+          </svg>
+        </div>
+        <div class="sim-pulses">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <div class="sim-stamps">
+          <span>Backtest</span>
+          <span>Drawdown</span>
+          <span>Sharpe</span>
+        </div>
+      </div>
       <a class="cta-link" href="./simulator.html">Start Simulation</a>
     </section>
 
     <section class="card home-card">
       <h2>Tailored Portfolio Builder</h2>
       <p>Get personalized investment recommendations based on your InvestoType, or tune the 3-axis bars and let AI recommend your target allocation.</p>
+      <div class="feature-preview tailored-preview" aria-hidden="true">
+        <div class="tailored-rings">
+          <span class="ring r1"></span>
+          <span class="ring r2"></span>
+          <span class="ring r3"></span>
+        </div>
+        <div class="tailored-tags">
+          <span>Core</span>
+          <span>Satellite</span>
+          <span>Tilt</span>
+        </div>
+        <div class="tailored-bars">
+          <span style="--h:62%"></span>
+          <span style="--h:46%"></span>
+          <span style="--h:78%"></span>
+        </div>
+      </div>
       <a class="cta-link" href="./investotype-portfolio.html">Open Tailored Portfolio Builder</a>
     </section>
   </main>
