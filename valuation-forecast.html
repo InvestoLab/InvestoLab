@@ -13,10 +13,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>InvestoLab - Prediction Lab</title>
-  <link rel="stylesheet" href="styles.css?v=20260318e" />
+  <link rel="stylesheet" href="styles.css?v=20260318q" />
   <script src="nav.js?v=20260318a" defer></script>
   <script src="config.js?v=20260227a" defer></script>
-  <script src="api-base.js?v=20260318d" defer></script>
+  <script src="api-base.js?v=20260318e" defer></script>
 </head>
 <body class="valuation-page forecast-page">
   <nav class="taskbar">
@@ -78,20 +78,36 @@
         </section>
 
         <section class="forecast-step">
-          <h3>Step 2: Let AI Set Assumptions (Recommended)</h3>
+          <h3>Step 2: Pick An AI Starting Point</h3>
+          <p class="forecast-step-intro">AI Auto is the easiest option. Pick a style, then you can run right away.</p>
           <div class="forecast-actions">
-            <button type="button" id="aiAutoBtn">AI Auto</button>
-            <button type="button" id="aiConservativeBtn">AI Conservative</button>
-            <button type="button" id="aiBalancedBtn">AI Balanced</button>
-            <button type="button" id="aiAggressiveBtn">AI Aggressive</button>
+            <button type="button" id="aiAutoBtn" class="forecast-preset-btn" aria-pressed="false">
+              <strong>AI Auto</strong>
+              <span>Best default. Uses recent trend and news to set everything for you.</span>
+            </button>
+            <button type="button" id="aiConservativeBtn" class="forecast-preset-btn" aria-pressed="false">
+              <strong>Conservative</strong>
+              <span>Shorter horizon, lower volatility, more defensive assumptions.</span>
+            </button>
+            <button type="button" id="aiBalancedBtn" class="forecast-preset-btn" aria-pressed="false">
+              <strong>Balanced</strong>
+              <span>Middle-ground setup for a more neutral base case.</span>
+            </button>
+            <button type="button" id="aiAggressiveBtn" class="forecast-preset-btn" aria-pressed="false">
+              <strong>Aggressive</strong>
+              <span>Longer horizon with higher growth and wider outcome ranges.</span>
+            </button>
           </div>
-          <small class="field-help">Auto adapts to historical trend and headline tone.</small>
+          <p id="forecastPresetState" class="forecast-preset-state" aria-live="polite">No AI preset selected yet. AI Auto is the easiest start.</p>
           <p id="forecastStep2Error" class="forecast-step-error hidden" aria-live="polite"></p>
         </section>
 
-        <section class="forecast-step forecast-step-advanced">
-          <h3>Step 3: Fine-Tune Settings (Optional)</h3>
-          <div class="forecast-grid-controls">
+        <details id="forecastAdvancedStep" class="forecast-step forecast-step-advanced" open>
+          <summary>
+            <span>Step 3: Adjust Timeline Or Risk Settings Only If Needed</span>
+            <small>Optional</small>
+          </summary>
+          <div class="forecast-grid-controls forecast-grid-controls-basic">
             <label>
               <span class="field-label">Time Interval</span>
               <select id="forecastInterval">
@@ -112,11 +128,17 @@
             <label>
               <span class="field-label">Simulation Paths</span>
               <div class="field-inline">
-                <input id="forecastPathsRange" type="range" min="0" max="3000" step="50" value="0" />
-                <input id="forecastPaths" type="number" min="0" max="3000" step="50" value="0" />
+                <input id="forecastPathsRange" type="range" min="100" max="3000" step="50" value="800" />
+                <input id="forecastPaths" type="number" min="100" max="3000" step="50" value="800" />
               </div>
-              <small class="field-help">More paths = smoother results, slower run.</small>
+              <small class="field-help">800 is a strong default. More paths = smoother results, slower run.</small>
             </label>
+          </div>
+
+          <details id="forecastAssumptionDetails" class="forecast-assumption-details">
+            <summary>Show Technical Assumptions</summary>
+            <p class="forecast-step-intro forecast-step-intro-subtle">Only open this if you want to override the AI on growth, volatility, news, or macro conditions.</p>
+            <div class="forecast-grid-controls forecast-grid-controls-advanced">
             <label>
               <span class="field-label">Expected Drift % (Annual)</span>
               <div class="field-inline">
@@ -157,8 +179,9 @@
               </div>
               <small class="field-help">How strongly prices pull back toward long-run trend.</small>
             </label>
-          </div>
-        </section>
+            </div>
+          </details>
+        </details>
 
         <p id="forecastQuickSummary" class="forecast-quick-summary">Using default assumptions.</p>
         <button type="submit" class="forecast-run-btn">Run Future Simulation</button>
@@ -173,9 +196,10 @@
     Copyright (c) 2026 InvestoLab. All rights reserved.
   </footer>
 
-  <script src="valuation-forecast.js?v=20260305v3" defer></script>
+  <script src="valuation-forecast.js?v=20260318a" defer></script>
 </body>
 </html>
+
 
 
 
