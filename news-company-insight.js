@@ -7,6 +7,7 @@ let companySearchResults = [];
 let companySearchIndex = -1;
 let companySearchTimer = null;
 let companySelectedSymbol = '';
+let activeInsightQuery = '';
 
 function fmtMoney(v) {
   const n = Number(v || 0);
@@ -25,6 +26,11 @@ function esc(raw) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
+}
+
+function withLiveStamp(url) {
+  const stamp = `t=${Date.now()}`;
+  return String(url || '').includes('?') ? `${url}&${stamp}` : `${url}?${stamp}`;
 }
 
 function hideCompanyDropdown() {
@@ -230,8 +236,8 @@ function renderInsight(payload) {
 }
 
 async function requestCompanyInsight(query) {
-  const url = `./api/news/company-insight?query=${encodeURIComponent(query)}`;
-  const response = await fetch(url);
+  const url = withLiveStamp(`./api/news/company-insight?query=${encodeURIComponent(query)}`);
+  const response = await fetch(url, { cache: 'no-store' });
   const data = await response.json();
   if (!response.ok) throw new Error(data?.error || 'Failed to load company insight.');
   return data;
@@ -248,6 +254,7 @@ companyInsightForm?.addEventListener('submit', async (event) => {
   if (companyInsightResult) companyInsightResult.innerHTML = '';
   try {
     const payload = await requestCompanyInsight(query);
+    activeInsightQuery = String(payload?.company?.symbol || query).trim();
     renderInsight(payload);
     companyInsightStatus.textContent = `Analysis ready for ${payload?.company?.symbol || query}.`;
   } catch (error) {
@@ -258,6 +265,7 @@ companyInsightForm?.addEventListener('submit', async (event) => {
 companyInsightQuery?.addEventListener('input', () => {
   const q = String(companyInsightQuery.value || '').trim();
   companySelectedSymbol = '';
+  activeInsightQuery = '';
   if (companySearchTimer) clearTimeout(companySearchTimer);
   if (!q || q.length < 2) {
     hideCompanyDropdown();
@@ -311,4 +319,21 @@ companyInsightDropdown?.addEventListener('mousedown', (event) => {
 
 companyInsightQuery?.addEventListener('blur', () => {
   setTimeout(hideCompanyDropdown, 120);
+});
+
+async function refreshActiveInsight() {
+  if (!activeInsightQuery || document.hidden) return;
+  try {
+    const payload = await requestCompanyInsight(activeInsightQuery);
+    renderInsight(payload);
+    companyInsightStatus.textContent = `Analysis refreshed for ${payload?.company?.symbol || activeInsightQuery}.`;
+  } catch (_error) {
+    // Keep the current rendered insight if a refresh fails.
+  }
+}
+
+window.setInterval(refreshActiveInsight, 120000);
+
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) refreshActiveInsight();
 });

@@ -22,6 +22,40 @@ function esc(raw) {
     .replace(/'/g, '&#39;');
 }
 
+function withLiveStamp(url) {
+  const stamp = `t=${Date.now()}`;
+  return String(url || '').includes('?') ? `${url}&${stamp}` : `${url}?${stamp}`;
+}
+
+async function readJson(url, failMessage) {
+  const response = await fetch(withLiveStamp(url), { cache: 'no-store' });
+  const responseClone = response.clone();
+  let data = null;
+  try {
+    data = await response.json();
+  } catch (_error) {
+    let raw = '';
+    try {
+      raw = await responseClone.text();
+    } catch (_textError) {
+      raw = '';
+    }
+    const snippet = String(raw || '').trim().slice(0, 220);
+    throw new Error(snippet ? `${failMessage} ${snippet}` : failMessage);
+  }
+  if (!response.ok) throw new Error(data?.error || failMessage);
+  return data;
+}
+
+async function readJsonWithFallback(primaryUrl, fallbackUrl, failMessage) {
+  try {
+    return await readJson(primaryUrl, failMessage);
+  } catch (primaryError) {
+    if (window.__INVESTOLAB_DISABLE_STATIC || !fallbackUrl) throw primaryError;
+    return readJson(fallbackUrl, failMessage);
+  }
+}
+
 function renderHeadlineList(headlines, emptyText = 'No headlines available.') {
   const list = Array.isArray(headlines) ? headlines : [];
   return `
@@ -33,9 +67,7 @@ function renderHeadlineList(headlines, emptyText = 'No headlines available.') {
               const titleHtml = href
                 ? `<a class="news-headline-link" href="${esc(href)}" target="_blank" rel="noopener noreferrer">${esc(h.title)}</a>`
                 : `<strong>${esc(h.title)}</strong>`;
-              return `<li>${titleHtml}<span>${esc(h.publisher || 'Unknown')}${h.date ? ` | ${esc(
-                h.date
-              )}` : ''}</span></li>`;
+              return `<li>${titleHtml}<span>${esc(h.publisher || 'Unknown')}${h.date ? ` | ${esc(h.date)}` : ''}</span></li>`;
             })
             .join('')
         : `<li>${esc(emptyText)}</li>`}
@@ -44,51 +76,22 @@ function renderHeadlineList(headlines, emptyText = 'No headlines available.') {
 }
 
 async function loadInvestmentOfPeriod() {
+  const hadContent = Boolean(String(newsResult?.innerHTML || '').trim());
   try {
+    newsDateLabel?.classList.add('loading-ellipsis');
+    if (newsDateLabel) newsDateLabel.textContent = 'Loading investment pick';
+
     const fallbackPathByPeriod = {
       day: './data/news-investment-day.json',
       week: './data/news-investment-week.json',
       month: './data/news-investment-month.json',
       year: './data/news-investment-year.json'
     };
-    const readJsonWithFallback = async (primaryUrl, fallbackUrl) => {
-      const readJson = async (url) => {
-        const response = await fetch(url);
-        const responseClone = response.clone();
-        let data = null;
-        try {
-          data = await response.json();
-        } catch (_error) {
-          let raw = '';
-          try {
-            raw = await responseClone.text();
-          } catch (_textError) {
-            raw = '';
-          }
-          const snippet = String(raw || '').trim().slice(0, 240);
-          const status = Number(response.status || 0) || 'unknown';
-          throw new Error(
-            `Response was not valid JSON (status ${status}).${snippet ? ` Body: ${snippet}` : ''}`
-          );
-        }
-        if (!response.ok) {
-          throw new Error(data?.error || 'Failed to load investment pick.');
-        }
-        return data;
-      };
-      try {
-        return await readJson(primaryUrl);
-      } catch (primaryError) {
-        if (window.__INVESTOLAB_DISABLE_STATIC) {
-          throw primaryError;
-        }
-        if (!fallbackUrl) throw primaryError;
-        return readJson(fallbackUrl);
-      }
-    };
+
     const data = await readJsonWithFallback(
       `./api/news/investment-of-day?period=${encodeURIComponent(pagePeriod)}`,
-      fallbackPathByPeriod[pagePeriod] || fallbackPathByPeriod.day
+      fallbackPathByPeriod[pagePeriod] || fallbackPathByPeriod.day,
+      'Unable to load investment pick.'
     );
 
     const investment = data?.investment || {};
@@ -103,8 +106,10 @@ async function loadInvestmentOfPeriod() {
     if (investmentPeriodTitle) {
       investmentPeriodTitle.textContent = String(data?.title || `Investment Of The ${periodLabel}`);
     }
-    newsDateLabel.classList.remove('loading-ellipsis');
-    newsDateLabel.textContent = `Date: ${esc(data?.asOfDate || '')} | Period: ${esc(periodLabel.toUpperCase())}`;
+    newsDateLabel?.classList.remove('loading-ellipsis');
+    if (newsDateLabel) {
+      newsDateLabel.textContent = `Date: ${esc(data?.asOfDate || '')} | Period: ${esc(periodLabel.toUpperCase())}`;
+    }
 
     newsResult.innerHTML = `
       <section class="valuation-hero ${String(rec.action || 'HOLD').toLowerCase()}">
@@ -152,14 +157,19 @@ async function loadInvestmentOfPeriod() {
       </section>
     `;
   } catch (error) {
-    newsDateLabel.classList.remove('loading-ellipsis');
-    newsDateLabel.textContent = 'Unable to load investment pick.';
-    newsResult.innerHTML = `<section class="chart-card"><p>${esc(error.message || 'Unknown error')}</p></section>`;
+    newsDateLabel?.classList.remove('loading-ellipsis');
+    if (newsDateLabel) newsDateLabel.textContent = hadContent ? 'Live update delayed.' : 'Unable to load investment pick.';
+    if (!hadContent) {
+      newsResult.innerHTML = `<section class="chart-card"><p>${esc(error.message || 'Unknown error')}</p></section>`;
+    }
   }
 }
 
 loadInvestmentOfPeriod();
+window.setInterval(() => {
+  if (!document.hidden) loadInvestmentOfPeriod();
+}, 120000);
 
-
-
-
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) loadInvestmentOfPeriod();
+});
