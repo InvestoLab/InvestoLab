@@ -65,11 +65,12 @@ async function loadMarketNews() {
     const readJsonWithFallback = async (primaryUrl, fallbackUrl) => {
       const readJson = async (url) => {
         const response = await fetch(url);
-        const contentType = String(response.headers.get('content-type') || '').toLowerCase();
-        if (!contentType.includes('application/json')) {
+        let data = null;
+        try {
+          data = await response.json();
+        } catch (_error) {
           throw new Error('Market news response was not valid JSON.');
         }
-        const data = await response.json();
         if (!response.ok) throw new Error(data?.error || 'Failed to load market news.');
         return data;
       };

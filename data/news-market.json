@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "asOfDate": "2026-03-05",
+  "asOfDate": "2026-03-18",
   "title": "Market News",
   "universe": [
     "SPY",
@@ -21,7 +21,7 @@
     {
       "title": "CTA Gained While the S&P 500 Collapsed. Here Is What It Holds",
       "publisher": "24/7 Wall St.",
-      "date": "2026-03-05",
+      "date": "2026-03-18",
       "symbol": "SPY",
       "url": "https://news.google.com/search?q=SPY%20CTA%20Gained%20While%20the%20S%26P%20500%20Collapsed.%20Here%20Is%20What%20It%20Holds",
       "link": "https://news.google.com/search?q=SPY%20CTA%20Gained%20While%20the%20S%26P%20500%20Collapsed.%20Here%20Is%20What%20It%20Holds"
@@ -29,7 +29,7 @@
     {
       "title": "Is Apple Stock Going to $1,000?",
       "publisher": "Motley Fool",
-      "date": "2026-03-05",
+      "date": "2026-03-18",
       "symbol": "AAPL",
       "url": "https://news.google.com/search?q=AAPL%20Is%20Apple%20Stock%20Going%20to%20%241%2C000%3F",
       "link": "https://news.google.com/search?q=AAPL%20Is%20Apple%20Stock%20Going%20to%20%241%2C000%3F"
@@ -37,15 +37,15 @@
     {
       "title": "Major Tech Group Reportedly Voices Concern Over Anthropic's 'Supply Chain Risk' Label",
       "publisher": "MT Newswires",
-      "date": "2026-03-05",
+      "date": "2026-03-18",
       "symbol": "AAPL",
       "url": "https://news.google.com/search?q=AAPL%20Major%20Tech%20Group%20Reportedly%20Voices%20Concern%20Over%20Anthropic's%20'Supply%20Chain%20Risk'%20Label",
       "link": "https://news.google.com/search?q=AAPL%20Major%20Tech%20Group%20Reportedly%20Voices%20Concern%20Over%20Anthropic's%20'Supply%20Chain%20Risk'%20Label"
     },
     {
-      "title": "Broadcomâ€™s AI Business Is Booming. The Rest Is Complicated.",
+      "title": "Broadcom?™s AI Business Is Booming. The Rest Is Complicated.",
       "publisher": "The Wall Street Journal",
-      "date": "2026-03-05",
+      "date": "2026-03-18",
       "symbol": "AAPL",
       "url": "https://news.google.com/search?q=AAPL%20Broadcom%E2%80%99s%20AI%20Business%20Is%20Booming.%20The%20Rest%20Is%20Complicated.",
       "link": "https://news.google.com/search?q=AAPL%20Broadcom%E2%80%99s%20AI%20Business%20Is%20Booming.%20The%20Rest%20Is%20Complicated."
@@ -53,7 +53,7 @@
     {
       "title": "CZ Health Insurances Chooses Sapiens IDITSuite for P&C to Modernise Their Business",
       "publisher": "PR Newswire",
-      "date": "2026-03-05",
+      "date": "2026-03-18",
       "symbol": "MSFT",
       "url": "https://news.google.com/search?q=MSFT%20CZ%20Health%20Insurances%20Chooses%20Sapiens%20IDITSuite%20for%20P%26C%20to%20Modernise%20Their%20Business",
       "link": "https://news.google.com/search?q=MSFT%20CZ%20Health%20Insurances%20Chooses%20Sapiens%20IDITSuite%20for%20P%26C%20to%20Modernise%20Their%20Business"
@@ -61,7 +61,7 @@
     {
       "title": "Market Chatter: Trade Desk, OpenAI in Discussions Over Ads Sale",
       "publisher": "MT Newswires",
-      "date": "2026-03-05",
+      "date": "2026-03-18",
       "symbol": "MSFT",
       "url": "https://news.google.com/search?q=MSFT%20Market%20Chatter%3A%20Trade%20Desk%2C%20OpenAI%20in%20Discussions%20Over%20Ads%20Sale",
       "link": "https://news.google.com/search?q=MSFT%20Market%20Chatter%3A%20Trade%20Desk%2C%20OpenAI%20in%20Discussions%20Over%20Ads%20Sale"
@@ -69,7 +69,7 @@
     {
       "title": "Social Buzz: Wallstreetbets Stocks Mixed Pre-Bell Thursday; Broadcom to Advance, Webull to Decline",
       "publisher": "MT Newswires",
-      "date": "2026-03-05",
+      "date": "2026-03-18",
       "symbol": "MSFT",
       "url": "https://news.google.com/search?q=MSFT%20Social%20Buzz%3A%20Wallstreetbets%20Stocks%20Mixed%20Pre-Bell%20Thursday%3B%20Broadcom%20to%20Advance%2C%20Webull%20to%20Decline",
       "link": "https://news.google.com/search?q=MSFT%20Social%20Buzz%3A%20Wallstreetbets%20Stocks%20Mixed%20Pre-Bell%20Thursday%3B%20Broadcom%20to%20Advance%2C%20Webull%20to%20Decline"
@@ -77,7 +77,7 @@
     {
       "title": "Netflix Calls It Quits on Warner Bros. Acquisition. Is the Stock a Buy?",
       "publisher": "Motley Fool",
-      "date": "2026-03-05",
+      "date": "2026-03-18",
       "symbol": "NVDA",
       "url": "https://news.google.com/search?q=NVDA%20Netflix%20Calls%20It%20Quits%20on%20Warner%20Bros.%20Acquisition.%20Is%20the%20Stock%20a%20Buy%3F",
       "link": "https://news.google.com/search?q=NVDA%20Netflix%20Calls%20It%20Quits%20on%20Warner%20Bros.%20Acquisition.%20Is%20the%20Stock%20a%20Buy%3F"
@@ -85,15 +85,15 @@
     {
       "title": "Nvidia Shifts Focus After China Chip Roadblock",
       "publisher": "GuruFocus.com",
-      "date": "2026-03-05",
+      "date": "2026-03-18",
       "symbol": "NVDA",
       "url": "https://news.google.com/search?q=NVDA%20Nvidia%20Shifts%20Focus%20After%20China%20Chip%20Roadblock",
       "link": "https://news.google.com/search?q=NVDA%20Nvidia%20Shifts%20Focus%20After%20China%20Chip%20Roadblock"
     },
     {
-      "title": "Broadcom Stock Pops. Why Its Earnings Got a Better Response Than Nvidiaâ€™s.",
+      "title": "Broadcom Stock Pops. Why Its Earnings Got a Better Response Than Nvidia?™s.",
       "publisher": "Barrons.com",
-      "date": "2026-03-05",
+      "date": "2026-03-18",
       "symbol": "NVDA",
       "url": "https://news.google.com/search?q=NVDA%20Broadcom%20Stock%20Pops.%20Why%20Its%20Earnings%20Got%20a%20Better%20Response%20Than%20Nvidia%E2%80%99s.",
       "link": "https://news.google.com/search?q=NVDA%20Broadcom%20Stock%20Pops.%20Why%20Its%20Earnings%20Got%20a%20Better%20Response%20Than%20Nvidia%E2%80%99s."
@@ -101,7 +101,7 @@
     {
       "title": "Trade Desk Stock Jumps. Why the Beaten Down Shares Are Getting a Big Boost.",
       "publisher": "Barrons.com",
-      "date": "2026-03-05",
+      "date": "2026-03-18",
       "symbol": "AMZN",
       "url": "https://news.google.com/search?q=AMZN%20Trade%20Desk%20Stock%20Jumps.%20Why%20the%20Beaten%20Down%20Shares%20Are%20Getting%20a%20Big%20Boost.",
       "link": "https://news.google.com/search?q=AMZN%20Trade%20Desk%20Stock%20Jumps.%20Why%20the%20Beaten%20Down%20Shares%20Are%20Getting%20a%20Big%20Boost."
@@ -164,3 +164,4 @@
     }
   ]
 }
+

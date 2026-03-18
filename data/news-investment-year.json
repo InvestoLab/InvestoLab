@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "asOfDate": "2026-03-05",
+  "asOfDate": "2026-03-18",
   "period": "year",
   "title": "Investment Of The Year",
   "symbol": "SPY",
@@ -8,7 +8,7 @@
     "symbol": "SPY",
     "displayName": "State Street SPDR S&P 500 ETF Trust",
     "resolvedFrom": "ticker",
-    "asOfDate": "2026-03-05",
+    "asOfDate": "2026-03-18",
     "market": {
       "price": 685.1300048828125,
       "priceDate": "2026-03-04",
@@ -1926,7 +1926,7 @@
         {
           "title": "CTA Gained While the S&P 500 Collapsed. Here Is What It Holds",
           "publisher": "24/7 Wall St.",
-          "date": "2026-03-05",
+          "date": "2026-03-18",
           "symbol": "SPY",
           "url": "https://news.google.com/search?q=SPY%20CTA%20Gained%20While%20the%20S%26P%20500%20Collapsed.%20Here%20Is%20What%20It%20Holds",
           "link": "https://news.google.com/search?q=SPY%20CTA%20Gained%20While%20the%20S%26P%20500%20Collapsed.%20Here%20Is%20What%20It%20Holds"
@@ -1994,4 +1994,5 @@
     "AAPL"
   ]
 }
+
 

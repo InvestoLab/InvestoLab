@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "asOfDate": "2026-03-05",
+  "asOfDate": "2026-03-18",
   "period": "week",
   "title": "Investment Of The Week",
   "symbol": "AAPL",
@@ -8,7 +8,7 @@
     "symbol": "AAPL",
     "displayName": "Apple Inc.",
     "resolvedFrom": "ticker",
-    "asOfDate": "2026-03-05",
+    "asOfDate": "2026-03-18",
     "market": {
       "price": 262.5199890136719,
       "priceDate": "2026-03-04",
@@ -1926,7 +1926,7 @@
         {
           "title": "Is Apple Stock Going to $1,000?",
           "publisher": "Motley Fool",
-          "date": "2026-03-05",
+          "date": "2026-03-18",
           "symbol": "AAPL",
           "url": "https://news.google.com/search?q=AAPL%20Is%20Apple%20Stock%20Going%20to%20%241%2C000%3F",
           "link": "https://news.google.com/search?q=AAPL%20Is%20Apple%20Stock%20Going%20to%20%241%2C000%3F"
@@ -1934,7 +1934,7 @@
         {
           "title": "Major Tech Group Reportedly Voices Concern Over Anthropic's 'Supply Chain Risk' Label",
           "publisher": "MT Newswires",
-          "date": "2026-03-05",
+          "date": "2026-03-18",
           "symbol": "AAPL",
           "url": "https://news.google.com/search?q=AAPL%20Major%20Tech%20Group%20Reportedly%20Voices%20Concern%20Over%20Anthropic's%20'Supply%20Chain%20Risk'%20Label",
           "link": "https://news.google.com/search?q=AAPL%20Major%20Tech%20Group%20Reportedly%20Voices%20Concern%20Over%20Anthropic's%20'Supply%20Chain%20Risk'%20Label"
@@ -1942,7 +1942,7 @@
         {
           "title": "Broadcom?™s AI Business Is Booming. The Rest Is Complicated.",
           "publisher": "The Wall Street Journal",
-          "date": "2026-03-05",
+          "date": "2026-03-18",
           "symbol": "AAPL",
           "url": "https://news.google.com/search?q=AAPL%20Broadcom%E2%80%99s%20AI%20Business%20Is%20Booming.%20The%20Rest%20Is%20Complicated.",
           "link": "https://news.google.com/search?q=AAPL%20Broadcom%E2%80%99s%20AI%20Business%20Is%20Booming.%20The%20Rest%20Is%20Complicated."
@@ -1994,4 +1994,5 @@
     "NVDA"
   ]
 }
+
 
