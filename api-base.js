@@ -2,7 +2,7 @@
   const isGithubPages = /\.github\.io$/i.test(window.location.hostname);
   window.__INVESTOLAB_DISABLE_STATIC = isGithubPages;
   const FORCE_PUBLIC_API = true;
-  const USE_REMOTE_ON_GITHUB = false;
+  const USE_REMOTE_ON_GITHUB = true;
   const apiBase = '';
   const MARKET_NEWS_SYMBOLS = ['SPY', 'QQQ', 'AAPL', 'MSFT', 'NVDA', 'AMZN', 'TLT', 'GLD'];
   const TAILORED_NEWS_PROFILES = {

@@ -3,6 +3,7 @@ const forecastQueryInput = document.getElementById('forecastQuery');
 const forecastSearchDropdown = document.getElementById('forecastSearchDropdown');
 const forecastSelectionState = document.getElementById('forecastSelectionState');
 const forecastStep2Error = document.getElementById('forecastStep2Error');
+const forecastPresetState = document.getElementById('forecastPresetState');
 const forecastStatus = document.getElementById('forecastStatus');
 const forecastResult = document.getElementById('forecastResult');
 const forecastYearsInput = document.getElementById('forecastYears');
@@ -22,6 +23,8 @@ const forecastNewsRange = document.getElementById('forecastNewsIndexRange');
 const forecastMacroRange = document.getElementById('forecastMacroIndexRange');
 const forecastMeanRevRange = document.getElementById('forecastMeanReversionRange');
 const forecastQuickSummary = document.getElementById('forecastQuickSummary');
+const forecastAdvancedStep = document.getElementById('forecastAdvancedStep');
+const forecastAssumptionDetails = document.getElementById('forecastAssumptionDetails');
 const aiAutoBtn = document.getElementById('aiAutoBtn');
 const aiConservativeBtn = document.getElementById('aiConservativeBtn');
 const aiBalancedBtn = document.getElementById('aiBalancedBtn');
@@ -32,6 +35,7 @@ let forecastSearchIndex = -1;
 let forecastSearchTimer = null;
 let forecastSelectedSymbol = '';
 let currentBaseline = null;
+let activePreset = '';
 
 function setStep2Error(message) {
   if (!forecastStep2Error) return;
@@ -52,6 +56,73 @@ function setForecastStatus(message) {
   const msg = String(message || '').trim();
   forecastStatus.textContent = msg;
   forecastStatus.classList.toggle('loading-ellipsis', /^loading/i.test(msg));
+}
+
+function setPresetState(message) {
+  if (!forecastPresetState) return;
+  forecastPresetState.textContent = String(message || '').trim();
+}
+
+function getPresetLabel(preset) {
+  if (preset === 'conservative') return 'Conservative';
+  if (preset === 'balanced') return 'Balanced';
+  if (preset === 'aggressive') return 'Aggressive';
+  if (preset === 'auto') return 'AI Auto';
+  return 'Manual';
+}
+
+function syncPresetButtons() {
+  [
+    ['auto', aiAutoBtn],
+    ['conservative', aiConservativeBtn],
+    ['balanced', aiBalancedBtn],
+    ['aggressive', aiAggressiveBtn]
+  ].forEach(([preset, button]) => {
+    if (!button) return;
+    const isActive = preset === activePreset;
+    button.classList.toggle('is-active', isActive);
+    button.setAttribute('aria-pressed', String(isActive));
+  });
+}
+
+function clearUserSetFlag(input) {
+  if (!input?.dataset) return;
+  delete input.dataset.userSet;
+}
+
+function hasUserSetFlag(input) {
+  return String(input?.dataset?.userSet || '') === '1';
+}
+
+function clearStep3UserFlags() {
+  [forecastYearsInput, forecastPathsInput, forecastDriftInput, forecastVolInput, forecastNewsInput, forecastMacroInput, forecastMeanRevInput].forEach(
+    clearUserSetFlag
+  );
+  clearUserSetFlag(forecastIntervalSelect);
+}
+
+function hasManualAssumptionOverrides() {
+  return [forecastDriftInput, forecastVolInput, forecastNewsInput, forecastMacroInput, forecastMeanRevInput].some(hasUserSetFlag);
+}
+
+function hasAnyStep3Changes() {
+  return hasManualAssumptionOverrides() || [forecastYearsInput, forecastPathsInput, forecastIntervalSelect].some(hasUserSetFlag);
+}
+
+function resetPresetSelection(message = 'No AI preset selected yet. AI Auto is the easiest start.') {
+  activePreset = '';
+  syncPresetButtons();
+  setPresetState(message);
+}
+
+function noteManualAssumptionOverride() {
+  if (forecastAdvancedStep) forecastAdvancedStep.open = true;
+  if (forecastAssumptionDetails) forecastAssumptionDetails.open = true;
+  if (activePreset) {
+    setPresetState(`${getPresetLabel(activePreset)} is loaded with custom technical overrides.`);
+    return;
+  }
+  setPresetState('Using manual technical assumptions.');
 }
 
 function normalizePresetError(error) {
@@ -372,30 +443,44 @@ function updateQuickSummary() {
   const intervalMeta = getIntervalMeta(forecastIntervalSelect?.value);
   const horizonUnits = Number(forecastYearsInput?.value || intervalMeta.periodsPerYear * 3);
   const years = horizonUnits / intervalMeta.periodsPerYear;
-  const paths = Number(forecastPathsInput?.value || 500);
+  const paths = Number(forecastPathsInput?.value || 800);
   const drift = Number(forecastDriftInput?.value || 8);
   const vol = Number(forecastVolInput?.value || 25);
   const news = Number(forecastNewsInput?.value || 0);
   const macro = Number(forecastMacroInput?.value || 0);
-  forecastQuickSummary.textContent = `Preview: ${Math.round(horizonUnits)} ${intervalMeta.unitLabel.toLowerCase()}s (~${years.toFixed(
-    1
-  )}Y), ${paths} paths, drift ${drift.toFixed(
-    1
-  )}%, volatility ${vol.toFixed(1)}%, news ${news.toFixed(0)}, macro ${macro.toFixed(0)}, ${intervalMeta.titleLabel.toLowerCase()} steps.`;
+  const setupLabel = activePreset ? getPresetLabel(activePreset) : hasManualAssumptionOverrides() ? 'Custom' : 'Baseline';
+  const summary = [`${setupLabel} setup: ${years.toFixed(1)} years`, `${intervalMeta.titleLabel.toLowerCase()} updates`, `${Math.round(paths)} simulation paths`];
+
+  if (hasManualAssumptionOverrides()) {
+    summary.push(`custom drift ${drift.toFixed(1)}%`);
+    summary.push(`volatility ${vol.toFixed(1)}%`);
+    summary.push(`news ${news.toFixed(0)}`);
+    summary.push(`macro ${macro.toFixed(0)}`);
+  } else if (activePreset) {
+    summary.push('AI assumptions locked in');
+  } else {
+    summary.push('AI Auto is the fastest start');
+  }
+
+  forecastQuickSummary.textContent = summary.join(' | ');
 }
 
 function bindNumberRange(numberInput, rangeInput, options = {}) {
   if (!numberInput || !rangeInput) return;
-  const userSet = options.userSet;
-  const sync = (fromRange) => {
+  const trackManual = Boolean(options.trackManual);
+  const onManualChange = typeof options.onManualChange === 'function' ? options.onManualChange : null;
+  const sync = ({ fromRange = false, manual = false } = {}) => {
     const source = fromRange ? rangeInput : numberInput;
     setControlValue(numberInput, rangeInput, source.value);
-    if (userSet) numberInput.dataset.userSet = '1';
+    if (trackManual && manual) {
+      numberInput.dataset.userSet = '1';
+      if (onManualChange) onManualChange();
+    }
     updateQuickSummary();
   };
-  rangeInput.addEventListener('input', () => sync(true));
-  numberInput.addEventListener('input', () => sync(false));
-  sync(false);
+  rangeInput.addEventListener('input', () => sync({ fromRange: true, manual: true }));
+  numberInput.addEventListener('input', () => sync({ fromRange: false, manual: true }));
+  sync();
 }
 
 function applyAiPreset(preset) {
@@ -404,6 +489,9 @@ function applyAiPreset(preset) {
     return;
   }
   setStep2Error('');
+  activePreset = preset;
+  clearStep3UserFlags();
+  syncPresetButtons();
   const drift = currentBaseline.annualDrift;
   const vol = currentBaseline.annualVol;
   const score = Number(currentBaseline.compositeScore || 50);
@@ -465,6 +553,8 @@ function applyAiPreset(preset) {
   setControlValue(forecastNewsInput, forecastNewsRange, Math.round(clamp(newsIdx * 100, -100, 100)));
   setControlValue(forecastMacroInput, forecastMacroRange, Math.round(clamp(macroIdx * 100, -100, 100)));
   setControlValue(forecastMeanRevInput, forecastMeanRevRange, Math.round(clamp(meanRev * 100, 0, 100)));
+  if (forecastAssumptionDetails) forecastAssumptionDetails.open = false;
+  setPresetState(`${getPresetLabel(preset)} is ready. You can run now or open step 3 to make small adjustments.`);
   updateQuickSummary();
   setForecastStatus(`AI ${preset === 'auto' ? 'Auto' : preset} assumptions applied.`);
 }
@@ -527,6 +617,9 @@ async function ensureBaselineLoaded() {
   currentBaseline = await fetchBaseline(symbol);
   forecastSelectedSymbol = currentBaseline.symbol;
   if (forecastQueryInput) forecastQueryInput.value = currentBaseline.symbol;
+  if (!activePreset) {
+    setPresetState(`${currentBaseline.symbol} is loaded. AI Auto is ready if you want the simplest setup.`);
+  }
   return currentBaseline;
 }
 
@@ -708,6 +801,9 @@ forecastQueryInput?.addEventListener('input', () => {
   forecastSelectedSymbol = '';
   currentBaseline = null;
   setSelectionState('', '');
+  resetPresetSelection();
+  clearStep3UserFlags();
+  setStep2Error('');
   if (forecastSearchTimer) clearTimeout(forecastSearchTimer);
   if (!raw.trim()) {
     hideSearchDropdown();
@@ -772,14 +868,24 @@ forecastForm?.addEventListener('submit', async (event) => {
   try {
     currentBaseline = await ensureBaselineLoaded();
 
-    if (!forecastDriftInput.dataset.userSet) {
+    if (!activePreset && !hasAnyStep3Changes()) {
+      applyAiPreset('auto');
+    }
+
+    if (!hasUserSetFlag(forecastDriftInput)) {
       setControlValue(forecastDriftInput, forecastDriftRange, currentBaseline.annualDrift * 100);
     }
-    if (!forecastVolInput.dataset.userSet) {
+    if (!hasUserSetFlag(forecastVolInput)) {
       setControlValue(forecastVolInput, forecastVolRange, currentBaseline.annualVol * 100);
     }
-    if (!forecastNewsInput.dataset.userSet) {
+    if (!hasUserSetFlag(forecastNewsInput)) {
       setControlValue(forecastNewsInput, forecastNewsRange, Math.round(currentBaseline.newsBias * 100));
+    }
+    if (!hasUserSetFlag(forecastMacroInput)) {
+      setControlValue(forecastMacroInput, forecastMacroRange, 0);
+    }
+    if (!hasUserSetFlag(forecastMeanRevInput)) {
+      setControlValue(forecastMeanRevInput, forecastMeanRevRange, 25);
     }
     updateQuickSummary();
 
@@ -787,7 +893,7 @@ forecastForm?.addEventListener('submit', async (event) => {
     const simulation = runSimulation(currentBaseline, {
       horizonUnits: Number(forecastYearsInput?.value || 36),
       interval: String(forecastIntervalSelect?.value || 'monthly'),
-      paths: Number(forecastPathsInput?.value || 500),
+      paths: Number(forecastPathsInput?.value || 800),
       driftPct: Number(forecastDriftInput?.value || 8),
       volPct: Number(forecastVolInput?.value || 25),
       newsIndex: Number(forecastNewsInput?.value || 0),
@@ -803,16 +909,19 @@ forecastForm?.addEventListener('submit', async (event) => {
 });
 
 forecastIntervalSelect?.addEventListener('change', () => {
+  forecastIntervalSelect.dataset.userSet = '1';
   applyHorizonConfig(forecastIntervalSelect.value, true);
   updateQuickSummary();
 });
 
 applyHorizonConfig(forecastIntervalSelect?.value || 'monthly', false);
-bindNumberRange(forecastYearsInput, forecastYearsRange);
-bindNumberRange(forecastPathsInput, forecastPathsRange);
-bindNumberRange(forecastDriftInput, forecastDriftRange, { userSet: true });
-bindNumberRange(forecastVolInput, forecastVolRange, { userSet: true });
-bindNumberRange(forecastNewsInput, forecastNewsRange, { userSet: true });
-bindNumberRange(forecastMacroInput, forecastMacroRange, { userSet: true });
-bindNumberRange(forecastMeanRevInput, forecastMeanRevRange, { userSet: true });
+bindNumberRange(forecastYearsInput, forecastYearsRange, { trackManual: true });
+bindNumberRange(forecastPathsInput, forecastPathsRange, { trackManual: true });
+bindNumberRange(forecastDriftInput, forecastDriftRange, { trackManual: true, onManualChange: noteManualAssumptionOverride });
+bindNumberRange(forecastVolInput, forecastVolRange, { trackManual: true, onManualChange: noteManualAssumptionOverride });
+bindNumberRange(forecastNewsInput, forecastNewsRange, { trackManual: true, onManualChange: noteManualAssumptionOverride });
+bindNumberRange(forecastMacroInput, forecastMacroRange, { trackManual: true, onManualChange: noteManualAssumptionOverride });
+bindNumberRange(forecastMeanRevInput, forecastMeanRevRange, { trackManual: true, onManualChange: noteManualAssumptionOverride });
+syncPresetButtons();
+resetPresetSelection();
 updateQuickSummary();
