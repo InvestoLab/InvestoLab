@@ -27,6 +27,40 @@ function esc(raw) {
     .replace(/'/g, '&#39;');
 }
 
+function withLiveStamp(url) {
+  const stamp = `t=${Date.now()}`;
+  return String(url || '').includes('?') ? `${url}&${stamp}` : `${url}?${stamp}`;
+}
+
+async function readJson(url, failMessage) {
+  const response = await fetch(withLiveStamp(url), { cache: 'no-store' });
+  const responseClone = response.clone();
+  let data = null;
+  try {
+    data = await response.json();
+  } catch (_error) {
+    let raw = '';
+    try {
+      raw = await responseClone.text();
+    } catch (_textError) {
+      raw = '';
+    }
+    const snippet = String(raw || '').trim().slice(0, 180);
+    throw new Error(snippet ? `${failMessage} ${snippet}` : failMessage);
+  }
+  if (!response.ok) throw new Error(data?.error || failMessage);
+  return data;
+}
+
+async function readJsonWithFallback(primaryUrl, fallbackUrl, failMessage) {
+  try {
+    return await readJson(primaryUrl, failMessage);
+  } catch (primaryError) {
+    if (window.__INVESTOLAB_DISABLE_STATIC || !fallbackUrl) throw primaryError;
+    return readJson(fallbackUrl, failMessage);
+  }
+}
+
 function renderHeadlineList(headlines, emptyText = 'No headlines available.') {
   const list = Array.isArray(headlines) ? headlines : [];
   return `
@@ -60,31 +94,10 @@ function renderNewsSignalCards(sentiment) {
 }
 
 async function loadMarketNews() {
+  const hadContent = Boolean(String(marketNewsResult?.innerHTML || '').trim());
   try {
     setLoadingLabel(marketNewsDateLabel, 'Loading market feed');
-    const readJsonWithFallback = async (primaryUrl, fallbackUrl) => {
-      const readJson = async (url) => {
-        const response = await fetch(url);
-        let data = null;
-        try {
-          data = await response.json();
-        } catch (_error) {
-          throw new Error('Market news response was not valid JSON.');
-        }
-        if (!response.ok) throw new Error(data?.error || 'Failed to load market news.');
-        return data;
-      };
-      try {
-        return await readJson(primaryUrl);
-      } catch (primaryError) {
-        if (window.__INVESTOLAB_DISABLE_STATIC) {
-          throw primaryError;
-        }
-        if (!fallbackUrl) throw primaryError;
-        return readJson(fallbackUrl);
-      }
-    };
-    const data = await readJsonWithFallback('./api/news/market', './data/news-market.json');
+    const data = await readJsonWithFallback('./api/news/market', './data/news-market.json', 'Failed to load market news.');
 
     setLabel(marketNewsDateLabel, `Date: ${esc(data?.asOfDate || '')}`);
     marketNewsResult.innerHTML = `
@@ -99,13 +112,18 @@ async function loadMarketNews() {
       </section>
     `;
   } catch (error) {
-    setLabel(marketNewsDateLabel, 'Unable to load market news.');
-    marketNewsResult.innerHTML = `<section class="chart-card"><p>${esc(error.message || 'Unknown error')}</p></section>`;
+    setLabel(marketNewsDateLabel, hadContent ? 'Live update delayed.' : 'Unable to load market news.');
+    if (!hadContent) {
+      marketNewsResult.innerHTML = `<section class="chart-card"><p>${esc(error.message || 'Unknown error')}</p></section>`;
+    }
   }
 }
 
 loadMarketNews();
+window.setInterval(() => {
+  if (!document.hidden) loadMarketNews();
+}, 120000);
 
-
-
-
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) loadMarketNews();
+});

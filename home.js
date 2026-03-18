@@ -416,6 +416,54 @@ if (previewCards.length) {
     new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }).format(Number(v || 0));
   const fmtPct = (v) => `${(Number(v || 0) * 100).toFixed(2)}%`;
 
+  const fetchLiveForSymbol = async (symbol) => {
+    try {
+      const response = await fetch(`/api/valuation/investment?t=${Date.now()}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: symbol }),
+        cache: 'no-store'
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data?.error || `Failed to load ${symbol}`);
+      }
+      const investment = data?.investment || {};
+      const price = Number(investment?.market?.price || 0);
+      const d30 = Number(investment?.market?.trailingReturns?.d30 || 0);
+      if (!Number.isFinite(price) || price <= 0) {
+        throw new Error(`Invalid price for ${symbol}`);
+      }
+      return {
+        symbol,
+        price,
+        change: Number.isFinite(d30) ? d30 : 0,
+        tone: d30 < 0 ? 'down' : 'up'
+      };
+    } catch (_error) {
+      const fallback = await fetch('/api/assets/price', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: symbol }),
+        cache: 'no-store'
+      });
+      const fallbackData = await fallback.json();
+      if (!fallback.ok) {
+        throw new Error(fallbackData?.error || `Failed to load ${symbol}`);
+      }
+      const fallbackPrice = Number(fallbackData?.price || 0);
+      if (!Number.isFinite(fallbackPrice) || fallbackPrice <= 0) {
+        throw new Error(`Invalid fallback price for ${symbol}`);
+      }
+      return {
+        symbol,
+        price: fallbackPrice,
+        change: 0,
+        tone: 'up'
+      };
+    }
+  };
+
   const fetchLivePreview = async () => {
     const symbols = Array.from(
       new Set(
@@ -425,29 +473,18 @@ if (previewCards.length) {
           .filter(Boolean)
       )
     );
-    for (const symbol of symbols) {
-      try {
-        const response = await fetch('/api/valuation/investment', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query: symbol })
-        });
-        const data = await response.json();
-        if (!response.ok) continue;
-        const investment = data?.investment || {};
-        const price = Number(investment?.market?.price || 0);
-        const d30 = Number(investment?.market?.trailingReturns?.d30 || 0);
-        if (Number.isFinite(price)) {
-          liveMap.set(symbol, {
-            price,
-            change: d30,
-            tone: d30 < 0 ? 'down' : 'up'
-          });
-        }
-      } catch (_error) {
-        // keep static fallback
-      }
-    }
+    const results = await Promise.allSettled(symbols.map((symbol) => fetchLiveForSymbol(symbol)));
+    results.forEach((result) => {
+      if (result.status !== 'fulfilled') return;
+      const row = result.value;
+      if (!row?.symbol) return;
+      liveMap.set(row.symbol, {
+        price: row.price,
+        change: row.change,
+        tone: row.tone
+      });
+    });
+    applyPortfolio();
   };
 
   const applyPortfolio = () => {
@@ -482,7 +519,7 @@ if (previewCards.length) {
 
   applyPortfolio();
   fetchLivePreview();
-  window.setInterval(fetchLivePreview, 300000);
+  window.setInterval(fetchLivePreview, 120000);
   window.setInterval(swapPortfolio, 3200);
 }
 
@@ -517,34 +554,109 @@ if (newsCards.length) {
     }, 240);
   };
 
+  const withTs = (url) => `${url}${url.includes('?') ? '&' : '?'}t=${Date.now()}`;
+  const readJson = async (url) => {
+    const res = await fetch(withTs(url), { cache: 'no-store' });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data?.error || `Request failed: ${res.status}`);
+    }
+    return data;
+  };
+  const dedupeByTitle = (rows) => {
+    const seen = new Set();
+    return rows.filter((row) => {
+      const key = String(row?.title || '').trim().toLowerCase();
+      if (!key || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  };
+  const formatMeta = (headline, fallbackDate = '') => {
+    const publisher = String(headline?.publisher || '').trim();
+    const date = String(headline?.date || '').trim();
+    if (publisher && date) return `${publisher} | ${date}`;
+    if (publisher) return publisher;
+    if (date) return date;
+    return fallbackDate ? `Updated ${fallbackDate}` : '';
+  };
+
   const fetchNews = async () => {
-    try {
-      const res = await fetch('/api/news/market', { cache: 'no-store' });
-      const data = await res.json();
+    const [marketRes, tailoredRes, weeklyRes] = await Promise.allSettled([
+      readJson('/api/news/market'),
+      readJson('/api/news/tailored?type=passive_rational_allocator'),
+      readJson('/api/news/investment-of-day?period=week')
+    ]);
+
+    const merged = [];
+
+    if (marketRes.status === 'fulfilled') {
+      const data = marketRes.value || {};
       const rows = Array.isArray(data?.headlines) ? data.headlines : [];
-      const mapped = rows
-        .filter((h) => h && h.title)
-        .slice(0, 12)
-        .map((h) => ({
-          tag: (h.symbol || 'Market').toUpperCase(),
-          title: String(h.title || '').trim(),
-          meta: String(h.publisher || h.date || '').trim()
-        }))
-        .filter((h) => h.title);
-      if (mapped.length) {
-        newsItems = mapped;
-        newsIndex = 0;
-        applyNews();
+      const lead = rows[0];
+      if (lead?.title) {
+        merged.push({
+          tag: 'Market',
+          title: String(lead.title).trim(),
+          meta: formatMeta(lead, data?.asOfDate || '')
+        });
       }
-    } catch (_error) {
-      // keep existing headlines
+      rows.slice(1, 12).forEach((h) => {
+        if (!h?.title) return;
+        merged.push({
+          tag: (h.symbol || 'Market').toUpperCase(),
+          title: String(h.title).trim(),
+          meta: formatMeta(h, data?.asOfDate || '')
+        });
+      });
+    }
+
+    if (tailoredRes.status === 'fulfilled') {
+      const data = tailoredRes.value || {};
+      const headline = Array.isArray(data?.headlines) ? data.headlines[0] : null;
+      if (headline?.title) {
+        merged.push({
+          tag: 'Tailored',
+          title: String(headline.title).trim(),
+          meta: formatMeta(headline, data?.asOfDate || '')
+        });
+      }
+    }
+
+    if (weeklyRes.status === 'fulfilled') {
+      const data = weeklyRes.value || {};
+      const headline = data?.investment?.signals?.headlines?.[0] || null;
+      const fallbackTitle =
+        data?.investment?.displayName && data?.investment?.symbol
+          ? `${data.investment.displayName} (${data.investment.symbol}) leads weekly momentum`
+          : '';
+      if (headline?.title || fallbackTitle) {
+        merged.push({
+          tag: 'Weekly',
+          title: String(headline?.title || fallbackTitle).trim(),
+          meta: formatMeta(headline, data?.asOfDate || '')
+        });
+      }
+    }
+
+    const nextItems = dedupeByTitle(merged).filter((h) => h.title).slice(0, 16);
+    if (nextItems.length) {
+      newsItems = nextItems;
+      newsIndex = 0;
+      applyNews();
     }
   };
 
   applyNews();
-  fetchNews();
+  fetchNews().catch(() => {
+    // keep existing headlines if live endpoints are unavailable
+  });
   window.setInterval(swapNews, 3600);
-  window.setInterval(fetchNews, 180000);
+  window.setInterval(() => {
+    fetchNews().catch(() => {
+      // keep current view on refresh failures
+    });
+  }, 120000);
 }
 
 const revealTargets = Array.from(document.querySelectorAll('.scroll-reveal'));

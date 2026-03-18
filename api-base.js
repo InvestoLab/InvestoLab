@@ -637,15 +637,18 @@
     throw lastError || new Error('Unable to load data.');
   }
 
-  async function yahooSearch(query, _quotesCount = 10, _newsCount = 0) {
+  async function yahooSearch(query, quotesCount = 10, newsCount = 0) {
     const q = String(query || '').trim().toUpperCase();
     if (!q) return { quotes: [], news: [] };
     try {
+      const safeQuotesCount = Math.max(0, Math.min(100, Number(quotesCount || 0)));
+      const safeNewsCount = Math.max(0, Math.min(20, Number(newsCount || 0)));
       const remoteUrl = `https://query1.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(
         q
-      )}&quotesCount=100&newsCount=0`;
+      )}&quotesCount=${encodeURIComponent(String(safeQuotesCount))}&newsCount=${encodeURIComponent(String(safeNewsCount))}`;
       const remoteData = await fetchJsonWithCors(remoteUrl, { cache: 'no-store' });
       const remoteQuotes = Array.isArray(remoteData?.quotes) ? remoteData.quotes : [];
+      const remoteNews = Array.isArray(remoteData?.news) ? remoteData.news : [];
       const cleaned = remoteQuotes
         .filter((row) => row && row.symbol)
         .map((row) => {
@@ -672,7 +675,15 @@
         return String(a.symbol).localeCompare(String(b.symbol));
       });
       const remoteTop = cleaned.slice(0, 40).map(({ _score, _pop, ...row }) => row);
-      if (remoteTop.length) return { quotes: remoteTop, news: [] };
+      const news = remoteNews
+        .map((row) => ({
+          title: String(row?.title || '').trim(),
+          publisher: String(row?.publisher || row?.provider || 'Yahoo Finance').trim(),
+          providerPublishTime: Number(row?.providerPublishTime || row?.pubDate || 0),
+          link: String(row?.link || row?.clickThroughUrl?.url || row?.url || '').trim()
+        }))
+        .filter((row) => row.title);
+      if (remoteTop.length || news.length) return { quotes: remoteTop, news };
     } catch (_error) {
       // Fall back to local universe when remote search is unavailable.
     }
@@ -831,19 +842,42 @@
   }
 
   async function getNewsHeadlines(symbol, count = 8) {
-    try {
-      const search = await yahooSearch(symbol, 0, count);
-      const list = Array.isArray(search?.news) ? search.news : [];
-      return list.slice(0, count).map((n) => ({
-        title: String(n.title || '').trim(),
-        publisher: n.publisher || 'Yahoo Finance',
-        date: n.providerPublishTime ? toIsoDate(Number(n.providerPublishTime) * 1000) : '',
-        url: String(n.link || n?.clickThroughUrl?.url || '').trim(),
-        symbol: normalizeSymbol(symbol)
-      })).filter((x) => x.title);
-    } catch (_error) {
-      return [];
+    const targetSymbol = normalizeSymbol(symbol);
+    const queries = Array.from(
+      new Set(
+        [targetSymbol, fullNameForSymbol(targetSymbol)]
+          .map((value) => String(value || '').trim())
+          .filter(Boolean)
+      )
+    );
+    const headlines = [];
+    const seen = new Set();
+
+    for (const query of queries) {
+      try {
+        const search = await yahooSearch(query, 0, Math.max(count * 2, count));
+        const list = Array.isArray(search?.news) ? search.news : [];
+        for (const row of list) {
+          const title = String(row?.title || '').trim();
+          if (!title) continue;
+          const key = title.toLowerCase();
+          if (seen.has(key)) continue;
+          seen.add(key);
+          headlines.push({
+            title,
+            publisher: row?.publisher || 'Yahoo Finance',
+            date: row?.providerPublishTime ? toIsoDate(Number(row.providerPublishTime) * 1000) : '',
+            url: String(row?.link || row?.clickThroughUrl?.url || '').trim(),
+            symbol: targetSymbol
+          });
+          if (headlines.length >= count) return headlines;
+        }
+      } catch (_error) {
+        // Keep trying alternate queries.
+      }
     }
+
+    return headlines;
   }
 
   function scoreLabel(score) {
@@ -2050,6 +2084,14 @@
       return rawFetch(input, init);
     }
 
+    const effectiveInit =
+      isPriceCriticalApi(apiPath) ||
+      apiPath.startsWith('/api/news/') ||
+      apiPath.startsWith('/api/valuation/') ||
+      apiPath.startsWith('/api/assets/price')
+        ? { ...(init || {}), cache: 'no-store' }
+        : init;
+
     const shouldFallbackToLocal = (response) => {
       if (!(response instanceof Response)) return true;
       const status = Number(response.status || 0);
@@ -2062,7 +2104,7 @@
     // Keep simulation session state in one place for the full browser session.
     // Mixing backend/local simulation IDs causes "Simulation not found" errors.
     if (!isGithubPages && apiPath.startsWith('/api/simulations/')) {
-      const localApiResponse = await handleLocalApi(apiPath, init);
+      const localApiResponse = await handleLocalApi(apiPath, effectiveInit);
       if (localApiResponse instanceof Response) return localApiResponse;
       return jsonErrorResponse('Local simulation API failed.', 500);
     }
@@ -2071,13 +2113,13 @@
     // fall back to local/public API emulation when backend is unreachable.
     if (!isGithubPages) {
       try {
-        const response = await rawFetch(input, init);
+        const response = await rawFetch(input, effectiveInit);
         if (!shouldFallbackToLocal(response)) return response;
       } catch (_error) {
         // Fall through to local API mode.
       }
 
-      const localApiResponse = await handleLocalApi(apiPath, init);
+      const localApiResponse = await handleLocalApi(apiPath, effectiveInit);
       if (localApiResponse instanceof Response) return localApiResponse;
       return jsonErrorResponse('Local API fallback failed.', 500);
     }
@@ -2087,14 +2129,14 @@
     // However, price-critical endpoints should try the backend first when available
     // to keep live pricing up to date.
     if (USE_REMOTE_ON_GITHUB && isGithubPages && API_BASES.length && isPriceCriticalApi(apiPath)) {
-      const remoteFirst = await fetchFromRemoteApiBases(apiPath, init);
+      const remoteFirst = await fetchFromRemoteApiBases(apiPath, effectiveInit);
       if (remoteFirst instanceof Response && remoteFirst.status < 500) return remoteFirst;
     }
     if (shouldForceLocalFirst(apiPath)) {
-      const localFirst = await handleLocalApi(apiPath, init);
+      const localFirst = await handleLocalApi(apiPath, effectiveInit);
       if (localFirst instanceof Response && localFirst.status < 500) return localFirst;
       if (!FORCE_PUBLIC_API) {
-        const remoteFallback = await fetchFromRemoteApiBases(apiPath, init);
+        const remoteFallback = await fetchFromRemoteApiBases(apiPath, effectiveInit);
         if (remoteFallback instanceof Response) return remoteFallback;
       }
       if (localFirst instanceof Response) return localFirst;
@@ -2102,21 +2144,21 @@
     }
 
     if (shouldPreferRemoteApi(apiPath)) {
-      const remoteResponse = await fetchFromRemoteApiBases(apiPath, init);
+      const remoteResponse = await fetchFromRemoteApiBases(apiPath, effectiveInit);
       if (remoteResponse instanceof Response) return remoteResponse;
       if (isPriceCriticalApi(apiPath)) {
         return jsonErrorResponse('Live pricing is temporarily unavailable. Please try again shortly.', 503);
       }
     }
 
-    const localApiResponse = await handleLocalApi(apiPath, init);
+    const localApiResponse = await handleLocalApi(apiPath, effectiveInit);
     if (!(localApiResponse instanceof Response)) {
       return jsonErrorResponse('Public API handler failed.', 500);
     }
     if (localApiResponse.status === 501 && isGithubPages) {
       const staticDataUrl = mapApiToStaticData(apiPath);
       if (staticDataUrl) {
-        return rawFetch(staticDataUrl, init).catch(() =>
+        return rawFetch(staticDataUrl, effectiveInit).catch(() =>
           jsonErrorResponse('Static data is unavailable right now. Try again in a moment.', 503)
         );
       }
