@@ -79,6 +79,9 @@ async function loadInvestmentOfPeriod() {
       try {
         return await readJson(primaryUrl);
       } catch (primaryError) {
+        if (window.__INVESTOLAB_DISABLE_STATIC) {
+          throw primaryError;
+        }
         if (!fallbackUrl) throw primaryError;
         return readJson(fallbackUrl);
       }

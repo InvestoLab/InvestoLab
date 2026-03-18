@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "asOfDate": "2026-03-05",
+  "asOfDate": "2026-03-18",
   "period": "day",
   "title": "Investment Of The Day",
   "symbol": "GOOGL",
@@ -8,7 +8,7 @@
     "symbol": "GOOGL",
     "displayName": "Alphabet Inc.",
     "resolvedFrom": "ticker",
-    "asOfDate": "2026-03-05",
+    "asOfDate": "2026-03-18",
     "market": {
       "price": 303.1300048828125,
       "priceDate": "2026-03-04",
@@ -1924,9 +1924,9 @@
       "earningsDate": null,
       "headlines": [
         {
-          "title": "Broadcom Stock Pops. Why Its Earnings Got a Better Response Than Nvidiaâ€™s.",
+          "title": "Broadcom Stock Pops. Why Its Earnings Got a Better Response Than Nvidia?™s.",
           "publisher": "Barrons.com",
-          "date": "2026-03-05",
+          "date": "2026-03-18",
           "symbol": "GOOGL",
           "url": "https://news.google.com/search?q=GOOGL%20Broadcom%20Stock%20Pops.%20Why%20Its%20Earnings%20Got%20a%20Better%20Response%20Than%20Nvidia%E2%80%99s.",
           "link": "https://news.google.com/search?q=GOOGL%20Broadcom%20Stock%20Pops.%20Why%20Its%20Earnings%20Got%20a%20Better%20Response%20Than%20Nvidia%E2%80%99s."
@@ -1934,7 +1934,7 @@
         {
           "title": "Rentokil Initial H2 Earnings Call Highlights",
           "publisher": "MarketBeat",
-          "date": "2026-03-05",
+          "date": "2026-03-18",
           "symbol": "GOOGL",
           "url": "https://news.google.com/search?q=GOOGL%20Rentokil%20Initial%20H2%20Earnings%20Call%20Highlights",
           "link": "https://news.google.com/search?q=GOOGL%20Rentokil%20Initial%20H2%20Earnings%20Call%20Highlights"
@@ -1942,7 +1942,7 @@
         {
           "title": "Trade Desk Stock Jumps. Why the Beaten Down Shares Are Getting a Big Boost.",
           "publisher": "Barrons.com",
-          "date": "2026-03-05",
+          "date": "2026-03-18",
           "symbol": "GOOGL",
           "url": "https://news.google.com/search?q=GOOGL%20Trade%20Desk%20Stock%20Jumps.%20Why%20the%20Beaten%20Down%20Shares%20Are%20Getting%20a%20Big%20Boost.",
           "link": "https://news.google.com/search?q=GOOGL%20Trade%20Desk%20Stock%20Jumps.%20Why%20the%20Beaten%20Down%20Shares%20Are%20Getting%20a%20Big%20Boost."
@@ -1950,7 +1950,7 @@
         {
           "title": "Stocks to Watch Thursday: Broadcom, StubHub, FedEx, Trade Desk",
           "publisher": "The Wall Street Journal",
-          "date": "2026-03-05",
+          "date": "2026-03-18",
           "symbol": "GOOGL",
           "url": "https://news.google.com/search?q=GOOGL%20Stocks%20to%20Watch%20Thursday%3A%20Broadcom%2C%20StubHub%2C%20FedEx%2C%20Trade%20Desk",
           "link": "https://news.google.com/search?q=GOOGL%20Stocks%20to%20Watch%20Thursday%3A%20Broadcom%2C%20StubHub%2C%20FedEx%2C%20Trade%20Desk"
@@ -1958,7 +1958,7 @@
         {
           "title": "Broadcom rallies as it touts more than $100 billion in AI chip sales in 2027",
           "publisher": "Reuters",
-          "date": "2026-03-05",
+          "date": "2026-03-18",
           "symbol": "GOOGL",
           "url": "https://news.google.com/search?q=GOOGL%20Broadcom%20rallies%20as%20it%20touts%20more%20than%20%24100%20billion%20in%20AI%20chip%20sales%20in%202027",
           "link": "https://news.google.com/search?q=GOOGL%20Broadcom%20rallies%20as%20it%20touts%20more%20than%20%24100%20billion%20in%20AI%20chip%20sales%20in%202027"
@@ -2010,3 +2010,4 @@
     "META"
   ]
 }
+

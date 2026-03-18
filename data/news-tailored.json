@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "asOfDate": "2026-03-05",
+  "asOfDate": "2026-03-18",
   "type": "passive_rational_allocator",
   "profile": "Index Strategist",
   "watchlist": [
@@ -155,4 +155,5 @@
     }
   ]
 }
+
 
