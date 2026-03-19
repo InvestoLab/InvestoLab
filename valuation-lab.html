@@ -13,7 +13,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>InvestoLab - Valuation Lab</title>
-  <link rel="stylesheet" href="styles.css?v=20260318q" />
+  <link rel="stylesheet" href="styles.css?v=20260319i" />
   <script src="nav.js?v=20260318b" defer></script>
   <script src="config.js?v=20260227a" defer></script>
   <script src="api-base.js?v=20260318e" defer></script>
@@ -119,25 +119,34 @@
       <h2>Investment Map</h2>
       <p>Pick a position and map nearby peers, anchors, and hedges around it.</p>
       <div class="feature-preview map-preview" aria-hidden="true">
-        <div class="map-preview-stage">
-          <svg viewBox="0 0 220 140" focusable="false" aria-hidden="true">
-            <line x1="110" y1="68" x2="50" y2="34"></line>
-            <line x1="110" y1="68" x2="166" y2="28"></line>
-            <line x1="110" y1="68" x2="182" y2="88"></line>
-            <line x1="110" y1="68" x2="64" y2="108"></line>
-            <line x1="110" y1="68" x2="116" y2="120"></line>
-          </svg>
-          <span class="map-preview-node center">AAPL</span>
-          <span class="map-preview-node peer-1">MSFT</span>
-          <span class="map-preview-node peer-2">QQQ</span>
-          <span class="map-preview-node peer-3">GLD</span>
-          <span class="map-preview-node peer-4">NVDA</span>
-          <span class="map-preview-node peer-5">TLT</span>
-        </div>
-        <div class="map-preview-tags">
-          <span>Theme</span>
-          <span>Anchor</span>
-          <span>Hedge</span>
+        <div class="map-preview-shell">
+          <div class="map-preview-focus">
+            <span class="map-preview-focus-label">Focus</span>
+            <strong>AAPL</strong>
+          </div>
+
+          <div class="map-preview-branch" aria-hidden="true">
+            <span class="map-preview-branch-dot"></span>
+          </div>
+
+          <div class="map-preview-grid">
+            <div class="map-preview-card">
+              <span class="map-preview-card-type">Peer</span>
+              <strong>MSFT</strong>
+            </div>
+            <div class="map-preview-card">
+              <span class="map-preview-card-type">Anchor</span>
+              <strong>QQQ</strong>
+            </div>
+            <div class="map-preview-card">
+              <span class="map-preview-card-type">Hedge</span>
+              <strong>TLT</strong>
+            </div>
+            <div class="map-preview-card">
+              <span class="map-preview-card-type">Amplifier</span>
+              <strong>NVDA</strong>
+            </div>
+          </div>
         </div>
       </div>
       <a class="cta-link" href="./valuation-map.html">Open Investment Map</a>
