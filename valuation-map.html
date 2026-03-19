@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-816ETP25SD"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-816ETP25SD');
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>InvestoLab - Investment Map</title>
+  <link rel="stylesheet" href="styles.css?v=20260319af" />
+  <script src="nav.js?v=20260318b" defer></script>
+  <script src="config.js?v=20260227a" defer></script>
+  <script src="api-base.js?v=20260318e" defer></script>
+</head>
+<body class="valuation-page investment-map-page">
+  <nav class="taskbar">
+    <a href="./index.html" class="brand">InvestoLab</a>
+    <div class="task-links">
+      <a href="./index.html">Overview</a>
+      <div class="nav-dropdown">
+        <a href="./valuation-lab.html" class="nav-dropdown-toggle active" aria-current="page">Valuation Lab</a>
+        <div class="nav-dropdown-menu">
+          <a href="./valuation-forecast.html">Prediction Lab</a>
+          <a href="./valuation.html">Investment Valuation</a>
+          <a href="./valuation-map.html">Investment Map</a>
+          <a href="./portfolio-builder.html">Portfolio Valuation</a>
+        </div>
+      </div>
+      <div class="nav-dropdown">
+        <a href="./investotype.html" class="nav-dropdown-toggle">InvestoType</a>
+        <div class="nav-dropdown-menu">
+          <a href="./investor-types.html">Types</a>
+          <a href="./quiz.html">Quiz</a>
+          <a href="./investotype-lab.html">Decision Arena</a>
+          <a href="./simulator.html">Simulation (Demo)</a>
+          <a href="./investotype-portfolio.html">Tailored Portfolio</a>
+        </div>
+      </div>
+      <div class="nav-dropdown">
+        <a href="./news.html" class="nav-dropdown-toggle">News</a>
+        <div class="nav-dropdown-menu">
+          <a href="./news-company-insight.html">Company Insight</a>
+          <a href="./news-market.html">Market</a>
+          <a href="./news-tailored.html">Tailored</a>
+        </div>
+      </div>
+      <a href="./about.html">About</a>
+    </div>
+  </nav>
+
+  <header class="hero page-hero">
+    <h1>Investment Map</h1>
+    <p>Pick one investment and see a clean visual map of peers, hedges, anchors, amplifiers, and other connected ideas.</p>
+  </header>
+
+  <main class="single-layout investment-map-layout">
+    <section class="card valuation-card investment-map-card">
+      <div class="valuation-head">
+        <h2>Connection Mapper</h2>
+        <p>We score nearby investments using shared themes, 90-day trend, volatility, sentiment, and a few anchor or hedge relationships, then place them into a visual map around the center idea.</p>
+      </div>
+
+      <form id="investmentMapForm" class="valuation-form-grid investment-map-form">
+        <label>
+          <span class="field-label">Investment</span>
+          <div class="search-wrap">
+            <input id="investmentMapQuery" type="text" placeholder="Ticker or company name" autocomplete="off" required />
+            <div id="investmentMapSearchDropdown" class="search-dropdown hidden"></div>
+          </div>
+        </label>
+        <label>
+          <span class="field-label">As Of Date</span>
+          <input id="investmentMapDate" type="date" />
+        </label>
+        <button type="submit">Build Map</button>
+      </form>
+
+      <div class="quick-picks investment-map-picks" aria-label="Map quick picks">
+        <button type="button" data-map-pick="SPY">SPY</button>
+        <button type="button" data-map-pick="NVDA">NVDA</button>
+        <button type="button" data-map-pick="GLD">GLD</button>
+        <button type="button" data-map-pick="BTC-USD">BTC-USD</button>
+      </div>
+
+      <p id="investmentMapStatus" class="asset-help">Type an investment or choose from the dropdown, then build the map.</p>
+      <div id="investmentMapResult" class="investment-map-result hidden"></div>
+    </section>
+
+    <section class="card valuation-card investment-map-notes-card">
+      <div class="valuation-head">
+        <h2>How To Read It</h2>
+        <p>The center node is your selected asset. Nearby nodes are not recommendations by default. They are comparison points.</p>
+      </div>
+      <ul class="investor-list">
+        <li><strong>Theme Peer</strong> means the asset belongs to a similar market story or exposure cluster.</li>
+        <li><strong>Momentum Peer</strong> means the recent trend and score profile look similar.</li>
+        <li><strong>Hedge</strong> points to a ballast asset that can offset the main position's risk.</li>
+        <li><strong>Anchor</strong> gives you a broad market reference so you can compare the pick against a bigger benchmark.</li>
+      </ul>
+      <div class="investment-map-notes-actions">
+        <a class="cta-link" href="./valuation.html">Open Investment Valuation</a>
+        <a class="cta-link" href="./portfolio-builder.html">Open Portfolio Valuation</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <a class="footer-contact-btn" href="mailto:tgrkhwang@gmail.com" aria-label="Contact by email">Contact</a>
+    Copyright (c) 2026 InvestoLab. All rights reserved.
+  </footer>
+
+  <script src="valuation-map.js?v=20260319ah" defer></script>
+</body>
+</html>
