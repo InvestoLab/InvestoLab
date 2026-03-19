@@ -102,6 +102,28 @@
     if (!taskLinks) return;
     taskbar.classList.add('taskbar-mobile-flat');
 
+    taskLinks.querySelectorAll('.nav-dropdown').forEach((dropdown) => {
+      const toggle = dropdown.querySelector('.nav-dropdown-toggle');
+      const menu = dropdown.querySelector('.nav-dropdown-menu');
+      if (!toggle || !menu) return;
+      const href = String(toggle.getAttribute('href') || '').trim();
+      if (!href.endsWith('valuation-lab.html')) return;
+      if (menu.querySelector('a[href="./valuation-map.html"]')) return;
+
+      const mapLink = document.createElement('a');
+      mapLink.href = './valuation-map.html';
+      mapLink.textContent = 'Investment Map';
+
+      const valuationLink = menu.querySelector('a[href="./valuation.html"]');
+      if (valuationLink?.nextSibling) {
+        menu.insertBefore(mapLink, valuationLink.nextSibling);
+      } else if (valuationLink) {
+        menu.appendChild(mapLink);
+      } else {
+        menu.appendChild(mapLink);
+      }
+    });
+
     if (!taskLinks.id) {
       taskLinks.id = `task-links-${index + 1}`;
     }

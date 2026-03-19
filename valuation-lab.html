@@ -13,8 +13,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>InvestoLab - Valuation Lab</title>
-  <link rel="stylesheet" href="styles.css?v=20260318p" />
-  <script src="nav.js?v=20260318a" defer></script>
+  <link rel="stylesheet" href="styles.css?v=20260318q" />
+  <script src="nav.js?v=20260318b" defer></script>
   <script src="config.js?v=20260227a" defer></script>
   <script src="api-base.js?v=20260318e" defer></script>
 </head>
@@ -28,6 +28,7 @@
         <div class="nav-dropdown-menu">
           <a href="./valuation-forecast.html">Prediction Lab</a>
           <a href="./valuation.html">Investment Valuation</a>
+          <a href="./valuation-map.html">Investment Map</a>
           <a href="./portfolio-builder.html">Portfolio Valuation</a>
         </div>
       </div>
@@ -112,6 +113,34 @@
         </div>
       </div>
       <a class="cta-link" href="./valuation.html">Open Investment Valuation</a>
+    </section>
+
+    <section class="card home-card">
+      <h2>Investment Map</h2>
+      <p>Pick a position and map nearby peers, anchors, and hedges around it.</p>
+      <div class="feature-preview map-preview" aria-hidden="true">
+        <div class="map-preview-stage">
+          <svg viewBox="0 0 220 140" focusable="false" aria-hidden="true">
+            <line x1="110" y1="68" x2="50" y2="34"></line>
+            <line x1="110" y1="68" x2="166" y2="28"></line>
+            <line x1="110" y1="68" x2="182" y2="88"></line>
+            <line x1="110" y1="68" x2="64" y2="108"></line>
+            <line x1="110" y1="68" x2="116" y2="120"></line>
+          </svg>
+          <span class="map-preview-node center">AAPL</span>
+          <span class="map-preview-node peer-1">MSFT</span>
+          <span class="map-preview-node peer-2">QQQ</span>
+          <span class="map-preview-node peer-3">GLD</span>
+          <span class="map-preview-node peer-4">NVDA</span>
+          <span class="map-preview-node peer-5">TLT</span>
+        </div>
+        <div class="map-preview-tags">
+          <span>Theme</span>
+          <span>Anchor</span>
+          <span>Hedge</span>
+        </div>
+      </div>
+      <a class="cta-link" href="./valuation-map.html">Open Investment Map</a>
     </section>
 
     <section class="card home-card">
