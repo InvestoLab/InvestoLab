@@ -128,6 +128,11 @@ const quizIntro = document.getElementById('quizIntro');
 const startQuizBtn = document.getElementById('startQuizBtn');
 const quizSection = document.getElementById('quizSection');
 const quizQuestionEl = document.getElementById('quizQuestion');
+const quizQuestionTitle = document.getElementById('quizQuestionTitle');
+const quizQuestionEyebrow = document.getElementById('quizQuestionEyebrow');
+const quizQuestionMeta = document.getElementById('quizQuestionMeta');
+const quizAxisBadge = document.getElementById('quizAxisBadge');
+const quizQuestionCard = document.getElementById('quizQuestionCard');
 const quizOptions = document.getElementById('quizOptions');
 const quizPrevBtn = document.getElementById('quizPrevBtn');
 const quizProgress = document.getElementById('quizProgress');
@@ -139,6 +144,13 @@ const shareResultBtn = document.getElementById('shareResultBtn');
 const shareResultMenu = document.getElementById('shareResultMenu');
 const shareResultLinkBtn = document.getElementById('shareResultLinkBtn');
 const shareResultImageBtn = document.getElementById('shareResultImageBtn');
+const quizResultMoodline = document.getElementById('quizResultMoodline');
+const quizResultMonogram = document.getElementById('quizResultMonogram');
+const quizResultSignalTag = document.getElementById('quizResultSignalTag');
+const quizResultAxisMini = document.getElementById('quizResultAxisMini');
+const quizResultSnapshot = document.getElementById('quizResultSnapshot');
+const resultFilterButtons = Array.from(document.querySelectorAll('[data-result-filter]'));
+const resultFilterSections = Array.from(document.querySelectorAll('[data-result-group]'));
 const setupAllocationRows = document.getElementById('setupAllocationRows');
 let sharePreviewBackdrop = null;
 let sharePreviewImage = null;
@@ -147,7 +159,10 @@ let sharePreviewDownloadBtn = null;
 let sharePreviewDataUrl = '';
 let sharePreviewFileName = '';
 let sharePreviewMode = 'square';
+const QUIZ_RESULT_STORAGE_KEY = 'investolab.quizResult.v1';
+const isStandaloneQuizResultPage = document.body?.dataset.page === 'quiz-result';
 
+/*
 // ---------- quiz question bank ----------
 // 5 questions per axis, plus 5 general behavioral/psychological questions.
 const quizQuestions = [];
@@ -230,6 +245,255 @@ addAxisQuestions('reactivity', [
 
 // shuffle the array to mix axis questions
 quizQuestions.sort(() => Math.random() - 0.5);
+*/
+
+// ---------- quiz question bank ----------
+const QUIZ_AXIS_META = {
+  risk: {
+    label: 'Risk Axis',
+    eyebrow: 'Upside vs Safety',
+    prompt: 'Do you usually chase upside or protect your money first?'
+  },
+  control: {
+    label: 'Control Axis',
+    eyebrow: 'My Call vs The Plan',
+    prompt: 'Do you like calling the shots yourself or following a plan?'
+  },
+  reactivity: {
+    label: 'Reactivity Axis',
+    eyebrow: 'Heat Check',
+    prompt: 'When things get intense, do you react fast or stay steady?'
+  }
+};
+
+const QUIZ_DEFAULT_SCORE_SCALE = [1, 0.78, 0.5, 0.22, 0];
+
+function createScenarioQuestion({ axis, title, scenario, weight = 1, eyebrow = '', options = [] }) {
+  return {
+    axis,
+    title,
+    scenario,
+    weight,
+    eyebrow: eyebrow || QUIZ_AXIS_META[axis]?.eyebrow || 'Pressure Test',
+    options: options.map((option, idx) => ({
+      label: String(option?.label || '').trim(),
+      detail: String(option?.detail || '').trim(),
+      score: Number.isFinite(option?.score) ? Number(option.score) : QUIZ_DEFAULT_SCORE_SCALE[idx]
+    }))
+  };
+}
+
+const QUIZ_OPTION_CUES = {
+  risk: ['Go big', 'Lean in', 'Wait and see', 'Play defense', 'Protect cash'],
+  control: ['My call', 'Mostly my call', 'Mix of both', 'Trust the plan', 'Hands off'],
+  reactivity: ['React now', 'Move fast', 'Take a breath', 'Stick to rules', 'Stay calm']
+};
+
+function getQuizOptionCue(axis, optionIndex) {
+  const cues = QUIZ_OPTION_CUES[String(axis || '').toLowerCase()] || [];
+  return String(cues[optionIndex] || 'Your move');
+}
+
+const quizQuestions = [
+  createScenarioQuestion({
+    axis: 'risk',
+    title: 'Your Favorite Stock Drops Overnight',
+    scenario:
+      'You wake up and see that a stock or fund you really like is down about 20% before the market opens. You still kind of believe in it, but the news is rough.',
+    weight: 1.18,
+    options: [
+      { label: 'Buy a lot more right away', detail: 'Big drops feel like a chance to swing hard for a comeback.' },
+      { label: 'Buy a little more', detail: 'I would add, but not so much that one bad day ruins me.' },
+      { label: 'Wait and watch first', detail: 'I would rather see what happens before touching anything.' },
+      { label: 'Sell a little', detail: 'I would cut some risk fast and think more clearly after.' },
+      { label: 'Sell it all', detail: 'Protecting my money matters more than guessing the rebound.' }
+    ]
+  }),
+  createScenarioQuestion({
+    axis: 'control',
+    title: 'Your Plan Says One Thing, Your Gut Says Another',
+    scenario:
+      'Your simple investing plan says it is time to take some profit, but your gut says the stock could keep running.',
+    weight: 1.15,
+    options: [
+      { label: 'Ignore the plan and trust myself', detail: 'If my instincts feel strong, I want the final say.' },
+      { label: 'Bend the plan a little', detail: 'I still want the steering wheel in my hands.' },
+      { label: 'Look one more time, then decide', detail: 'I want a final check before committing either way.' },
+      { label: 'Stick with the plan unless something major changed', detail: 'A plan should win over a random feeling.' },
+      { label: 'Follow the plan exactly', detail: 'The whole point of the plan is to stop me from freelancing.' }
+    ]
+  }),
+  createScenarioQuestion({
+    axis: 'reactivity',
+    title: 'Everything on Your Screen Is Red',
+    scenario:
+      'You open your investing app and almost everything is falling fast. It feels like every minute looks worse than the last.',
+    weight: 1.18,
+    options: [
+      { label: 'Sell first and think later', detail: 'I would want the pain to stop before I sort it out.' },
+      { label: 'Make a quick defensive move', detail: 'I would feel better doing something right away.' },
+      { label: 'Take a short break, then decide', detail: 'I need a moment to reset before touching anything.' },
+      { label: 'Check my rules before acting', detail: 'I do not want one scary screen to rewrite the plan.' },
+      { label: 'Wait until I feel calm', detail: 'I would rather pause than let panic choose for me.' }
+    ]
+  }),
+  createScenarioQuestion({
+    axis: 'risk',
+    title: 'Tiny Company, Huge Upside',
+    scenario:
+      'A small company could soar if one big deal happens, but it could also crash hard if it does not. You have extra cash ready to invest.',
+    options: [
+      { label: 'Make it a big bet', detail: 'Big upside is worth taking a real shot at.' },
+      { label: 'Buy enough to matter', detail: 'I want a meaningful position, but not a wild one.' },
+      { label: 'Buy a tiny test amount', detail: 'I want some exposure without serious damage if I am wrong.' },
+      { label: 'Watch it for now', detail: 'I would rather wait for proof before risking money.' },
+      { label: 'Skip it completely', detail: 'That kind of risk is just not for me.' }
+    ]
+  }),
+  createScenarioQuestion({
+    axis: 'control',
+    title: 'Everyone Is Giving You Advice',
+    scenario:
+      'Friends, creators, and market experts all disagree about the same stock. You need to decide today.',
+    options: [
+      { label: 'Block out the noise and decide alone', detail: 'I do not want outside voices in the driver’s seat.' },
+      { label: 'Listen, but I still call the shot', detail: 'Advice is useful, but the final decision is mine.' },
+      { label: 'Try a small amount while I think', detail: 'I want room to learn without going all in.' },
+      { label: 'Wait for a clearer picture', detail: 'I want more structure before I act.' },
+      { label: 'Pass and let others figure it out', detail: 'If everyone disagrees, I would rather not improvise.' }
+    ]
+  }),
+  createScenarioQuestion({
+    axis: 'reactivity',
+    title: 'You Feel Unstoppably Good',
+    scenario:
+      'You have had a great week and feel extra confident. A fresh investing idea shows up right before the day ends.',
+    options: [
+      { label: 'Go bigger while I am hot', detail: 'When I feel sharp, I want to press the advantage.' },
+      { label: 'Move faster than usual', detail: 'Confidence would push me to act more boldly.' },
+      { label: 'Take it, but watch my mood', detail: 'I know I am hyped, so I would try to stay aware of it.' },
+      { label: 'Keep my normal size and rules', detail: 'A good streak should not change my process.' },
+      { label: 'Force myself to cool off first', detail: 'Feeling unstoppable is exactly when I need to slow down.' }
+    ]
+  }),
+  createScenarioQuestion({
+    axis: 'risk',
+    title: 'One Winner Gets Huge',
+    scenario:
+      'One investment has grown so much that it now makes up a huge chunk of your account. People keep saying it can still go much higher.',
+    options: [
+      { label: 'Add even more', detail: 'If a winner is working, I am okay letting it get very big.' },
+      { label: 'Leave it alone and let it ride', detail: 'I can live with a concentrated bet if upside still looks huge.' },
+      { label: 'Trim a little', detail: 'I want some discipline without cooling the story too much.' },
+      { label: 'Cut it back to a healthier size', detail: 'One idea should not decide my whole future.' },
+      { label: 'Sell a big chunk', detail: 'I do not want one position getting that much power over my account.' }
+    ]
+  }),
+  createScenarioQuestion({
+    axis: 'control',
+    title: 'Your Auto-Invest Is About to Fire',
+    scenario:
+      'Your regular automatic investment is about to go through on a scary market day. The screen looks messy and unstable.',
+    options: [
+      { label: 'Turn it off and do it my way', detail: 'This is the moment when I want hands-on control.' },
+      { label: 'Change the size or timing myself', detail: 'The plan can stay, but I still want to steer it.' },
+      { label: 'Let some happen and keep some back', detail: 'I like a mix of structure and flexibility.' },
+      { label: 'Let it go through as planned', detail: 'The plan is there to stop me from editing it on every scary day.' },
+      { label: 'Do not touch it at all', detail: 'If I made the plan earlier, I should trust it now.' }
+    ]
+  }),
+  createScenarioQuestion({
+    axis: 'reactivity',
+    title: 'Your Feed Is Full of Huge Gains',
+    scenario:
+      'Your social feed is packed with screenshots of people making money in something you do not own. The fear of missing out feels very real.',
+    options: [
+      { label: 'Jump in immediately', detail: 'I would rather be late than miss another big move.' },
+      { label: 'Buy today with real money', detail: 'The excitement would push me to act fast.' },
+      { label: 'Open a small starter position', detail: 'I might scratch the itch, but keep it contained.' },
+      { label: 'Wait for my own setup', detail: 'Other people’s excitement is not enough reason for me.' },
+      { label: 'Mute it and move on', detail: 'That kind of hype is exactly what I do not want to trade on.' }
+    ]
+  }),
+  createScenarioQuestion({
+    axis: 'risk',
+    title: 'The Market Just Crashed',
+    scenario:
+      'The market has fallen hard. A very risky fund now looks tempting because people say the rebound could be huge.',
+    options: [
+      { label: 'Take a bold swing', detail: 'A huge rebound is worth taking a lot of risk for.' },
+      { label: 'Buy a decent amount', detail: 'I want real upside, but not total chaos.' },
+      { label: 'Keep it small', detail: 'I would want some exposure without going overboard.' },
+      { label: 'Wait for more proof', detail: 'Big drops can always get bigger before they bounce.' },
+      { label: 'Avoid that kind of risk', detail: 'That is more heat than I want near my money.' }
+    ]
+  }),
+  createScenarioQuestion({
+    axis: 'control',
+    title: 'One Video Turns Into Ten',
+    scenario:
+      'You planned to buy one simple fund, but after a night of videos and research you now have ten more exciting ideas.',
+    options: [
+      { label: 'Rebuild the whole plan myself', detail: 'If I have new ideas, I want the portfolio to reflect them.' },
+      { label: 'Keep the core, add my own side picks', detail: 'I still want a meaningful part that I control directly.' },
+      { label: 'Change one or two things', detail: 'I want some personal input without rebuilding everything.' },
+      { label: 'Stick with the original simple plan', detail: 'Simple usually beats chasing every shiny idea.' },
+      { label: 'Leave it to the preset plan', detail: 'The less I meddle, the better I usually do.' }
+    ]
+  }),
+  createScenarioQuestion({
+    axis: 'reactivity',
+    title: 'You Told Friends About It',
+    scenario:
+      'A stock you talked up to friends just had bad news and dropped hard. Messages are already coming in.',
+    options: [
+      { label: 'Sell right away', detail: 'I would want to act before the situation gets even more awkward.' },
+      { label: 'Move fast so I am not stuck', detail: 'That social pressure would push me to react quickly.' },
+      { label: 'Pause, then decide', detail: 'I would need a short reset before touching it.' },
+      { label: 'Review why I bought it first', detail: 'Embarrassment should not decide the trade for me.' },
+      { label: 'Ignore the pressure and follow my process', detail: 'Other people’s messages should not set my timeline.' }
+    ]
+  }),
+  createScenarioQuestion({
+    axis: 'risk',
+    title: 'This Money Is for a Home',
+    scenario:
+      'This account now includes money you may need for a home down payment in about six months, but a few risky ideas still look exciting.',
+    options: [
+      { label: 'Still chase big upside', detail: 'I would keep swinging even with a real near-term goal.' },
+      { label: 'Take a few selective risks', detail: 'Some bold bets would still make the cut.' },
+      { label: 'Mostly safe, with a small fun bucket', detail: 'I would split the difference instead of going all one way.' },
+      { label: 'Move most of it defensive', detail: 'Protecting the money matters more than squeezing extra return.' },
+      { label: 'Keep it almost fully safe', detail: 'Short-term money should not act like long-term risk money.' }
+    ]
+  }),
+  createScenarioQuestion({
+    axis: 'control',
+    title: 'Your Reason for Buying It Gets Weaker',
+    scenario:
+      'Nothing has hit your stop or review date yet, but your reason for buying this investment feels weaker now.',
+    options: [
+      { label: 'Change the plan right now', detail: 'If the story changes, I want to change before the rules do.' },
+      { label: 'Adjust it myself but keep some exposure', detail: 'I want the flexibility to steer in real time.' },
+      { label: 'Give it one more review', detail: 'I want one calm check before making the call.' },
+      { label: 'Let the original rules decide', detail: 'Rules exist to stop me from second-guessing all the time.' },
+      { label: 'Do nothing unless a preset trigger hits', detail: 'I would rather trust the structure than improvise.' }
+    ]
+  }),
+  createScenarioQuestion({
+    axis: 'reactivity',
+    title: 'Scary News on Sunday Night',
+    scenario:
+      'Big news hits on Sunday night and futures are swinging. You are staring at your screen before the week has even started.',
+    options: [
+      { label: 'Place orders immediately', detail: 'I would want to move before everyone else wakes up to it.' },
+      { label: 'Start changing things tonight', detail: 'I would not sleep well without doing something.' },
+      { label: 'Make a rough plan, then check again at the open', detail: 'I want some action, but not a full commitment yet.' },
+      { label: 'Wait for the market to open', detail: 'Scary headlines alone are not enough for me to act.' },
+      { label: 'Stick to my normal morning routine', detail: 'My process starts when the market is actually open.' }
+    ]
+  })
+];
 
 const setupAllocationSummary = document.getElementById('setupAllocationSummary');
 const setupAllocBlock = document.getElementById('setupAllocBlock');
@@ -727,190 +991,85 @@ function openSharePreview(mode = 'square') {
   document.body.classList.add('modal-open');
 }
 
-function drawRoundedRect(ctx, x, y, w, h, r) {
-  const radius = Math.max(0, Math.min(Number(r || 0), Math.min(w, h) / 2));
-  ctx.beginPath();
-  ctx.moveTo(x + radius, y);
-  ctx.lineTo(x + w - radius, y);
-  ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
-  ctx.lineTo(x + w, y + h - radius);
-  ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
-  ctx.lineTo(x + radius, y + h);
-  ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
-  ctx.lineTo(x, y + radius);
-  ctx.quadraticCurveTo(x, y, x + radius, y);
-  ctx.closePath();
+function readShareListItems(listEl, limit = 3) {
+  return Array.from(listEl?.querySelectorAll('li') || [])
+    .map((item) => String(item.textContent || '').replace(/\s+/g, ' ').trim())
+    .filter(Boolean)
+    .slice(0, limit);
 }
 
-function drawWrappedText(ctx, text, x, y, maxWidth, lineHeight, maxLines = 4) {
-  const words = String(text || '').split(/\s+/).filter(Boolean);
-  const lines = [];
-  let current = '';
-  for (const w of words) {
-    const next = current ? `${current} ${w}` : w;
-    if (ctx.measureText(next).width <= maxWidth) current = next;
-    else {
-      if (current) lines.push(current);
-      current = w;
-    }
-  }
-  if (current) lines.push(current);
-  const trimmed = lines.slice(0, Math.max(1, maxLines));
-  trimmed.forEach((line, idx) => ctx.fillText(line, x, y + idx * lineHeight));
+function cleanShareTitle(value) {
+  return String(value || '')
+    .replace(/^You are\s+/i, '')
+    .replace(/[.!?]+$/g, '')
+    .trim();
 }
 
-function drawShareAxisBars(ctx, x, y, width, mode) {
+function buildResultSharePayload() {
   const clampPct = (value) => Math.max(0, Math.min(100, Number(value || 0)));
-  const scores = axis3dState?.scores || {};
-  const rows = [
-    {
-      title: 'Risk Axis',
-      left: 'Conservative',
-      right: 'Aggressive',
-      value: clampPct(scores.aggressive),
-      color: '#2563eb'
-    },
-    {
-      title: 'Control Axis',
-      left: 'Passive',
-      right: 'Active',
-      value: clampPct(scores.internal),
-      color: '#0d9488'
-    },
-    {
-      title: 'Reactivity Axis',
-      left: 'Rational',
-      right: 'Emotional',
-      value: clampPct(scores.emotional),
-      color: '#ea580c'
-    }
+  const scores = {
+    riskAggressive: clampPct(axis3dState?.scores?.aggressive),
+    controlInternal: clampPct(axis3dState?.scores?.internal),
+    reactivityEmotional: clampPct(axis3dState?.scores?.emotional)
+  };
+  const axes = [
+    { title: 'Risk', value: scores.riskAggressive, low: 'Conservative', high: 'Aggressive' },
+    { title: 'Control', value: scores.controlInternal, low: 'Passive', high: 'Active' },
+    { title: 'Reactivity', value: scores.reactivityEmotional, low: 'Rational', high: 'Emotional' }
   ];
+  const strongestAxis = axes.sort((left, right) => Math.abs(right.value - 50) - Math.abs(left.value - 50))[0] || axes[0];
+  const profileLabel = formatAxisMixLabel(
+    scores.riskAggressive >= 50 ? 'Aggressive' : 'Conservative',
+    scores.controlInternal >= 50 ? 'Active' : 'Passive',
+    scores.reactivityEmotional >= 50 ? 'Emotional' : 'Rational'
+  );
+  const bestFit = String(investorBestFitList?.querySelector('li strong')?.textContent || '').trim() || 'Best fit idea pending';
+  const bestFitReason =
+    String(investorBestFitList?.querySelector('.best-fit-why')?.textContent || '')
+      .replace(/^Why this fits:\s*/i, '')
+      .trim() || 'It aligns well with your current investor profile.';
+  const isQuizResult = String(latestFinalResult?.analysisSource || '').toLowerCase() === 'quiz' || (!!quizResultSection && !quizResultSection.classList.contains('hidden'));
+  const title =
+    cleanShareTitle(investorTypeBadge?.textContent) ||
+    cleanShareTitle(investorTypeTitle?.textContent) ||
+    'Investor Analysis';
+  const habits = readShareListItems(investorHabitsList, 3);
+  const forward = readShareListItems(investorForwardList, 3);
+  const fallbackMoves = readShareListItems(investorWhyList, 3);
 
-  const rowHeight = mode === 'portrait' ? 170 : 128;
-  const gap = mode === 'portrait' ? 22 : 18;
-  const trackH = mode === 'portrait' ? 24 : 20;
-  const labelYGap = mode === 'portrait' ? 46 : 38;
-
-  rows.forEach((row, idx) => {
-    const top = y + idx * (rowHeight + gap);
-    ctx.fillStyle = '#0f172a';
-    ctx.font = mode === 'portrait' ? '700 32px Manrope, sans-serif' : '700 26px Manrope, sans-serif';
-    ctx.fillText(row.title, x, top + 34);
-
-    const pctText = `${Math.round(row.value)}%`;
-    ctx.fillStyle = row.color;
-    ctx.font = mode === 'portrait' ? '700 28px Manrope, sans-serif' : '700 22px Manrope, sans-serif';
-    const pctWidth = ctx.measureText(pctText).width;
-    ctx.fillText(pctText, x + width - pctWidth, top + 34);
-
-    const trackY = top + 52;
-    drawRoundedRect(ctx, x, trackY, width, trackH, 999);
-    ctx.fillStyle = '#e2e8f0';
-    ctx.fill();
-
-    const fillW = Math.max(8, (row.value / 100) * width);
-    drawRoundedRect(ctx, x, trackY, fillW, trackH, 999);
-    const fillGrad = ctx.createLinearGradient(x, trackY, x + fillW, trackY);
-    fillGrad.addColorStop(0, row.color);
-    fillGrad.addColorStop(1, '#ffffff');
-    ctx.fillStyle = fillGrad;
-    ctx.fill();
-
-    const dotX = x + (row.value / 100) * width;
-    ctx.beginPath();
-    ctx.fillStyle = row.color;
-    ctx.arc(dotX, trackY + trackH / 2, mode === 'portrait' ? 11 : 9, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 3;
-    ctx.stroke();
-
-    ctx.fillStyle = '#475569';
-    ctx.font = mode === 'portrait' ? '600 24px Manrope, sans-serif' : '600 19px Manrope, sans-serif';
-    ctx.fillText(row.left, x, trackY + labelYGap);
-    const rightW = ctx.measureText(row.right).width;
-    ctx.fillText(row.right, x + width - rightW, trackY + labelYGap);
-  });
-
-  return rows.length * rowHeight + (rows.length - 1) * gap;
+  return {
+    label: 'InvestoLab',
+    eyebrow: isQuizResult ? 'InvestoType Quiz Result' : 'Simulation Behavior Result',
+    title,
+    badge: profileLabel,
+    summary: String(investorTypeSummary?.textContent || '').replace(/\s+/g, ' ').trim(),
+    axisScores: scores,
+    highlights: [
+      { label: 'Axis Mix', value: profileLabel },
+      { label: 'Strongest Edge', value: `${strongestAxis.value >= 50 ? strongestAxis.high : strongestAxis.low} ${strongestAxis.title}` },
+      { label: 'Best Fit Investment', value: bestFit },
+      { label: 'Signal Source', value: isQuizResult ? `${quizQuestions.length} pressure scenarios` : 'Behavior from simulation play' }
+    ],
+    bestFit: {
+      title: 'Best Fit Investment',
+      name: bestFit,
+      reason: bestFitReason
+    },
+    sections: [
+      { title: 'How You Tend To Move', items: habits.length ? habits : fallbackMoves },
+      { title: 'Next Best Moves', items: forward.length ? forward : readShareListItems(investorStrengthsList, 3) }
+    ],
+    fileBase: isQuizResult ? 'investolab-investotype-quiz' : 'investolab-investotype-simulation',
+    link: isStandaloneQuizResultPage ? getQuizSourcePageUrl() : window.location.href
+  };
 }
 
 function buildResultShareCanvas(mode = 'square') {
-  const width = 1080;
-  const height = mode === 'portrait' ? 2160 : 1080; // 9:18 or 1:1
-  const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) throw new Error('Unable to build share image.');
-
-  const grad = ctx.createLinearGradient(0, 0, 0, height);
-  grad.addColorStop(0, '#eef8ff');
-  grad.addColorStop(1, '#ffffff');
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, width, height);
-
-  const pad = 72;
-  const cardW = width - pad * 2;
-  let y = pad;
-
-  ctx.fillStyle = '#0f766e';
-  ctx.font = '700 28px Manrope, sans-serif';
-  ctx.fillText('InvestoLab Result', pad, y);
-  y += 44;
-
-  const title = String(investorTypeTitle?.textContent || 'Investor Analysis').trim();
-  const badge = String(investorTypeBadge?.textContent || '').trim();
-  const summary = String(investorTypeSummary?.textContent || '').trim();
-  const bestFit =
-    String(investorBestFitList?.querySelector('li strong')?.textContent || investorBestFitList?.querySelector('li')?.textContent || '-').trim();
-
-  drawRoundedRect(ctx, pad, y, cardW, 190, 24);
-  ctx.fillStyle = '#ffffff';
-  ctx.fill();
-  ctx.strokeStyle = '#dbe7f7';
-  ctx.lineWidth = 2;
-  ctx.stroke();
-  ctx.fillStyle = '#0f172a';
-  ctx.font = '800 44px Manrope, sans-serif';
-  ctx.fillText(title, pad + 26, y + 58);
-  if (badge) {
-    ctx.fillStyle = '#1d4ed8';
-    ctx.font = '700 24px Manrope, sans-serif';
-    ctx.fillText(badge, pad + 26, y + 95);
+  const builder = window.InvestoTypeShare?.buildShareCanvas;
+  if (typeof builder !== 'function') {
+    throw new Error('Share image builder unavailable.');
   }
-  ctx.fillStyle = '#334155';
-  ctx.font = '600 24px Manrope, sans-serif';
-  drawWrappedText(ctx, summary, pad + 26, y + 132, cardW - 52, 30, 2);
-  y += 222;
-
-  const axisCardH = mode === 'portrait' ? 700 : 470;
-  drawRoundedRect(ctx, pad, y, cardW, axisCardH, 24);
-  ctx.fillStyle = '#ffffff';
-  ctx.fill();
-  ctx.strokeStyle = '#dbe7f7';
-  ctx.lineWidth = 2;
-  ctx.stroke();
-  ctx.fillStyle = '#0f172a';
-  ctx.font = '700 30px Manrope, sans-serif';
-  ctx.fillText('3 Axis Profile Bars', pad + 24, y + 44);
-  drawShareAxisBars(ctx, pad + 24, y + 70, cardW - 48, mode);
-  y += axisCardH + 26;
-
-  drawRoundedRect(ctx, pad, y, cardW, 150, 24);
-  ctx.fillStyle = '#ffffff';
-  ctx.fill();
-  ctx.strokeStyle = '#dbe7f7';
-  ctx.lineWidth = 2;
-  ctx.stroke();
-  ctx.fillStyle = '#0f172a';
-  ctx.font = '700 30px Manrope, sans-serif';
-  ctx.fillText('Best-Suiting Investment', pad + 24, y + 48);
-  ctx.fillStyle = '#1e293b';
-  ctx.font = '600 26px Manrope, sans-serif';
-  drawWrappedText(ctx, bestFit, pad + 24, y + 92, cardW - 48, 32, 2);
-
-  return canvas;
+  return builder(buildResultSharePayload(), mode);
 }
 
 function downloadResultShareImage(mode = 'square') {
@@ -923,7 +1082,7 @@ function downloadResultShareImage(mode = 'square') {
 }
 
 async function copyResultLink() {
-  const text = window.location.href;
+  const text = isStandaloneQuizResultPage ? getQuizSourcePageUrl() : window.location.href;
   try {
     if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(text);
     else throw new Error('Clipboard API unavailable');
@@ -1539,6 +1698,23 @@ function axisLabelFromCode(axis, code) {
   return '';
 }
 
+function formatAxisMixLabel(riskLabel, controlLabel, reactLabel, separator = ' / ') {
+  return [
+    String(riskLabel || 'Conservative'),
+    String(controlLabel || 'Passive'),
+    String(reactLabel || 'Rational')
+  ].join(separator);
+}
+
+function axisPointDescriptor(axis, value) {
+  const pct = Math.max(0, Math.min(100, Number(value || 0)));
+  const isHighSide = pct >= 50;
+  return {
+    label: axisLabelFromCode(axis, isHighSide ? (axis === 'reactivity' ? 'E' : axis === 'control' ? 'I' : 'A') : axis === 'reactivity' ? 'R' : axis === 'control' ? 'E' : 'C'),
+    value: Math.round(isHighSide ? pct : 100 - pct)
+  };
+}
+
 function getAxisCodes(profile) {
   const code = String(profile?.code || '').trim().toUpperCase();
   const parts = code.split('-');
@@ -1558,6 +1734,25 @@ function getAxisCodes(profile) {
 
 function getCubeCode(risk, control, reactivity) {
   return `${risk || 'C'}-${control || 'E'}-${reactivity || 'R'}`;
+}
+
+const INVESTOR_TYPE_BY_CODE = {
+  'A-I-R': 'The Quant',
+  'A-I-E': 'Portfolio Manager',
+  'A-E-R': 'Technical Analyst',
+  'A-E-E': 'Day Trader',
+  'C-I-R': 'Research Analyst',
+  'C-I-E': 'Risk Manager',
+  'C-E-R': 'Index Strategist',
+  'C-E-E': 'Wealth Advisor'
+};
+
+function getInvestorTypeFromCubeCode(codeOrRisk, control, reactivity) {
+  const code =
+    typeof control === 'undefined' && typeof reactivity === 'undefined'
+      ? String(codeOrRisk || '').trim().toUpperCase()
+      : getCubeCode(codeOrRisk, control, reactivity);
+  return INVESTOR_TYPE_BY_CODE[code] || 'Index Strategist';
 }
 
 // derive likely MBTI suggestions strictly from the three axis codes
@@ -1897,10 +2092,13 @@ function renderAxis3dGraph() {
     ctx.stroke();
   });
 
+  const riskPointLabel = axisPointDescriptor('risk', scores.aggressive);
+  const controlPointLabel = axisPointDescriptor('control', scores.internal);
+  const reactPointLabel = axisPointDescriptor('reactivity', scores.emotional);
   [
-    { p: rr, c: '#2563eb', t: `Aggressive ${Math.round(scores.aggressive)}%` },
-    { p: rc, c: '#0f766e', t: `Active ${Math.round(scores.internal)}%` },
-    { p: re, c: '#dc2626', t: `Emotional ${Math.round(scores.emotional)}%` }
+    { p: rr, c: '#2563eb', t: `${riskPointLabel.label} ${riskPointLabel.value}%` },
+    { p: rc, c: '#0f766e', t: `${controlPointLabel.label} ${controlPointLabel.value}%` },
+    { p: re, c: '#dc2626', t: `${reactPointLabel.label} ${reactPointLabel.value}%` }
   ].forEach((n) => {
     ctx.save();
     ctx.shadowBlur = 10;
@@ -2024,13 +2222,167 @@ function setAxisGridScores(axisScores, axisCodes, metrics = {}) {
   return { aggressive, internal, emotional };
 }
 
+let activeResultFilter = 'all';
+
+function getQuizResultMonogram(text) {
+  const words = String(text || '')
+    .replace(/[^A-Za-z0-9\s]/g, ' ')
+    .split(/\s+/)
+    .filter(Boolean);
+  if (!words.length) return 'IT';
+  if (words.length === 1) return words[0].slice(0, 3).toUpperCase();
+  return words.slice(0, 3).map((word) => word.charAt(0).toUpperCase()).join('');
+}
+
+function setQuizResultFilter(filter = 'all') {
+  const next = resultFilterButtons.some((button) => String(button.dataset.resultFilter || '') === filter) ? filter : 'all';
+  activeResultFilter = next;
+
+  resultFilterButtons.forEach((button) => {
+    const active = String(button.dataset.resultFilter || '') === next;
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-pressed', active ? 'true' : 'false');
+  });
+
+  resultFilterSections.forEach((section) => {
+    const match = next === 'all' || String(section.dataset.resultGroup || '') === next;
+    section.classList.toggle('result-filter-hidden', !match);
+  });
+}
+
+function renderQuizResultReveal(options = {}) {
+  if (!quizResultSection) return;
+
+  const tone = String(options.tone || 'balanced');
+  const type = String(options.type || 'Investor');
+  const strongestEdge = String(options.strongestEdge || 'Balanced signal');
+  const bestFit = String(options.bestFit || 'Best-fit pending');
+  const riskLabel = String(options.riskLabel || 'Conservative');
+  const controlLabel = String(options.controlLabel || 'Passive');
+  const reactLabel = String(options.reactLabel || 'Rational');
+  const axisMix = formatAxisMixLabel(riskLabel, controlLabel, reactLabel, ' | ');
+  const scores = options.scores || {};
+  const questionCount = Math.max(1, Number(options.questionCount || quizQuestions.length || 15));
+
+  investorPanel?.setAttribute('data-result-tone', tone);
+
+  if (quizResultMonogram) quizResultMonogram.textContent = getQuizResultMonogram(type);
+  if (quizResultSignalTag) quizResultSignalTag.textContent = strongestEdge;
+  if (quizResultMoodline) {
+    quizResultMoodline.textContent =
+      `${type} energy with a ${strongestEdge.toLowerCase()} edge. ` +
+      `Across ${questionCount} pressure scenarios, you leaned ${riskLabel.toLowerCase()} on risk, ${controlLabel.toLowerCase()} on control, and ${reactLabel.toLowerCase()} under stress.`;
+  }
+
+  if (quizResultAxisMini) {
+    const axisCards = [
+      { title: 'Risk', value: scores.aggressive, edge: riskLabel, tone: 'risk' },
+      { title: 'Control', value: scores.internal, edge: controlLabel, tone: 'control' },
+      { title: 'Reactivity', value: scores.emotional, edge: reactLabel, tone: 'reactivity' }
+    ];
+    quizResultAxisMini.innerHTML = axisCards
+      .map(
+        (axis) => `
+          <article class="quiz-axis-mini-card ${escapeHtml(axis.tone)}">
+            <div class="quiz-axis-mini-head">
+              <strong>${escapeHtml(axis.title)}</strong>
+              <span>${Math.round(Number(axis.value || 0))}%</span>
+            </div>
+            <div class="quiz-axis-mini-meter">
+              <span class="quiz-axis-mini-fill" style="width:${Math.max(10, Math.min(100, Number(axis.value || 0)))}%;"></span>
+            </div>
+            <small>${escapeHtml(axis.edge)} tilt</small>
+          </article>
+        `
+      )
+      .join('');
+  }
+
+  if (quizResultSnapshot) {
+    const cards = [
+      { label: 'Axis Mix', value: axisMix, tone: 'identity' },
+      { label: 'Strongest Edge', value: strongestEdge, tone: 'signal' },
+      { label: 'Best Fit', value: bestFit, tone: 'strategy' },
+      { label: 'Decision Style', value: type, tone: 'behavior' }
+    ];
+    quizResultSnapshot.innerHTML = cards
+      .map(
+        (card) => `
+          <article class="quiz-result-stat ${escapeHtml(card.tone)}">
+            <small>${escapeHtml(card.label)}</small>
+            <strong>${escapeHtml(card.value)}</strong>
+          </article>
+        `
+      )
+      .join('');
+  }
+
+  setQuizResultFilter('all');
+}
+
+function getQuizResultPageUrl() {
+  return new URL('./quiz-result.html', window.location.href).href;
+}
+
+function getQuizSourcePageUrl() {
+  const source = String(document.body?.dataset.shareSource || '').trim();
+  return source ? new URL(source, window.location.href).href : new URL('./quiz.html', window.location.href).href;
+}
+
+function resetQuizSourceLandingState() {
+  if (isStandaloneQuizResultPage || !quizIntro || !quizSection) return;
+  clearQuizAdvanceTimer();
+  quizIndex = 0;
+  quizAnswers.length = 0;
+  quizIntro.classList.remove('hidden');
+  quizSection.classList.add('hidden');
+  if (quizSeeResultBtn) {
+    quizSeeResultBtn.classList.add('hidden');
+    quizSeeResultBtn.disabled = false;
+    quizSeeResultBtn.textContent = 'Reveal My Type';
+  }
+  if (quizPrevBtn) quizPrevBtn.disabled = true;
+}
+
+function storeQuizResult(result) {
+  try {
+    sessionStorage.setItem(QUIZ_RESULT_STORAGE_KEY, JSON.stringify(result));
+  } catch (_error) {
+    return false;
+  }
+  return true;
+}
+
+function readStoredQuizResult() {
+  try {
+    const raw = sessionStorage.getItem(QUIZ_RESULT_STORAGE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch (_error) {
+    return null;
+  }
+}
+
+function restoreStandaloneQuizResultPage() {
+  if (!isStandaloneQuizResultPage) return;
+  const stored = readStoredQuizResult();
+  if (!stored?.investorProfile) {
+    window.location.replace(getQuizSourcePageUrl());
+    return;
+  }
+  latestFinalResult = stored;
+  renderInvestorTypePage(stored);
+  if (quizResultSection) quizResultSection.classList.remove('hidden');
+}
+
 function renderInvestorTypePage(result) {
   if (!result) return;
   const isQuizAnalysis = String(result?.analysisSource || '').toLowerCase() === 'quiz' || !!quizResultSection;
-  const type = String(result?.investorProfile?.type || 'Index Strategist');
-  const code = String(result?.investorProfile?.code || '').trim();
+  const storedCode = String(result?.investorProfile?.code || '').trim();
   const axes = result?.investorProfile?.axes || {};
   const axisCodes = getAxisCodes(result?.investorProfile || {});
+  const activeCode = storedCode || getCubeCode(axisCodes.risk, axisCodes.control, axisCodes.reactivity);
+  const type = String(result?.investorProfile?.type || getInvestorTypeFromCubeCode(activeCode));
   const axisScores = result?.investorProfile?.axisScores || {};
   const recommendation = String(result?.investorProfile?.recommendation || '').trim();
   const profile = getInvestorTypePlaybook(type);
@@ -2038,6 +2390,10 @@ function renderInvestorTypePage(result) {
   const behavior = result?.behavior || {};
   const reasons = [];
   const habits = [];
+  let quizAxisSnapshot = null;
+  const bestFitOptions = Array.isArray(investmentPlan.bestFit) ? investmentPlan.bestFit.filter(Boolean) : [];
+  const selectedBestFit = bestFitOptions.length ? bestFitOptions[0] : 'Vanguard Total Stock Market ETF (VTI).';
+  const selectedWhy = String(investmentPlan.bestFitWhy || 'It aligns well with your investor profile.').trim();
 
   const avgTurnover = Number(behavior?.avgTurnover || 0);
   const avgConcentration = Number(behavior?.avgConcentrationHHI || 0);
@@ -2045,7 +2401,6 @@ function renderInvestorTypePage(result) {
   const maxDrawdown = Number(result?.maxDrawdown || 0);
   const vol = Number(result?.annualizedVolatility || 0);
   const rebalances = Number(behavior?.rebalancesCompleted || 0);
-  const activeCode = code || getCubeCode(axisCodes.risk, axisCodes.control, axisCodes.reactivity);
   const riskLabel = String(axes?.risk || axisLabelFromCode('risk', axisCodes.risk));
   const controlLabel = String(axes?.control || axisLabelFromCode('control', axisCodes.control));
   const reactLabel = String(axes?.reactivity || axisLabelFromCode('reactivity', axisCodes.reactivity));
@@ -2056,14 +2411,24 @@ function renderInvestorTypePage(result) {
     const reactPct = Number(result?.investorProfile?.axisScores?.reactivityEmotional || 50);
     const strongestAxisLabel = String(result?.quizMeta?.strongestAxis || 'Risk');
     const strongestAxisPct = Number(result?.quizMeta?.strongestAxisPct || 50);
+    const strongestAxisDelta = Number(result?.quizMeta?.strongestAxisDelta);
     const questionCount = Number(result?.quizMeta?.questionCount || 20);
+    const strongestAxisDistance = Number.isFinite(strongestAxisDelta) ? strongestAxisDelta : Math.abs(strongestAxisPct - 50);
+    quizAxisSnapshot = {
+      riskPct,
+      controlPct,
+      reactPct,
+      strongestAxisLabel,
+      strongestAxisDistance,
+      questionCount
+    };
 
     reasons.push(`Quiz source: ${questionCount} answers were used to classify your profile.`);
     reasons.push(`Axis outcome: ${[riskLabel, controlLabel, reactLabel].filter(Boolean).join(' | ')}.`);
     reasons.push(`Risk leaning scored ${Math.round(riskPct)}% toward Aggressive versus Conservative.`);
     reasons.push(`Control leaning scored ${Math.round(controlPct)}% toward Active versus Passive.`);
     reasons.push(`Reactivity leaning scored ${Math.round(reactPct)}% toward Emotional versus Rational.`);
-    reasons.push(`Your strongest signal was on the ${strongestAxisLabel} axis (${Math.round(strongestAxisPct)}% away from neutral).`);
+    reasons.push(`Your strongest signal was on the ${strongestAxisLabel} axis (${Math.round(strongestAxisDistance)} points away from neutral).`);
 
     habits.push(
       riskPct >= 60
@@ -2167,22 +2532,31 @@ function renderInvestorTypePage(result) {
     const riskAgg = resolvedAxisScores.aggressive;
     const controlInt = resolvedAxisScores.internal;
     const reactEmo = resolvedAxisScores.emotional;
+    const riskEvidence = quizAxisSnapshot
+      ? `Evidence: ${quizAxisSnapshot.questionCount} pressure scenarios placed you ${Math.round(quizAxisSnapshot.riskPct)}% toward Aggressive versus Conservative.`
+      : `Evidence: vol ${toPercent(vol)}, max drawdown ${toPercent(maxDrawdown)}, cash ratio ${toPercent(avgCashRatio)}.`;
+    const controlEvidence = quizAxisSnapshot
+      ? `Evidence: ${Math.round(quizAxisSnapshot.controlPct)}% toward Active versus Passive, with your strongest signal ${Math.round(quizAxisSnapshot.strongestAxisDistance)} points from neutral on ${quizAxisSnapshot.strongestAxisLabel}.`
+      : `Evidence: turnover ${toPercent(avgTurnover)}, concentration HHI ${avgConcentration.toFixed(3)}.`;
+    const reactEvidence = quizAxisSnapshot
+      ? `Evidence: ${Math.round(quizAxisSnapshot.reactPct)}% toward Emotional versus Rational across the full quiz sequence.`
+      : `Evidence: turnover ${toPercent(avgTurnover)} under drawdown ${toPercent(maxDrawdown)}.`;
     investorAxisChips.innerHTML = [
       `<div class="investor-axis-chip"><strong>Risk Axis</strong> ${riskLabel}. ` +
         `${axisCodes.risk === 'A' ? 'You tolerate larger swings for higher upside.' : 'You prioritize steadier capital preservation.'} ` +
-        `Evidence: vol ${toPercent(vol)}, max drawdown ${toPercent(maxDrawdown)}, cash ratio ${toPercent(avgCashRatio)}.` +
+        `${riskEvidence}` +
         `<div class="axis-chip-bar"><span>Conservative</span><div class="axis-chip-track"><div class="axis-chip-you" style="left:${dot(
           riskAgg
         )};">You</div><div class="axis-chip-dot" style="left:${dot(riskAgg)};"></div></div><span>Aggressive</span></div></div>`,
       `<div class="investor-axis-chip"><strong>Control Axis</strong> ${controlLabel}. ` +
         `${axisCodes.control === 'I' ? 'You prefer to actively direct decisions yourself.' : 'You rely more on passive structure and market drift.'} ` +
-        `Evidence: turnover ${toPercent(avgTurnover)}, concentration HHI ${avgConcentration.toFixed(3)}.` +
+        `${controlEvidence}` +
         `<div class="axis-chip-bar"><span>Passive</span><div class="axis-chip-track"><div class="axis-chip-you" style="left:${dot(
           controlInt
         )};">You</div><div class="axis-chip-dot" style="left:${dot(controlInt)};"></div></div><span>Active</span></div></div>`,
       `<div class="investor-axis-chip"><strong>Reactivity Axis</strong> ${reactLabel}. ` +
         `${axisCodes.reactivity === 'E' ? 'Short-term volatility has stronger emotional impact on your decisions.' : 'You stay more analytical during drawdowns.'} ` +
-        `Evidence: turnover ${toPercent(avgTurnover)} under drawdown ${toPercent(maxDrawdown)}.` +
+        `${reactEvidence}` +
         `<div class="axis-chip-bar"><span>Rational</span><div class="axis-chip-track"><div class="axis-chip-you" style="left:${dot(
           reactEmo
         )};">You</div><div class="axis-chip-dot" style="left:${dot(reactEmo)};"></div></div><span>Emotional</span></div></div>`
@@ -2194,9 +2568,6 @@ function renderInvestorTypePage(result) {
   if (investorContextList) investorContextList.innerHTML = (profile.context || []).map((x) => `<li>${escapeHtml(x)}</li>`).join('');
   if (investorForwardList) investorForwardList.innerHTML = forward.map((x) => `<li>${escapeHtml(x)}</li>`).join('');
   if (investorBestFitList) {
-    const bestFitOptions = Array.isArray(investmentPlan.bestFit) ? investmentPlan.bestFit.filter(Boolean) : [];
-    const selectedBestFit = bestFitOptions.length ? bestFitOptions[0] : 'Vanguard Total Stock Market ETF (VTI).';
-    const selectedWhy = String(investmentPlan.bestFitWhy || 'It aligns well with your investor profile.').trim();
     investorBestFitList.innerHTML =
       `<li><strong>${escapeHtml(selectedBestFit)}</strong><span class="best-fit-why">Why this fits: ${escapeHtml(selectedWhy)}</span></li>`;
   }
@@ -2222,6 +2593,24 @@ function renderInvestorTypePage(result) {
       .map((x) => `<div class="investor-alike-item"><strong>${escapeHtml(x.label)}</strong><p>${escapeHtml(x.desc)}</p></div>`)
       .join('');
   }
+
+  const strongestAxisReveal = [
+    { title: 'Risk', value: resolvedAxisScores.aggressive, label: riskLabel },
+    { title: 'Control', value: resolvedAxisScores.internal, label: controlLabel },
+    { title: 'Reactivity', value: resolvedAxisScores.emotional, label: reactLabel }
+  ].sort((left, right) => Math.abs(right.value - 50) - Math.abs(left.value - 50))[0];
+  renderQuizResultReveal({
+    tone: getInvestorTone(type),
+    type,
+    code: activeCode,
+    strongestEdge: strongestAxisReveal ? `${strongestAxisReveal.label} ${strongestAxisReveal.title}` : `${riskLabel} Risk`,
+    bestFit: selectedBestFit,
+    riskLabel,
+    controlLabel,
+    reactLabel,
+    scores: resolvedAxisScores,
+    questionCount: quizAxisSnapshot?.questionCount || quizQuestions.length
+  });
 }
 
 function playInvestorTypeReveal(options = {}) {
@@ -7070,12 +7459,62 @@ newGameFromInvestorBtn?.addEventListener('click', () => {
 
 // quiz event wiring (only active on quiz page)
 restartQuizBtn?.addEventListener('click', () => {
+  if (isStandaloneQuizResultPage) {
+    window.location.href = getQuizSourcePageUrl();
+    return;
+  }
   window.location.reload();
+});
+resultFilterButtons.forEach((button) => {
+  button.addEventListener('click', () => {
+    setQuizResultFilter(String(button.dataset.resultFilter || 'all'));
+  });
 });
 
 // quiz state
 let quizIndex = 0;
 const quizAnswers = [];
+let quizAdvanceTimer = null;
+let quizAnswerLock = false;
+
+function clearQuizAdvanceTimer() {
+  if (!quizAdvanceTimer) return;
+  clearTimeout(quizAdvanceTimer);
+  quizAdvanceTimer = null;
+}
+
+function setQuizAxisTheme(axis) {
+  const normalized = String(axis || 'risk').toLowerCase();
+  if (quizSection) quizSection.dataset.quizAxis = normalized;
+  if (quizQuestionCard) quizQuestionCard.dataset.quizAxis = normalized;
+}
+
+function selectQuizOption(optionIndex) {
+  if (!quizOptions || quizAnswerLock) return;
+  const question = quizQuestions[quizIndex];
+  if (!question) return;
+  const safeIndex = Math.max(0, Math.min(question.options.length - 1, Number(optionIndex || 0)));
+  quizAnswers[quizIndex] = safeIndex;
+  Array.from(quizOptions.children).forEach((node, idx) => {
+    node.classList.toggle('selected', idx === safeIndex);
+  });
+
+  if (quizIndex >= quizQuestions.length - 1) {
+    if (quizSeeResultBtn) {
+      quizSeeResultBtn.classList.remove('hidden');
+      quizSeeResultBtn.disabled = false;
+      quizSeeResultBtn.textContent = 'Reveal My Type';
+    }
+    return;
+  }
+
+  quizAnswerLock = true;
+  clearQuizAdvanceTimer();
+  quizAdvanceTimer = setTimeout(() => {
+    quizIndex += 1;
+    showQuizQuestion();
+  }, 260);
+}
 
 function showQuizQuestion() {
   if (!quizSection || !quizQuestionEl || !quizOptions || !quizProgress) return;
@@ -7083,36 +7522,59 @@ function showQuizQuestion() {
     quizIndex = Math.max(0, quizQuestions.length - 1);
     return;
   }
-  const q = quizQuestions[quizIndex];
-  if (quizSeeResultBtn) quizSeeResultBtn.classList.add('hidden');
-  quizProgress.textContent = `Question ${quizIndex + 1} of ${quizQuestions.length}`;
+
+  clearQuizAdvanceTimer();
+  quizAnswerLock = false;
+
+  const question = quizQuestions[quizIndex];
+  const axisMeta = QUIZ_AXIS_META[question.axis] || QUIZ_AXIS_META.risk;
+  setQuizAxisTheme(question.axis);
+
+  if (quizSeeResultBtn) {
+    quizSeeResultBtn.classList.add('hidden');
+    quizSeeResultBtn.disabled = true;
+    quizSeeResultBtn.textContent = 'Reveal My Type';
+  }
+  if (quizProgress) quizProgress.textContent = `Question ${quizIndex + 1} of ${quizQuestions.length}`;
   if (quizProgressFill) {
     const pct = ((quizIndex + 1) / Math.max(1, quizQuestions.length)) * 100;
     quizProgressFill.style.width = `${Math.max(0, Math.min(100, pct)).toFixed(1)}%`;
   }
   if (quizPrevBtn) quizPrevBtn.disabled = quizIndex === 0;
-  quizQuestionEl.textContent = q.text;
+  if (quizAxisBadge) quizAxisBadge.textContent = axisMeta.label;
+  if (quizQuestionEyebrow) quizQuestionEyebrow.textContent = question.eyebrow || axisMeta.eyebrow;
+  if (quizQuestionTitle) quizQuestionTitle.textContent = question.title;
+  if (quizQuestionEl) quizQuestionEl.textContent = question.scenario;
+  if (quizQuestionMeta) quizQuestionMeta.textContent = axisMeta.prompt;
+
   quizOptions.innerHTML = '';
-  q.options.forEach((option, optionIndex) => {
+  question.options.forEach((option, optionIndex) => {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'quiz-option';
-    btn.textContent = option.label;
+    btn.setAttribute('data-option-index', String(optionIndex));
+
+    const idxEl = document.createElement('span');
+    idxEl.className = 'quiz-option-index';
+    idxEl.textContent = String(optionIndex + 1);
+
+    const copyWrap = document.createElement('span');
+    copyWrap.className = 'quiz-option-copy';
+
+    const cueEl = document.createElement('span');
+    cueEl.className = 'quiz-option-tag';
+    cueEl.textContent = getQuizOptionCue(question.axis, optionIndex);
+
+    const labelEl = document.createElement('strong');
+    labelEl.textContent = option.label;
+
+    const detailEl = document.createElement('small');
+    detailEl.textContent = option.detail || '';
+
+    copyWrap.append(cueEl, labelEl, detailEl);
+    btn.append(idxEl, copyWrap);
     if (quizAnswers[quizIndex] === optionIndex) btn.classList.add('selected');
-    btn.addEventListener('click', () => {
-      quizAnswers[quizIndex] = optionIndex;
-      Array.from(quizOptions.children).forEach((c) => c.classList.remove('selected'));
-      btn.classList.add('selected');
-      if (quizIndex >= quizQuestions.length - 1) {
-        if (quizSeeResultBtn) {
-          quizSeeResultBtn.classList.remove('hidden');
-          quizSeeResultBtn.disabled = false;
-        }
-        return;
-      }
-      quizIndex += 1;
-      showQuizQuestion();
-    });
+    btn.addEventListener('click', () => selectQuizOption(optionIndex));
     quizOptions.appendChild(btn);
   });
 }
@@ -7121,11 +7583,11 @@ function buildQuizResult() {
   const axisCounts = { risk: 0, control: 0, reactivity: 0 };
   const axisTotals = { risk: 0, control: 0, reactivity: 0 };
   quizQuestions.forEach((q, idx) => {
-    if (q.axis === 'general') return;
-    axisTotals[q.axis] += 1;
+    const weight = Number.isFinite(q?.weight) ? Number(q.weight) : 1;
+    axisTotals[q.axis] += weight;
     const answerIndex = quizAnswers[idx];
     const answer = Number.isInteger(answerIndex) ? q.options[answerIndex] : null;
-    axisCounts[q.axis] += answer?.score || 0.5;
+    axisCounts[q.axis] += (answer?.score ?? 0.5) * weight;
   });
   const riskPct = axisTotals.risk ? (axisCounts.risk / axisTotals.risk) * 100 : 50;
   const controlPct = axisTotals.control ? (axisCounts.control / axisTotals.control) * 100 : 50;
@@ -7136,6 +7598,8 @@ function buildQuizResult() {
     control: controlPct >= 50 ? 'I' : 'E',
     reactivity: reactPct >= 50 ? 'E' : 'R'
   };
+  const cubeCode = getCubeCode(axisCodes.risk, axisCodes.control, axisCodes.reactivity);
+  const investorType = getInvestorTypeFromCubeCode(cubeCode);
   const axesLabel = {
     risk: axisCodes.risk === 'A' ? 'Aggressive' : 'Conservative',
     control: axisCodes.control === 'I' ? 'Active' : 'Passive',
@@ -7147,6 +7611,7 @@ function buildQuizResult() {
     reactivity: reactPct
   };
   const strongestAxis = Object.entries(axisPctMap).sort((a, b) => Math.abs(b[1] - 50) - Math.abs(a[1] - 50))[0] || ['risk', 50];
+  const strongestAxisPct = Number(strongestAxis[1] || 50);
   const strongestAxisLabel =
     strongestAxis[0] === 'risk'
       ? 'Risk'
@@ -7156,8 +7621,8 @@ function buildQuizResult() {
 
   return {
     investorProfile: {
-      type: '',
-      code: getCubeCode(axisCodes.risk, axisCodes.control, axisCodes.reactivity),
+      type: investorType,
+      code: cubeCode,
       axes: axesLabel,
       axisScores: {
         riskAggressive: riskPct,
@@ -7173,7 +7638,8 @@ function buildQuizResult() {
     quizMeta: {
       questionCount: quizQuestions.length,
       strongestAxis: strongestAxisLabel,
-      strongestAxisPct: Number(strongestAxis[1] || 50)
+      strongestAxisPct,
+      strongestAxisDelta: Math.abs(strongestAxisPct - 50)
     },
     behavior: {},
     maxDrawdown: 0,
@@ -7187,24 +7653,23 @@ async function finishQuiz() {
     quizSeeResultBtn.textContent = 'Preparing...';
   }
   const fakeResult = buildQuizResult();
-  renderInvestorTypePage(fakeResult);
+  latestFinalResult = fakeResult;
+  const stored = storeQuizResult(fakeResult);
   await playInvestorTypeReveal({
-    titleBase: 'Analyzing your quiz',
-    subtitle: 'Building your investor profile from 20 answers'
+    titleBase: 'Reading your quiz',
+    subtitle: `Building your investor style from ${quizQuestions.length} quick choices`
   });
-  if (quizSection) quizSection.classList.add('hidden');
-  if (quizIntro) quizIntro.classList.add('hidden');
-  if (quizResultSection) quizResultSection.classList.remove('hidden');
-  scrollToInvestorIntro();
-  if (quizSeeResultBtn) {
-    quizSeeResultBtn.textContent = 'See Result';
-    quizSeeResultBtn.classList.add('hidden');
+  if (stored) {
+    window.location.href = getQuizResultPageUrl();
+    return;
   }
+  throw new Error('Unable to open the quiz result page right now. Please allow session storage and try again.');
 }
 
 startQuizBtn?.addEventListener('click', () => {
   if (quizIntro) quizIntro.classList.add('hidden');
   if (quizSection) quizSection.classList.remove('hidden');
+  clearQuizAdvanceTimer();
   quizIndex = 0;
   quizAnswers.length = 0;
   showQuizQuestion();
@@ -7212,6 +7677,7 @@ startQuizBtn?.addEventListener('click', () => {
 
 quizPrevBtn?.addEventListener('click', () => {
   if (quizIndex <= 0) return;
+  clearQuizAdvanceTimer();
   quizIndex -= 1;
   showQuizQuestion();
 });
@@ -7221,9 +7687,34 @@ quizSeeResultBtn?.addEventListener('click', () => {
     printError(error.message);
     if (quizSeeResultBtn) {
       quizSeeResultBtn.disabled = false;
-      quizSeeResultBtn.textContent = 'See Result';
+      quizSeeResultBtn.textContent = 'Reveal My Type';
     }
   });
+});
+
+window.addEventListener('keydown', (event) => {
+  if (!quizSection || quizSection.classList.contains('hidden') || quizResultSection && !quizResultSection.classList.contains('hidden')) return;
+  const key = String(event.key || '').toLowerCase();
+  if (/^[1-5]$/.test(key)) {
+    event.preventDefault();
+    selectQuizOption(Number(key) - 1);
+    return;
+  }
+  if (key === 'arrowleft' && !quizPrevBtn?.disabled) {
+    event.preventDefault();
+    clearQuizAdvanceTimer();
+    quizIndex = Math.max(0, quizIndex - 1);
+    showQuizQuestion();
+    return;
+  }
+  if (key === 'enter' && quizSeeResultBtn && !quizSeeResultBtn.classList.contains('hidden') && !quizSeeResultBtn.disabled) {
+    event.preventDefault();
+    finishQuiz().catch((error) => {
+      printError(error.message);
+      quizSeeResultBtn.disabled = false;
+      quizSeeResultBtn.textContent = 'Reveal My Type';
+    });
+  }
 });
 
 shareResultBtn?.addEventListener('click', (e) => {
@@ -7271,37 +7762,49 @@ document.addEventListener('click', (e) => {
   hideShareMenu();
 });
 
-updateAssetControls();
-updateSimAddControls();
-initAxis3dInteractivity();
-setAxisGridScores(
-  { riskAggressive: 50, controlInternal: 50, reactivityEmotional: 50 },
-  { risk: 'C', control: 'E', reactivity: 'R' }
-);
-const initialCashInput = getInitialCashInput();
-if (initialCashInput && String(initialCashInput.value || '').trim() !== '') {
-  initialCashInput.value = formatCashInputValue(parseCashInput(initialCashInput.value));
+if (!isStandaloneQuizResultPage && quizIntro && quizSection) {
+  resetQuizSourceLandingState();
+  window.addEventListener('pageshow', () => {
+    resetQuizSourceLandingState();
+  });
 }
-renderAssetList();
-renderSelectedBenchmarks();
-if (simFloatingActions) document.body.appendChild(simFloatingActions);
-updateFloatingActionDockState();
-setupValidated = { settings: false, portfolio: false, benchmark: false, summary: false };
-setupSummaryReady = false;
-setSetupStage('settings');
-refreshSetupSummary();
-if (autoPlayBtn) autoPlayBtn.disabled = true;
-if (replayToggleBtn) replayToggleBtn.disabled = true;
-if (replayDurationSelect) {
-  replayDurationSelect.value = '120';
-  replayDurationMs = 120000;
+
+if (isStandaloneQuizResultPage) {
+  initAxis3dInteractivity();
+  restoreStandaloneQuizResultPage();
+} else {
+  updateAssetControls();
+  updateSimAddControls();
+  initAxis3dInteractivity();
+  setAxisGridScores(
+    { riskAggressive: 50, controlInternal: 50, reactivityEmotional: 50 },
+    { risk: 'C', control: 'E', reactivity: 'R' }
+  );
+  const initialCashInput = getInitialCashInput();
+  if (initialCashInput && String(initialCashInput.value || '').trim() !== '') {
+    initialCashInput.value = formatCashInputValue(parseCashInput(initialCashInput.value));
+  }
+  renderAssetList();
+  renderSelectedBenchmarks();
+  if (simFloatingActions) document.body.appendChild(simFloatingActions);
+  updateFloatingActionDockState();
+  setupValidated = { settings: false, portfolio: false, benchmark: false, summary: false };
+  setupSummaryReady = false;
+  setSetupStage('settings');
+  refreshSetupSummary();
+  if (autoPlayBtn) autoPlayBtn.disabled = true;
+  if (replayToggleBtn) replayToggleBtn.disabled = true;
+  if (replayDurationSelect) {
+    replayDurationSelect.value = '120';
+    replayDurationMs = 120000;
+  }
+  if (allocationSortBy) allocationSortBy.value = 'current_value';
+  if (allocationSortDir) allocationSortDir.value = 'desc';
+  if (fluctuationView) fluctuationView.value = 'weekly';
+  setReplayStatus('Replay: paused');
+  updateHoldOnlyButton();
+  updateAutoPlayButton();
+  showSlide('setup');
 }
-if (allocationSortBy) allocationSortBy.value = 'current_value';
-if (allocationSortDir) allocationSortDir.value = 'desc';
-if (fluctuationView) fluctuationView.value = 'weekly';
-setReplayStatus('Replay: paused');
-updateHoldOnlyButton();
-updateAutoPlayButton();
-showSlide('setup');
 
 

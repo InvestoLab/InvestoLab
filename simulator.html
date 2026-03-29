@@ -1,16 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-816ETP25SD"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-816ETP25SD');
-  </script>
-  <meta charset="UTF-8" />
+<meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>InvestoLab - Simulation (Demo)</title>
   <link rel="stylesheet" href="styles.css?v=20260318p" />
@@ -459,6 +450,12 @@
                 <div class="investor-axis-right">
                   <div class="investor-cube-head">
                     <h4>Score Nebula</h4>
+                    <span id="investorCubeCode" class="investor-cube-code">Conservative | Passive | Rational</span>
+                  </div>
+                  <div class="axis-score-list" aria-live="polite">
+                    <div id="axisRiskScoreValue" class="axis-score-item">A 50% | C 50%</div>
+                    <div id="axisControlScoreValue" class="axis-score-item">I 50% | E 50%</div>
+                    <div id="axisReactivityScoreValue" class="axis-score-item">E 50% | R 50%</div>
                   </div>
                   <div id="axis3dStage" class="axis-3d-stage">
                     <canvas id="axis3dCanvas" width="560" height="360"></canvas>
@@ -523,11 +520,11 @@
   </main>
 
   <footer>
-    <a class="footer-contact-btn" href="mailto:tgrkhwang@gmail.com" aria-label="Contact by email">Contact</a>
     Copyright (c) 2026 InvestoLab. All rights reserved.
   </footer>
 
-  <script src="simulator.js?v=20260306n" defer></script>
+  <script src="investotype-share.js?v=20260329b" defer></script>
+  <script src="simulator.js?v=20260329f" defer></script>
 </body>
 </html>
 

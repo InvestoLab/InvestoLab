@@ -1,19 +1,10 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-816ETP25SD"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-816ETP25SD');
-  </script>
-  <meta charset="UTF-8" />
+<meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>InvestoLab - Quiz</title>
-  <link rel="stylesheet" href="styles.css?v=20260318p" />
+  <link rel="stylesheet" href="styles.css?v=20260329f" />
   <script src="nav.js?v=20260318a" defer></script>
   <script src="config.js?v=20260227a" defer></script>
   <script src="api-base.js?v=20260318e" defer></script>
@@ -54,123 +45,72 @@
     </div>
   </nav>
 
-  <header class="hero">
+  <header class="hero quiz-hero">
     <h1>Investor Personality Quiz</h1>
-    <p>Answer quick questions to find your investor type.</p>
+    <p>Quick, beginner-friendly scenarios that reveal how you invest under pressure.</p>
   </header>
 
   <main class="single-layout">
-    <section id="quizIntro" class="card home-card">
-      <h2 class="quiz-intro-title">Ready to Begin?</h2>
-      <p class="quiz-intro-subline">The quiz is short and beginner friendly.</p>
-      <p class="quiz-help-text">
-        There are no right or wrong answers. Pick what sounds most like you.
-      </p>
-      <button id="startQuizBtn" class="cta-link">Start Quiz</button>
-    </section>
-
-    <section id="quizSection" class="card hidden">
-      <div class="quiz-nav quiz-nav-top">
-        <button id="quizPrevBtn" type="button">Previous Question</button>
-      </div>
-      <p id="quizProgress"></p>
-      <div class="quiz-progress-track" aria-hidden="true">
-        <div id="quizProgressFill" class="quiz-progress-fill"></div>
-      </div>
-      <p id="quizQuestion" class="quiz-question"></p>
-      <div id="quizOptions" class="quiz-options"></div>
-      <div class="quiz-actions">
-        <button id="quizSeeResultBtn" type="button" class="cta-link hidden">See Result</button>
+    <section id="quizIntro" class="card quiz-intro-card">
+      <div class="quiz-intro-grid">
+        <div class="quiz-intro-copy">
+          <p class="quiz-intro-kicker">InvestoType Signal Scan</p>
+          <h2 class="quiz-intro-title">No finance background needed. Just pick what feels most like you.</h2>
+          <p class="quiz-intro-subline">This quiz uses short, easy scenarios to reveal your investing style on risk, control, and emotional reactivity.</p>
+          <div class="quiz-intro-pills" aria-label="Quiz details">
+            <span class="quiz-intro-pill">15 quick scenarios</span>
+            <span class="quiz-intro-pill">No finance jargon</span>
+            <span class="quiz-intro-pill">2-3 minutes</span>
+          </div>
+          <p class="quiz-help-text">
+            There are no right answers here. Go with your gut and choose the card that sounds most like you.
+          </p>
+          <button id="startQuizBtn" class="cta-link">Start Quick Quiz</button>
+        </div>
       </div>
     </section>
 
-    <section id="quizResultSection" class="hidden">
-      <!-- reuse the investorPanel markup from simulator.html -->
-      <div id="investorPanel" class="investor-panel">
-        <div class="investor-hero">
-          <p class="investor-eyebrow">Quiz Result</p>
-          <h3 id="investorTypeTitle">You are a...</h3>
-          <p id="investorTypeSummary" class="investor-summary">Complete the quiz to generate your analysis.</p>
-          <div id="investorTypeBadge" class="investor-type-badge">Type Pending</div>
-        </div>
-
-        <section class="chart-card investor-axis-combined">
-            <h4>3-Axis Profile Breakdown</h4>
-            <p id="investorAxisSummary" class="investor-axis-summary">Your axis explanation will appear here after the quiz.</p>
-            <div class="investor-axis-layout">
-              <div class="investor-axis-left">
-                <div id="investorAxisChips" class="investor-axis-chips"></div>
-              </div>
-              <div class="investor-axis-right">
-                <div class="investor-cube-head">
-                  <h4>Score Nebula</h4>
-                </div>
-                <div id="axis3dStage" class="axis-3d-stage">
-                  <canvas id="axis3dCanvas" width="560" height="360"></canvas>
-                  <div id="axis3dHoverTip" class="axis-3d-hover hidden"></div>
-                </div>
-              </div>
-            </div>
-        </section>
-
-        <div class="investor-grid">
-          <section class="chart-card investor-card investor-card-lead investor-span-12">
-            <h4>How To Invest Going Forward</h4>
-            <ul id="investorForwardList" class="investor-list"></ul>
-          </section>
-          <section class="chart-card investor-card investor-span-6">
-            <h4>Recommended Portfolio Mix</h4>
-            <ul id="investorPortfolioMixList" class="investor-list"></ul>
-          </section>
-          <section class="chart-card investor-card investor-span-6">
-            <h4>Best-Fit Investments</h4>
-            <ul id="investorBestFitList" class="investor-list"></ul>
-          </section>
-          <section class="chart-card investor-card investor-span-6">
-            <h4>Your Investment Habits</h4>
-            <ul id="investorHabitsList" class="investor-list"></ul>
-          </section>
-          <section class="chart-card investor-card investor-span-6">
-            <h4>Choices That Led Here</h4>
-            <ul id="investorWhyList" class="investor-list"></ul>
-          </section>
-          <section class="chart-card investor-card investor-span-6">
-            <h4>Strengths</h4>
-            <ul id="investorStrengthsList" class="investor-list"></ul>
-          </section>
-          <section class="chart-card investor-card investor-span-6">
-            <h4>Weaknesses</h4>
-            <ul id="investorWeaknessesList" class="investor-list"></ul>
-          </section>
-          <section class="chart-card investor-card investor-span-6">
-              <h4>Likely MBTI Tendencies</h4>
-            <ul id="investorMbtiList" class="investor-list"></ul>
-          </section>
-          <section class="chart-card investor-card investor-span-6">
-            <h4>Popular Investors With Similar Style</h4>
-            <div id="investorPopular" class="investor-alike"></div>
-          </section>
-        </div>
-
-        <div class="row investor-actions-row">
-          <button id="restartQuizBtn" type="button">Take Quiz Again</button>
-          <button id="shareResultBtn" type="button" class="ghost share-result-trigger">Share Result</button>
-          <div id="shareResultMenu" class="share-result-menu hidden">
-            <button id="shareResultLinkBtn" type="button" class="ghost">Copy Share Link</button>
-            <button id="shareResultImageBtn" type="button" class="ghost">Share Image</button>
+    <section id="quizSection" class="card quiz-stage-shell hidden" data-quiz-axis="risk">
+      <div class="quiz-stage-top">
+        <div class="quiz-stage-progress">
+          <p id="quizProgress"></p>
+          <div class="quiz-progress-track" aria-hidden="true">
+            <div id="quizProgressFill" class="quiz-progress-fill"></div>
+          </div>
+          <div class="quiz-progress-meta">
+            <p id="quizQuestionMeta" class="quiz-question-meta">No wrong answer. Pick the move that feels most like you.</p>
+            <span class="quiz-hotkey-hint">Hotkeys 1-5</span>
           </div>
         </div>
+        <div class="quiz-nav quiz-nav-top">
+          <div id="quizAxisBadge" class="quiz-axis-badge">Risk Axis</div>
+          <button id="quizPrevBtn" type="button">Previous Question</button>
+        </div>
+      </div>
+
+      <div id="quizQuestionCard" class="quiz-question-card" data-quiz-axis="risk">
+        <div class="quiz-question-shell">
+          <p id="quizQuestionEyebrow" class="quiz-question-eyebrow">Pressure Test</p>
+          <h2 id="quizQuestionTitle" class="quiz-question-title">Scenario Title</h2>
+          <p id="quizQuestion" class="quiz-question"></p>
+        </div>
+        <div id="quizOptions" class="quiz-options"></div>
+      </div>
+
+      <div class="quiz-actions">
+        <p class="quiz-action-hint">Choose the card that sounds most like your real instinct.</p>
+        <button id="quizSeeResultBtn" type="button" class="cta-link hidden">Reveal My Type</button>
       </div>
     </section>
 
   </main>
 
   <footer>
-    <a class="footer-contact-btn" href="mailto:tgrkhwang@gmail.com" aria-label="Contact by email">Contact</a>
     Copyright (c) 2026 InvestoLab. All rights reserved.
   </footer>
 
-  <script src="simulator.js?v=20260306n" defer></script>
+  <script src="investotype-share.js?v=20260329b" defer></script>
+  <script src="simulator.js?v=20260329g" defer></script>
 </body>
 </html>
 

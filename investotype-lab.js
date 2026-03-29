@@ -271,6 +271,10 @@ const arenaFeedbackTitle = document.getElementById('arenaFeedbackTitle');
 const arenaFeedbackText = document.getElementById('arenaFeedbackText');
 const arenaTypeLabel = document.getElementById('arenaTypeLabel');
 const arenaTypeSummary = document.getElementById('arenaTypeSummary');
+const arenaTypeBadge = document.getElementById('arenaTypeBadge');
+const arenaResultMoodline = document.getElementById('arenaResultMoodline');
+const arenaResultMonogram = document.getElementById('arenaResultMonogram');
+const arenaResultSignalTag = document.getElementById('arenaResultSignalTag');
 const arenaAxisSummary = document.getElementById('arenaAxisSummary');
 const arenaAxisBars = document.getElementById('arenaAxisBars');
 const arenaAxis3dCanvas = document.getElementById('arenaAxis3dCanvas');
@@ -283,6 +287,14 @@ const arenaStrengthList = document.getElementById('arenaStrengthList');
 const arenaRiskList = document.getElementById('arenaRiskList');
 const arenaPlanList = document.getElementById('arenaPlanList');
 const arenaRoundLog = document.getElementById('arenaRoundLog');
+const arenaShareResultBtn = document.getElementById('arenaShareResultBtn');
+const arenaShareResultMenu = document.getElementById('arenaShareResultMenu');
+const arenaShareResultLinkBtn = document.getElementById('arenaShareResultLinkBtn');
+const arenaShareResultImageBtn = document.getElementById('arenaShareResultImageBtn');
+const ARENA_RESULT_STORAGE_KEY = 'investolab.arenaResult.v1';
+const ARENA_FEATURE_PAGE_BUILD = '20260329g';
+const ARENA_RESULT_PAGE_BUILD = '20260329g';
+const isStandaloneArenaResultPage = document.body?.dataset.page === 'decision-arena-result';
 const ROUND_SWAP_MS = 220;
 const START_TRANSITION_MS = 280;
 
@@ -307,6 +319,7 @@ const arenaAxis3dState = {
 };
 let arenaLastScores = null;
 let currentScenarios = [];
+let latestArenaSharePayload = null;
 
 function clamp01(v) {
   return Math.max(0, Math.min(1, Number(v || 0)));
@@ -412,6 +425,24 @@ function cornerMetaFromPoint(p) {
     'C-E-E': 'Conservative, Passive, Emotional'
   }[code];
   return { code, explanation: explanation || 'Unclassified profile' };
+}
+
+function arenaAxisPointDescriptor(axis, value) {
+  const pct = Math.max(0, Math.min(100, Number(value || 0)));
+  const isHighSide = pct >= 50;
+  const label =
+    axis === 'risk'
+      ? isHighSide
+        ? 'Aggressive'
+        : 'Conservative'
+      : axis === 'control'
+      ? isHighSide
+        ? 'Active'
+        : 'Passive'
+      : isHighSide
+      ? 'Emotional'
+      : 'Rational';
+  return { label, value: Math.round(isHighSide ? pct : 100 - pct) };
 }
 
 function updateArenaAxis3dHover(clientX, clientY) {
@@ -641,10 +672,13 @@ function renderArenaAxis3dGraph() {
     ctx.stroke();
   });
 
+  const riskPointLabel = arenaAxisPointDescriptor('risk', scores.aggressive);
+  const controlPointLabel = arenaAxisPointDescriptor('control', scores.internal);
+  const reactPointLabel = arenaAxisPointDescriptor('reactivity', scores.emotional);
   [
-    { p: rr, c: '#2563eb', t: `Aggressive ${Math.round(scores.aggressive)}%` },
-    { p: rc, c: '#0f766e', t: `Active ${Math.round(scores.internal)}%` },
-    { p: re, c: '#dc2626', t: `Emotional ${Math.round(scores.emotional)}%` }
+    { p: rr, c: '#2563eb', t: `${riskPointLabel.label} ${riskPointLabel.value}%` },
+    { p: rc, c: '#0f766e', t: `${controlPointLabel.label} ${controlPointLabel.value}%` },
+    { p: re, c: '#dc2626', t: `${reactPointLabel.label} ${reactPointLabel.value}%` }
   ].forEach((n) => {
     ctx.save();
     ctx.shadowBlur = 10;
@@ -714,6 +748,120 @@ function showView(mode) {
   arenaResult?.classList.toggle('hidden', mode !== 'result');
 }
 
+function getArenaFeaturePageUrl() {
+  const url = new URL('./investotype-lab.html', window.location.href);
+  url.searchParams.set('v', ARENA_FEATURE_PAGE_BUILD);
+  return url.href;
+}
+
+function getArenaResultPageUrl() {
+  const url = new URL('./decision-arena-result.html', window.location.href);
+  url.searchParams.set('v', ARENA_RESULT_PAGE_BUILD);
+  return url.href;
+}
+
+function storeArenaResultState(state) {
+  try {
+    sessionStorage.setItem(ARENA_RESULT_STORAGE_KEY, JSON.stringify(state));
+  } catch (_error) {
+    return false;
+  }
+  return true;
+}
+
+function readStoredArenaResultState() {
+  try {
+    const raw = sessionStorage.getItem(ARENA_RESULT_STORAGE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch (_error) {
+    return null;
+  }
+}
+
+function renderArenaResultState(state) {
+  if (!state || !arenaResult) return;
+
+  arenaResult.dataset.resultTone = String(state.toneClass || 'balanced');
+  if (arenaTypeLabel) arenaTypeLabel.textContent = String(state.profileLabel || '-');
+  if (arenaTypeSummary) arenaTypeSummary.textContent = String(state.summaryText || '-');
+  if (arenaTypeBadge) {
+    arenaTypeBadge.className = `investor-type-badge ${String(state.toneClass || 'balanced')}`;
+    arenaTypeBadge.textContent = resolveArenaBadgeText(state.badgeText, state.identity);
+  }
+  if (arenaResultMoodline) {
+    const highlights = Array.isArray(state.highlights) ? state.highlights : [];
+    const leadSignal = highlights[0]?.value ? `${highlights[0].label} ${highlights[0].value}` : 'Process signal pending';
+    arenaResultMoodline.textContent =
+      `${String(state.profileLabel || 'Arena profile')} came from live pressure, repeated choices, and tempo. ` +
+      `${leadSignal} anchored the final readout.`;
+  }
+  if (arenaResultMonogram) arenaResultMonogram.textContent = makeArenaMonogram(state.profileLabel, 'DA');
+  if (arenaResultSignalTag) {
+    const highlights = Array.isArray(state.highlights) ? state.highlights : [];
+    arenaResultSignalTag.textContent = String(highlights[1]?.value || highlights[0]?.value || 'Arena Result');
+  }
+  if (arenaAxisSummary) arenaAxisSummary.textContent = String(state.axisSummaryText || '-');
+
+  if (arenaAxisBars) {
+    const identity = state.identity || {};
+    const scores = state.scores || {};
+    arenaAxisBars.innerHTML = [
+      axisRow('Risk Appetite', scores.risk, 'Conservative', 'Aggressive'),
+      axisRow('Control Preference', scores.control, 'Delegated', 'Hands-on'),
+      axisRow('Emotional Reactivity', scores.react, 'Composed', 'Reactive')
+    ].join('');
+    if (arenaTypeBadge && !String(state.badgeText || '').trim()) {
+      arenaTypeBadge.textContent = formatArenaIdentityMix(identity);
+    }
+  }
+
+  setArenaAxis3dScores(state.scores || {});
+
+  if (arenaInsights) {
+    arenaInsights.innerHTML = (Array.isArray(state.highlights) ? state.highlights : [])
+      .map((item) => renderArenaHighlightCard(item?.label, item?.value, item?.tone || ''))
+      .join('');
+  }
+  if (arenaBehaviorList) arenaBehaviorList.innerHTML = listHtml(state.behaviorItems || []);
+  if (arenaStrengthList) arenaStrengthList.innerHTML = listHtml(state.strengthItems || []);
+  if (arenaRiskList) arenaRiskList.innerHTML = listHtml(state.riskItems || []);
+  if (arenaPlanList) arenaPlanList.innerHTML = listHtml(state.planItems || []);
+
+  if (arenaRoundLog) {
+    const rounds = Array.isArray(state.rounds) ? state.rounds : [];
+    arenaRoundLog.innerHTML = `
+      <h4>Round Replay</h4>
+      <div class="decision-arena-log-list">
+        ${rounds
+          .map(
+            (pick, idx) => `
+              <div class="decision-arena-log-item">
+                <strong>R${idx + 1}: ${escapeHtml(pick?.scenario || '-')}</strong>
+                <span>${escapeHtml(pick?.choice || '-')}</span>
+                <small>Tempo ${escapeHtml(pick?.tempo || '-')} | Confidence ${escapeHtml(pick?.confidence || '-')}</small>
+              </div>
+            `
+          )
+          .join('')}
+      </div>
+    `;
+  }
+
+  latestArenaSharePayload = state.sharePayload || null;
+  showView('result');
+}
+
+function restoreStandaloneArenaResultPage() {
+  if (!isStandaloneArenaResultPage) return;
+  const stored = readStoredArenaResultState();
+  if (!stored) {
+    window.location.replace(getArenaFeaturePageUrl());
+    return;
+  }
+  renderArenaResultState(stored);
+}
+
 function stopTimer() {
   if (timerId) {
     clearInterval(timerId);
@@ -731,6 +879,79 @@ function speedToTempo(speed) {
   if (speed >= 0.52) return 'Fast';
   if (speed >= 0.32) return 'Balanced';
   return 'Deliberate';
+}
+
+function getArenaAxisIdentity(scores) {
+  const riskPct = Math.round(clamp01(scores?.risk) * 100);
+  const controlPct = Math.round(clamp01(scores?.control) * 100);
+  const reactPct = Math.round(clamp01(scores?.react) * 100);
+  return {
+    riskPct,
+    controlPct,
+    reactPct,
+    code: `${riskPct >= 50 ? 'A' : 'C'}-${controlPct >= 50 ? 'I' : 'E'}-${reactPct >= 50 ? 'E' : 'R'}`,
+    riskLabel: riskPct >= 50 ? 'Aggressive' : 'Conservative',
+    controlLabel: controlPct >= 50 ? 'Active' : 'Passive',
+    reactLabel: reactPct >= 50 ? 'Emotional' : 'Rational'
+  };
+}
+
+function formatArenaIdentityMix(identity, separator = ' / ') {
+  return [
+    String(identity?.riskLabel || 'Conservative'),
+    String(identity?.controlLabel || 'Passive'),
+    String(identity?.reactLabel || 'Rational')
+  ].join(separator);
+}
+
+function makeArenaMonogram(text, fallback = 'DA') {
+  const letters = String(text || '')
+    .toUpperCase()
+    .replace(/[^A-Z0-9 ]+/g, ' ')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join('');
+  return letters || fallback;
+}
+
+function resolveArenaBadgeText(badgeText, identity) {
+  const raw = String(badgeText || '').trim();
+  if (raw && !/^[ACEIR](?:\s*-\s*[ACEIR]){2}\s+Profile$/i.test(raw)) return raw;
+  const formatted = formatArenaIdentityMix(identity);
+  return formatted || raw || 'Investor Profile';
+}
+
+function getArenaToneClass(identity) {
+  if (!identity) return 'balanced';
+  if (identity.riskPct >= 68 || identity.reactPct >= 68) return 'bold';
+  if (identity.riskPct <= 38 && identity.reactPct <= 42) return 'calm';
+  return 'balanced';
+}
+
+function buildArenaResultSummary(profile, identity, markers = {}) {
+  const consistencyPct = Math.round(clamp01(markers.consistency) * 100);
+  const disciplinePct = Math.round(clamp01(markers.disciplineRate) * 100);
+  const avgConfidence = Number.isFinite(markers.avgConfidence) ? markers.avgConfidence.toFixed(1) : '3.0';
+  return (
+    `${profile.summary} Your decisions leaned ${identity.riskLabel.toLowerCase()} on risk, ` +
+    `${identity.controlLabel.toLowerCase()} on control, and ${identity.reactLabel.toLowerCase()} on reactivity, ` +
+    `with ${speedToTempo(markers.avgSpeed).toLowerCase()} decision tempo overall. ` +
+    `Across the arena, you stayed ${consistencyPct}% consistent with a ${disciplinePct}% discipline rate ` +
+    `and ${avgConfidence}/5 average confidence, so this result reflects both your preferred style and how steadily you held it under pressure.`
+  );
+}
+
+function renderArenaHighlightCard(label, value, tone = '') {
+  const toneClass = tone ? ` ${tone}` : '';
+  return `
+    <article class="result-highlight${toneClass}">
+      <small>${escapeHtml(label)}</small>
+      <strong>${escapeHtml(value)}</strong>
+    </article>
+  `;
 }
 
 function updateLiveSignals(speed = null) {
@@ -1045,6 +1266,7 @@ function renderResult() {
 
   const markers = { avgSpeed, avgConfidence, disciplineRate, impulseRate, consistency };
   const profile = getProfile(scores, markers);
+  const identity = getArenaAxisIdentity(scores);
   arenaLastScores = scores;
   const behaviorItems = buildBehaviorNarrative(scores, markers);
   const strengthItems = buildStrengthSignals(scores, markers);
@@ -1052,11 +1274,26 @@ function renderResult() {
   const planItems = buildActionPlan(profile, scores, markers);
 
   if (arenaTypeLabel) arenaTypeLabel.textContent = profile.label;
-  if (arenaTypeSummary) arenaTypeSummary.textContent = profile.summary;
+  const summaryText = buildArenaResultSummary(profile, identity, markers);
+  if (arenaTypeSummary) {
+    arenaTypeSummary.textContent = summaryText;
+  }
+  if (arenaTypeBadge) {
+    arenaTypeBadge.className = `investor-type-badge ${getArenaToneClass(identity)}`;
+    arenaTypeBadge.textContent = formatArenaIdentityMix(identity);
+  }
+  if (arenaResult) arenaResult.dataset.resultTone = getArenaToneClass(identity);
+  if (arenaResultMoodline) {
+    arenaResultMoodline.textContent =
+      `${profile.label} emerged from live pressure and repeated tradeoff decisions. ` +
+      `${Math.round(consistency * 100)}% consistency and ${speedToTempo(avgSpeed).toLowerCase()} tempo shaped the readout.`;
+  }
+  if (arenaResultMonogram) arenaResultMonogram.textContent = makeArenaMonogram(profile.label, 'DA');
+  if (arenaResultSignalTag) arenaResultSignalTag.textContent = speedToTempo(avgSpeed);
   if (arenaAxisSummary) {
-    arenaAxisSummary.textContent = `Risk ${Math.round(scores.risk * 100)}, Control ${Math.round(
-      scores.control * 100
-    )}, Reactivity ${Math.round(scores.react * 100)}. Drag the 3D widget to inspect your position.`;
+    arenaAxisSummary.textContent =
+      `Risk ${identity.riskPct}, Control ${identity.controlPct}, Reactivity ${identity.reactPct}. ` +
+      `Drag the 3D widget to inspect your point, then use the replay and action plan below to tighten your process.`;
   }
 
   if (arenaAxisBars) {
@@ -1069,15 +1306,13 @@ function renderResult() {
   setArenaAxis3dScores(scores);
 
   if (arenaInsights) {
-    arenaInsights.innerHTML = `
-      <div class="decision-arena-insight-grid">
-        <div class="decision-arena-insight-card"><small>Consistency</small><strong>${Math.round(consistency * 100)}%</strong></div>
-        <div class="decision-arena-insight-card"><small>Discipline Rate</small><strong>${Math.round(disciplineRate * 100)}%</strong></div>
-        <div class="decision-arena-insight-card"><small>Impulse Rate</small><strong>${Math.round(impulseRate * 100)}%</strong></div>
-        <div class="decision-arena-insight-card"><small>Avg Confidence</small><strong>${avgConfidence.toFixed(1)}/5</strong></div>
-        <div class="decision-arena-insight-card"><small>Decision Tempo</small><strong>${speedToTempo(avgSpeed)}</strong></div>
-      </div>
-    `;
+    arenaInsights.innerHTML = [
+      renderArenaHighlightCard('Consistency', `${Math.round(consistency * 100)}%`, consistency >= 0.72 ? 'up' : ''),
+      renderArenaHighlightCard('Discipline Rate', `${Math.round(disciplineRate * 100)}%`, disciplineRate >= 0.65 ? 'up' : ''),
+      renderArenaHighlightCard('Impulse Rate', `${Math.round(impulseRate * 100)}%`, impulseRate >= 0.35 ? 'down' : ''),
+      renderArenaHighlightCard('Avg Confidence', `${avgConfidence.toFixed(1)}/5`),
+      renderArenaHighlightCard('Decision Tempo', speedToTempo(avgSpeed))
+    ].join('');
   }
 
   if (arenaBehaviorList) arenaBehaviorList.innerHTML = listHtml(behaviorItems);
@@ -1104,7 +1339,71 @@ function renderResult() {
     `;
   }
 
-  showView('result');
+  latestArenaSharePayload = {
+    eyebrow: 'Decision Arena Result',
+    title: profile.label,
+    badge: formatArenaIdentityMix(identity),
+    summary:
+      `${profile.summary} Risk ${identity.riskPct}%, Control ${identity.controlPct}%, Reactivity ${identity.reactPct}% ` +
+      `with ${speedToTempo(avgSpeed).toLowerCase()} tempo and ${Math.round(consistency * 100)}% consistency.`,
+    axisScores: {
+      riskAggressive: identity.riskPct,
+      controlInternal: identity.controlPct,
+      reactivityEmotional: identity.reactPct
+    },
+    highlights: [
+      { label: 'Consistency', value: `${Math.round(consistency * 100)}%` },
+      { label: 'Discipline Rate', value: `${Math.round(disciplineRate * 100)}%` },
+      { label: 'Impulse Rate', value: `${Math.round(impulseRate * 100)}%` },
+      { label: 'Decision Tempo', value: speedToTempo(avgSpeed) }
+    ],
+    bestFit: {
+      title: 'Action Focus',
+      name: planItems[0] || 'Refine your decision process',
+      reason: riskItems[0] || strengthItems[0] || 'Use the round replay and axis readout to tighten your process.'
+    },
+    sections: [
+      { title: 'Action Plan', items: planItems.slice(0, 3) },
+      { title: 'Risk Signals', items: riskItems.slice(0, 3) }
+    ],
+    fileBase: 'investolab-decision-arena',
+    link: window.location.href
+  };
+
+  const arenaResultState = {
+    profileLabel: profile.label,
+    summaryText,
+    badgeText: formatArenaIdentityMix(identity),
+    toneClass: getArenaToneClass(identity),
+    axisSummaryText:
+      `Risk ${identity.riskPct}, Control ${identity.controlPct}, Reactivity ${identity.reactPct}. ` +
+      `Drag the 3D widget to inspect your point, then use the replay and action plan below to tighten your process.`,
+    scores,
+    identity,
+    highlights: [
+      { label: 'Consistency', value: `${Math.round(consistency * 100)}%`, tone: consistency >= 0.72 ? 'up' : '' },
+      { label: 'Discipline Rate', value: `${Math.round(disciplineRate * 100)}%`, tone: disciplineRate >= 0.65 ? 'up' : '' },
+      { label: 'Impulse Rate', value: `${Math.round(impulseRate * 100)}%`, tone: impulseRate >= 0.35 ? 'down' : '' },
+      { label: 'Avg Confidence', value: `${avgConfidence.toFixed(1)}/5`, tone: '' },
+      { label: 'Decision Tempo', value: speedToTempo(avgSpeed), tone: '' }
+    ],
+    behaviorItems,
+    strengthItems,
+    riskItems,
+    planItems,
+    rounds: picks.map((pick) => ({
+      scenario: pick.scenario,
+      choice: pick.choice,
+      tempo: speedToTempo(pick.speed),
+      confidence: `${pick.confidence}/5`
+    })),
+    sharePayload: latestArenaSharePayload
+  };
+  if (storeArenaResultState(arenaResultState)) {
+    window.location.href = getArenaResultPageUrl();
+    return;
+  }
+  window.alert('Unable to open the Decision Arena result page right now. Please allow session storage and try again.');
 }
 
 async function goNextRound() {
@@ -1120,6 +1419,7 @@ async function resetArena(withStartTransition = false) {
   stopTimer();
   currentScenarios = buildScenarioSet();
   arenaLastScores = null;
+  latestArenaSharePayload = null;
   arenaAxis3dState.rotX = -22;
   arenaAxis3dState.rotY = 28;
   hideArenaAxis3dHover();
@@ -1150,9 +1450,20 @@ async function resetArena(withStartTransition = false) {
   renderRound();
 }
 
+function getArenaSharePayload() {
+  if (!latestArenaSharePayload) throw new Error('Finish the arena first to share your result.');
+  return latestArenaSharePayload;
+}
+
 arenaConfidence?.addEventListener('input', updateConfidenceLabel);
 arenaStartBtn?.addEventListener('click', () => resetArena(true));
-arenaRestartBtn?.addEventListener('click', () => resetArena(false));
+arenaRestartBtn?.addEventListener('click', () => {
+  if (isStandaloneArenaResultPage) {
+    window.location.href = getArenaFeaturePageUrl();
+    return;
+  }
+  resetArena(false);
+});
 arenaNextBtn?.addEventListener('click', () => commitRound(false));
 
 window.addEventListener('keydown', (event) => {
@@ -1176,3 +1487,14 @@ renderArenaAxis3dGraph();
 window.addEventListener('resize', () => {
   renderArenaAxis3dGraph();
 });
+restoreStandaloneArenaResultPage();
+
+if (window.InvestoTypeShare) {
+  window.InvestoTypeShare.attach({
+    trigger: arenaShareResultBtn,
+    menu: arenaShareResultMenu,
+    copyLinkBtn: arenaShareResultLinkBtn,
+    imageBtn: arenaShareResultImageBtn,
+    getPayload: getArenaSharePayload
+  });
+}

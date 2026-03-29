@@ -1,19 +1,10 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-816ETP25SD"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-816ETP25SD');
-  </script>
-  <meta charset="UTF-8" />
+<meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>InvestoLab - Tailored Portfolio Builder</title>
-  <link rel="stylesheet" href="styles.css?v=20260318p" />
+  <link rel="stylesheet" href="styles.css?v=20260329e" />
   <script src="nav.js?v=20260318a" defer></script>
   <script src="config.js?v=20260227a" defer></script>
   <script src="api-base.js?v=20260318e" defer></script>
@@ -132,21 +123,43 @@
       </form>
       <p id="investotypeBuilderStatus" class="asset-help hidden">Pick a mode and generate your AI portfolio.</p>
 
-      <div id="investotypeBuilderResult" class="investotype-builder-result hidden">
-        <div class="result-hero">
-          <div class="result-hero-main">
-            <p class="result-eyebrow">AI Draft</p>
+      <div id="investotypeBuilderResult" class="investotype-builder-result investor-panel quiz-result-panel investotype-end-panel hidden" data-result-tone="balanced">
+        <div class="investor-hero quiz-result-hero">
+          <div class="quiz-result-hero-copy">
+            <p class="investor-eyebrow">Tailored Portfolio</p>
             <h3 id="builderTypeTitle">Portfolio Profile</h3>
-            <p id="builderTypeMeta" class="result-subline">Profile details will appear here.</p>
+            <p id="builderTypeMeta" class="investor-summary">Profile details will appear here.</p>
+            <div id="builderTypeBadge" class="investor-type-badge">Draft Pending</div>
+            <p id="builderResultMoodline" class="quiz-result-moodline">Generate a draft to reveal the same InvestoType finish system used across quiz and arena results.</p>
+          </div>
+          <div class="quiz-result-hero-visual" aria-hidden="true">
+            <div class="quiz-result-signal-core investotype-signal-core">
+              <span class="quiz-result-orbit orbit-a"></span>
+              <span class="quiz-result-orbit orbit-b"></span>
+              <span class="quiz-result-orbit orbit-c"></span>
+              <div id="builderResultMonogram" class="quiz-result-monogram">PF</div>
+              <span id="builderResultSignalTag" class="quiz-result-signal-tag">Draft Pending</span>
+            </div>
+            <p class="investotype-hero-note">Allocation, axis mix, and ticker ideas now surface in the same result language as the rest of InvestoType.</p>
           </div>
         </div>
 
+        <div class="quiz-result-topline investotype-result-topline-simple">
+          <div id="builderHighlights" class="result-highlights investotype-result-highlights"></div>
+        </div>
+
+        <section class="chart-card investor-axis-combined" data-result-group="signal" data-result-group-label="Signal">
+          <h4>3-Axis Profile Snapshot</h4>
+          <p id="builderAxisSummary" class="investor-axis-summary">Generate a draft to see how the axis scores shaped the portfolio.</p>
+          <div id="builderAxisResultChips" class="investor-axis-chips"></div>
+        </section>
+
         <div class="investor-grid">
-          <section class="chart-card investor-card investor-span-6">
+          <section class="chart-card investor-card investor-span-6" data-result-group="strategy" data-result-group-label="Strategy">
             <h4>Asset Allocation</h4>
             <ul id="builderAllocationList" class="investor-list"></ul>
           </section>
-          <section class="chart-card investor-card investor-span-6">
+          <section class="chart-card investor-card investor-span-6" data-result-group="strategy" data-result-group-label="Strategy">
             <h4>Sample Ticker Mix</h4>
             <div class="valuation-table-wrap">
               <table class="valuation-table">
@@ -162,21 +175,29 @@
               </table>
             </div>
           </section>
-          <section class="chart-card investor-card investor-span-12">
+          <section class="chart-card investor-card investor-span-12" data-result-group="identity" data-result-group-label="Rationale">
             <h4>AI Rationale</h4>
             <ul id="builderRationaleList" class="investor-list"></ul>
           </section>
+        </div>
+
+        <div class="row investor-actions-row investotype-builder-actions">
+          <button id="builderShareResultBtn" type="button" class="ghost share-result-trigger">Share Result</button>
+          <div id="builderShareResultMenu" class="share-result-menu hidden">
+            <button id="builderShareResultLinkBtn" type="button" class="ghost">Copy Share Link</button>
+            <button id="builderShareResultImageBtn" type="button" class="ghost">Share Image</button>
+          </div>
         </div>
       </div>
     </section>
   </main>
 
   <footer>
-    <a class="footer-contact-btn" href="mailto:tgrkhwang@gmail.com" aria-label="Contact by email">Contact</a>
     Copyright (c) 2026 InvestoLab. All rights reserved.
   </footer>
 
-  <script src="investotype.js?v=20260227a1" defer></script>
+  <script src="investotype-share.js?v=20260329b" defer></script>
+  <script src="investotype.js?v=20260329b" defer></script>
 </body>
 </html>
 

@@ -15,6 +15,13 @@ const reactValue = document.getElementById('builderReactValue');
 
 const typeTitle = document.getElementById('builderTypeTitle');
 const typeMeta = document.getElementById('builderTypeMeta');
+const builderTypeBadge = document.getElementById('builderTypeBadge');
+const builderResultMoodline = document.getElementById('builderResultMoodline');
+const builderResultMonogram = document.getElementById('builderResultMonogram');
+const builderResultSignalTag = document.getElementById('builderResultSignalTag');
+const builderHighlights = document.getElementById('builderHighlights');
+const builderAxisSummary = document.getElementById('builderAxisSummary');
+const builderAxisResultChips = document.getElementById('builderAxisResultChips');
 const axisCode = document.getElementById('builderAxisCode');
 const allocationList = document.getElementById('builderAllocationList');
 const tickerList = document.getElementById('builderTickerList');
@@ -24,6 +31,10 @@ const builderCubeCode = document.getElementById('builderCubeCode');
 const cubeStage = document.getElementById('builderAxis3dStage');
 const cubeCanvas = document.getElementById('builderAxis3dCanvas');
 const cubeHoverTip = document.getElementById('builderAxis3dHoverTip');
+const builderShareResultBtn = document.getElementById('builderShareResultBtn');
+const builderShareResultMenu = document.getElementById('builderShareResultMenu');
+const builderShareResultLinkBtn = document.getElementById('builderShareResultLinkBtn');
+const builderShareResultImageBtn = document.getElementById('builderShareResultImageBtn');
 
 const SYMBOL_FULL_NAMES = {
   'QQQ': 'Invesco QQQ Trust',
@@ -71,6 +82,8 @@ const cubeState = {
   }
 };
 
+let latestBuilderResult = null;
+
 function clamp(v, lo, hi) {
   return Math.max(lo, Math.min(hi, Number(v || 0)));
 }
@@ -82,6 +95,94 @@ function escapeHtml(text) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
+}
+
+function fmtPct(v, digits = 1) {
+  return `${Number(v || 0).toFixed(digits)}%`;
+}
+
+function getAxisIdentity(scores) {
+  const risk = clamp(scores?.riskAggressive, 0, 100);
+  const control = clamp(scores?.controlInternal, 0, 100);
+  const react = clamp(scores?.reactivityEmotional, 0, 100);
+  return {
+    risk,
+    control,
+    react,
+    code: `${risk >= 50 ? 'A' : 'C'}-${control >= 50 ? 'I' : 'E'}-${react >= 50 ? 'E' : 'R'}`,
+    riskLabel: risk >= 50 ? 'Aggressive' : 'Conservative',
+    controlLabel: control >= 50 ? 'Active' : 'Passive',
+    reactLabel: react >= 50 ? 'Emotional' : 'Rational'
+  };
+}
+
+function formatIdentityMix(identity, separator = ' / ') {
+  return [
+    String(identity?.riskLabel || 'Conservative'),
+    String(identity?.controlLabel || 'Passive'),
+    String(identity?.reactLabel || 'Rational')
+  ].join(separator);
+}
+
+function makeMonogram(text, fallback = 'PF') {
+  const letters = String(text || '')
+    .toUpperCase()
+    .replace(/[^A-Z0-9 ]+/g, ' ')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join('');
+  return letters || fallback;
+}
+
+function getToneClass(identity) {
+  if (!identity) return 'balanced';
+  if (identity.risk >= 68 || identity.react >= 68) return 'bold';
+  if (identity.risk <= 38 && identity.react <= 42) return 'calm';
+  return 'balanced';
+}
+
+function sumBucketWeights(rows, names) {
+  const wanted = new Set((Array.isArray(names) ? names : [names]).map((name) => String(name || '').toLowerCase()));
+  return (Array.isArray(rows) ? rows : []).reduce((sum, row) => {
+    const bucket = String(row?.bucket || '').toLowerCase();
+    return wanted.has(bucket) ? sum + Number(row?.weight || 0) : sum;
+  }, 0);
+}
+
+function getTopBucket(rows) {
+  return [...(Array.isArray(rows) ? rows : [])]
+    .sort((a, b) => Number(b?.weight || 0) - Number(a?.weight || 0))[0] || null;
+}
+
+function renderHighlightCard(label, value, tone = '') {
+  const toneClass = tone ? ` ${tone}` : '';
+  return `
+    <article class="result-highlight${toneClass}">
+      <small>${escapeHtml(label)}</small>
+      <strong>${escapeHtml(value)}</strong>
+    </article>
+  `;
+}
+
+function renderAxisChip(title, leftLabel, rightLabel, scorePct, detail) {
+  const pct = clamp(scorePct, 0, 100);
+  return `
+    <article class="investor-axis-chip">
+      <strong>${escapeHtml(title)}: ${Math.round(pct)}%</strong>
+      <span class="axis-chip-note">${escapeHtml(detail)}</span>
+      <div class="axis-chip-bar">
+        <span>${escapeHtml(leftLabel)}</span>
+        <div class="axis-chip-track">
+          <span class="axis-chip-you" style="left:${pct}%;">YOU</span>
+          <span class="axis-chip-dot" style="left:${pct}%;"></span>
+        </div>
+        <span>${escapeHtml(rightLabel)}</span>
+      </div>
+    </article>
+  `;
 }
 
 function setModeView() {
@@ -117,24 +218,151 @@ function syncAxisLabels() {
 function renderList(target, rows) {
   if (!target) return;
   const list = Array.isArray(rows) ? rows : [];
-  target.innerHTML = list.map((line) => `<li>${line}</li>`).join('');
+  target.innerHTML = list.map((line) => `<li>${escapeHtml(line)}</li>`).join('');
+}
+
+function renderBuilderHighlights(payload, identity) {
+  if (!builderHighlights) return;
+  const allocation = Array.isArray(payload?.allocation) ? payload.allocation : [];
+  const tickerRows = Array.isArray(payload?.tickerMix) ? payload.tickerMix : [];
+  const topBucket = getTopBucket(allocation);
+  const equityWeight = sumBucketWeights(allocation, ['US Equity', 'International Equity']);
+  const bondWeight = sumBucketWeights(allocation, 'Bonds');
+  const cashWeight = sumBucketWeights(allocation, 'Cash');
+  builderHighlights.innerHTML = [
+    renderHighlightCard('Axis Mix', formatIdentityMix(identity), getToneClass(identity)),
+    renderHighlightCard('Primary Allocation', topBucket ? `${topBucket.bucket} ${fmtPct(topBucket.weight, 1)}` : 'Draft pending'),
+    renderHighlightCard('Equity / Bonds', `${fmtPct(equityWeight, 0)} | ${fmtPct(bondWeight, 0)}`),
+    renderHighlightCard('Cash / Tickers', `${fmtPct(cashWeight, 0)} | ${tickerRows.length} names`)
+  ].join('');
+}
+
+function renderBuilderAxisSnapshot(payload, identity) {
+  if (builderAxisSummary) {
+    builderAxisSummary.textContent =
+      `This draft uses the same InvestoType axes as the quiz and simulator. ` +
+      `${identity.riskLabel} risk tilts the mix toward or away from equity, ${identity.controlLabel.toLowerCase()} control changes how tactical the sleeves are, ` +
+      `and ${identity.reactLabel.toLowerCase()} reactivity adjusts cash and hedging.`;
+  }
+  if (builderAxisResultChips) {
+    builderAxisResultChips.innerHTML = [
+      renderAxisChip(
+        'Risk Axis',
+        'Conservative',
+        'Aggressive',
+        identity.risk,
+        identity.risk >= 50
+          ? 'Higher risk score keeps more capital in equities and satellite ideas.'
+          : 'Lower risk score adds more ballast through bonds and cash.'
+      ),
+      renderAxisChip(
+        'Control Axis',
+        'Passive',
+        'Active',
+        identity.control,
+        identity.control >= 50
+          ? 'Higher control score keeps a more hands-on, tactical mix.'
+          : 'Lower control score leans more toward simpler passive structure.'
+      ),
+      renderAxisChip(
+        'Reactivity Axis',
+        'Rational',
+        'Emotional',
+        identity.react,
+        identity.react >= 50
+          ? 'Higher reactivity adds liquidity or hedges to soften volatility pressure.'
+          : 'Lower reactivity keeps the draft more steadily invested.'
+      )
+    ].join('');
+  }
+  if (axisCode) axisCode.textContent = formatIdentityMix(identity, ' | ');
+  if (builderCubeCode) builderCubeCode.textContent = formatIdentityMix(identity, ' | ');
+}
+
+function buildBuilderSummary(payload, identity) {
+  const allocation = Array.isArray(payload?.allocation) ? payload.allocation : [];
+  const equityWeight = sumBucketWeights(allocation, ['US Equity', 'International Equity']);
+  const bondWeight = sumBucketWeights(allocation, 'Bonds');
+  const cashWeight = sumBucketWeights(allocation, 'Cash');
+  const altWeight = sumBucketWeights(allocation, 'Alternatives');
+  return (
+    `${String(payload?.profile?.label || 'This draft')} aligns with the ${identity.riskLabel} / ` +
+    `${identity.controlLabel} / ${identity.reactLabel} profile pattern. ` +
+    `Current mix: ${fmtPct(equityWeight, 0)} equity, ${fmtPct(bondWeight, 0)} bonds, ` +
+    `${fmtPct(cashWeight, 0)} cash, and ${fmtPct(altWeight, 0)} alternatives.`
+  );
+}
+
+function getBuilderSharePayload() {
+  if (!latestBuilderResult) throw new Error('Generate a result first to share it.');
+  const payload = latestBuilderResult;
+  const identity = getAxisIdentity(payload.axisScores);
+  const allocation = [...(Array.isArray(payload?.allocation) ? payload.allocation : [])].sort(
+    (a, b) => Number(b?.weight || 0) - Number(a?.weight || 0)
+  );
+  const tickerRows = [...(Array.isArray(payload?.tickerMix) ? payload.tickerMix : [])].sort(
+    (a, b) => Number(b?.weight || 0) - Number(a?.weight || 0)
+  );
+  const equityWeight = sumBucketWeights(allocation, ['US Equity', 'International Equity']);
+  const bondWeight = sumBucketWeights(allocation, 'Bonds');
+  const cashWeight = sumBucketWeights(allocation, 'Cash');
+  return {
+    eyebrow: 'Tailored Portfolio Draft',
+    title: String(typeTitle?.textContent || payload?.profile?.label || 'Portfolio Draft'),
+    badge: formatIdentityMix(identity),
+    summary: String(typeMeta?.textContent || buildBuilderSummary(payload, identity)),
+    axisScores: payload.axisScores,
+    highlights: [
+      { label: 'Axis Mix', value: formatIdentityMix(identity) },
+      { label: 'Equity / Bonds', value: `${fmtPct(equityWeight, 0)} | ${fmtPct(bondWeight, 0)}` },
+      { label: 'Cash Buffer', value: fmtPct(cashWeight, 0) },
+      { label: 'Ticker Mix', value: `${tickerRows.length} sample holdings` }
+    ],
+    sections: [
+      {
+        title: 'Allocation Plan',
+        items: allocation.slice(0, 3).map((row) => `${row.bucket}: ${fmtPct(row.weight, 1)}`)
+      },
+      {
+        title: 'AI Rationale',
+        items: (Array.isArray(payload?.rationale) ? payload.rationale : []).slice(0, 3)
+      }
+    ],
+    fileBase: 'investolab-tailored-portfolio',
+    link: window.location.href
+  };
 }
 
 function renderResult(payload) {
   if (!payload) return;
-  if (typeTitle) typeTitle.textContent = String(payload?.profile?.label || 'Portfolio Profile');
-  if (typeMeta) {
-    const risk = Number(payload?.axisScores?.riskAggressive || 0).toFixed(1);
-    const control = Number(payload?.axisScores?.controlInternal || 0).toFixed(1);
-    const react = Number(payload?.axisScores?.reactivityEmotional || 0).toFixed(1);
-    typeMeta.textContent = `Risk ${risk}% | Control ${control}% | Reactivity ${react}%`;
+  latestBuilderResult = payload;
+  const identity = getAxisIdentity(payload?.axisScores || {});
+  const toneClass = getToneClass(identity);
+  const profileLabel = String(payload?.profile?.label || 'Portfolio Profile');
+  const topBucket = getTopBucket(payload?.allocation || []);
+  if (typeTitle) typeTitle.textContent = `${String(payload?.profile?.label || 'Portfolio Profile')} Draft`;
+  if (typeMeta) typeMeta.textContent = buildBuilderSummary(payload, identity);
+  if (builderTypeBadge) {
+    builderTypeBadge.className = `investor-type-badge ${toneClass}`;
+    builderTypeBadge.textContent = formatIdentityMix(identity);
   }
-  if (axisCode) axisCode.textContent = '';
+  if (resultEl) resultEl.dataset.resultTone = toneClass;
+  if (builderResultMoodline) {
+    builderResultMoodline.textContent =
+      `${profileLabel} now resolves into a tailored portfolio draft with ${formatIdentityMix(identity).toLowerCase()} behavior. ` +
+      `${topBucket ? `${topBucket.bucket} leads the mix at ${fmtPct(topBucket.weight, 1)}.` : 'Generate a draft to surface the lead allocation.'}`;
+  }
+  if (builderResultMonogram) builderResultMonogram.textContent = makeMonogram(profileLabel, 'PF');
+  if (builderResultSignalTag) {
+    builderResultSignalTag.textContent = topBucket ? `${topBucket.bucket} lead` : 'Draft Pending';
+  }
 
   const allocationRows = (payload?.allocation || []).map((row) => `${row.bucket}: ${Number(row.weight || 0).toFixed(1)}%`);
   const tickerRows = Array.isArray(payload?.tickerMix) ? payload.tickerMix : [];
   const rationaleRows = payload?.rationale || [];
 
+  renderBuilderHighlights(payload, identity);
+  renderBuilderAxisSnapshot(payload, identity);
   renderList(allocationList, allocationRows);
   if (tickerTableBody) {
     tickerTableBody.innerHTML = tickerRows
@@ -493,3 +721,17 @@ setModeView();
 applyTypePreset(typeSelect?.value || 'passive_rational_allocator');
 statusEl?.classList.add('hidden');
 resultEl?.classList.add('hidden');
+
+if (window.InvestoTypeShare) {
+  window.InvestoTypeShare.attach({
+    trigger: builderShareResultBtn,
+    menu: builderShareResultMenu,
+    copyLinkBtn: builderShareResultLinkBtn,
+    imageBtn: builderShareResultImageBtn,
+    getPayload: getBuilderSharePayload,
+    onError: (message) => {
+      statusEl?.classList.remove('hidden');
+      if (statusEl) statusEl.textContent = message;
+    }
+  });
+}

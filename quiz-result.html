@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>InvestoLab - Quiz Result</title>
+  <link rel="stylesheet" href="styles.css?v=20260329e" />
+  <script src="nav.js?v=20260318a" defer></script>
+  <script src="config.js?v=20260227a" defer></script>
+  <script src="api-base.js?v=20260318e" defer></script>
+</head>
+<body data-page="quiz-result" data-share-source="./quiz.html">
+  <nav class="taskbar">
+    <a href="./index.html" class="brand">InvestoLab</a>
+    <div class="task-links">
+      <a href="./index.html">Overview</a>
+      <div class="nav-dropdown">
+        <a href="./valuation-lab.html" class="nav-dropdown-toggle">Valuation Lab</a>
+        <div class="nav-dropdown-menu">
+          <a href="./valuation-forecast.html">Prediction Lab</a>
+          <a href="./valuation.html">Investment Valuation</a>
+          <a href="./valuation-map.html">Investment Map</a>
+          <a href="./portfolio-builder.html">Portfolio Valuation</a>
+        </div>
+      </div>
+      <div class="nav-dropdown">
+        <a href="./investotype.html" class="nav-dropdown-toggle active" aria-current="page">InvestoType</a>
+        <div class="nav-dropdown-menu">
+          <a href="./investor-types.html">Types</a>
+          <a href="./quiz.html">Quiz</a>
+          <a href="./investotype-lab.html">Decision Arena</a>
+          <a href="./simulator.html">Simulation (Demo)</a>
+          <a href="./investotype-portfolio.html">Tailored Portfolio</a>
+        </div>
+      </div>
+      <div class="nav-dropdown">
+        <a href="./news.html" class="nav-dropdown-toggle">News</a>
+        <div class="nav-dropdown-menu">
+          <a href="./news-company-insight.html">Company Insight</a>
+          <a href="./news-market.html">Market</a>
+          <a href="./news-tailored.html">Tailored</a>
+        </div>
+      </div>
+      <a href="./about.html">About</a>
+    </div>
+  </nav>
+
+  <header class="hero quiz-hero">
+    <h1>InvestoType Quiz Result</h1>
+    <p>Your pressure-test readout now lives on its own reveal page.</p>
+  </header>
+
+  <main class="single-layout">
+    <section id="quizResultSection">
+      <div id="investorPanel" class="investor-panel quiz-result-panel investotype-end-panel">
+        <div class="investor-hero quiz-result-hero">
+          <div class="quiz-result-hero-copy">
+            <p class="investor-eyebrow">Quiz Result</p>
+            <h3 id="investorTypeTitle">You are a...</h3>
+            <p id="investorTypeSummary" class="investor-summary">Complete the quiz to generate your analysis.</p>
+            <div id="investorTypeBadge" class="investor-type-badge">Type Pending</div>
+            <p id="quizResultMoodline" class="quiz-result-moodline">Your result reveal will light up here after the quiz.</p>
+          </div>
+          <div class="quiz-result-hero-visual" aria-hidden="true">
+            <div class="quiz-result-signal-core">
+              <span class="quiz-result-orbit orbit-a"></span>
+              <span class="quiz-result-orbit orbit-b"></span>
+              <span class="quiz-result-orbit orbit-c"></span>
+              <div id="quizResultMonogram" class="quiz-result-monogram">IT</div>
+              <span id="quizResultSignalTag" class="quiz-result-signal-tag">Signal Pending</span>
+            </div>
+            <div id="quizResultAxisMini" class="quiz-result-axis-mini"></div>
+          </div>
+        </div>
+
+        <div class="quiz-result-topline">
+          <div id="quizResultSnapshot" class="quiz-result-snapshot"></div>
+          <div class="quiz-result-toolbar" role="toolbar" aria-label="Filter result sections">
+            <button type="button" class="quiz-result-filter active" data-result-filter="all" aria-pressed="true">All</button>
+            <button type="button" class="quiz-result-filter" data-result-filter="signal" aria-pressed="false">Signal</button>
+            <button type="button" class="quiz-result-filter" data-result-filter="strategy" aria-pressed="false">Strategy</button>
+            <button type="button" class="quiz-result-filter" data-result-filter="behavior" aria-pressed="false">Behavior</button>
+            <button type="button" class="quiz-result-filter" data-result-filter="identity" aria-pressed="false">Identity</button>
+            <button type="button" class="quiz-result-filter" data-result-filter="social" aria-pressed="false">Social</button>
+          </div>
+        </div>
+
+        <section class="chart-card investor-axis-combined" data-result-group="signal" data-result-group-label="Signal">
+          <h4>3-Axis Profile Breakdown</h4>
+          <p id="investorAxisSummary" class="investor-axis-summary">Your axis explanation will appear here after the quiz.</p>
+          <div class="investor-axis-layout">
+            <div class="investor-axis-left">
+              <div id="investorAxisChips" class="investor-axis-chips"></div>
+            </div>
+            <div class="investor-axis-right">
+              <div class="investor-cube-head">
+                <h4>Score Nebula</h4>
+                <span id="investorCubeCode" class="investor-cube-code">Conservative | Passive | Rational</span>
+              </div>
+              <div class="axis-score-list" aria-live="polite">
+                <div id="axisRiskScoreValue" class="axis-score-item">A 50% | C 50%</div>
+                <div id="axisControlScoreValue" class="axis-score-item">I 50% | E 50%</div>
+                <div id="axisReactivityScoreValue" class="axis-score-item">E 50% | R 50%</div>
+              </div>
+              <div id="axis3dStage" class="axis-3d-stage">
+                <canvas id="axis3dCanvas" width="560" height="360"></canvas>
+                <div id="axis3dHoverTip" class="axis-3d-hover hidden"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div class="investor-grid">
+          <section class="chart-card investor-card investor-card-lead investor-span-12" data-result-group="strategy" data-result-group-label="Strategy">
+            <h4>How To Invest Going Forward</h4>
+            <ul id="investorForwardList" class="investor-list"></ul>
+          </section>
+          <section class="chart-card investor-card investor-span-6" data-result-group="strategy" data-result-group-label="Strategy">
+            <h4>Recommended Portfolio Mix</h4>
+            <ul id="investorPortfolioMixList" class="investor-list"></ul>
+          </section>
+          <section class="chart-card investor-card investor-span-6" data-result-group="strategy" data-result-group-label="Strategy">
+            <h4>Best-Fit Investments</h4>
+            <ul id="investorBestFitList" class="investor-list"></ul>
+          </section>
+          <section class="chart-card investor-card investor-span-6" data-result-group="behavior" data-result-group-label="Behavior">
+            <h4>Your Investment Habits</h4>
+            <ul id="investorHabitsList" class="investor-list"></ul>
+          </section>
+          <section class="chart-card investor-card investor-span-6" data-result-group="behavior" data-result-group-label="Behavior">
+            <h4>Choices That Led Here</h4>
+            <ul id="investorWhyList" class="investor-list"></ul>
+          </section>
+          <section class="chart-card investor-card investor-span-6" data-result-group="identity" data-result-group-label="Identity">
+            <h4>Strengths</h4>
+            <ul id="investorStrengthsList" class="investor-list"></ul>
+          </section>
+          <section class="chart-card investor-card investor-span-6" data-result-group="identity" data-result-group-label="Identity">
+            <h4>Weaknesses</h4>
+            <ul id="investorWeaknessesList" class="investor-list"></ul>
+          </section>
+          <section class="chart-card investor-card investor-span-6" data-result-group="social" data-result-group-label="Social">
+            <h4>Likely MBTI Tendencies</h4>
+            <ul id="investorMbtiList" class="investor-list"></ul>
+          </section>
+          <section class="chart-card investor-card investor-span-6" data-result-group="social" data-result-group-label="Social">
+            <h4>Popular Investors With Similar Style</h4>
+            <div id="investorPopular" class="investor-alike"></div>
+          </section>
+        </div>
+
+        <div class="row investor-actions-row">
+          <button id="restartQuizBtn" type="button">Take Quiz Again</button>
+          <button id="shareResultBtn" type="button" class="ghost share-result-trigger">Share Result</button>
+          <div id="shareResultMenu" class="share-result-menu hidden">
+            <button id="shareResultLinkBtn" type="button" class="ghost">Copy Share Link</button>
+            <button id="shareResultImageBtn" type="button" class="ghost">Share Image</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Copyright (c) 2026 InvestoLab. All rights reserved.
+  </footer>
+
+  <script src="investotype-share.js?v=20260329b" defer></script>
+  <script src="simulator.js?v=20260329f" defer></script>
+</body>
+</html>

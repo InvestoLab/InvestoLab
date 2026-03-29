@@ -1,19 +1,10 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-816ETP25SD"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-816ETP25SD');
-  </script>
-  <meta charset="UTF-8" />
+<meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>InvestoLab - Decision Arena</title>
-  <link rel="stylesheet" href="styles.css?v=20260318p" />
+  <link rel="stylesheet" href="styles.css?v=20260329g" />
   <script src="nav.js?v=20260318a" defer></script>
   <script src="config.js?v=20260227a" defer></script>
   <script src="api-base.js?v=20260318e" defer></script>
@@ -101,64 +92,15 @@
         </div>
       </div>
 
-      <div id="arenaResult" class="decision-arena-result hidden">
-        <h3>Your Arena InvestoType</h3>
-        <p id="arenaTypeLabel" class="decision-arena-type">-</p>
-        <p id="arenaTypeSummary" class="decision-arena-summary">-</p>
-
-        <section class="chart-card investor-axis-combined decision-arena-axis-combined">
-          <h4>3-Axis Profile Breakdown</h4>
-          <p id="arenaAxisSummary" class="investor-axis-summary">Drag the widget to view your Risk, Control, and Reactivity profile.</p>
-          <div class="investor-axis-layout">
-            <div class="investor-axis-left">
-              <div id="arenaAxisBars" class="investor-axis-chips"></div>
-            </div>
-            <div class="investor-axis-right">
-              <div class="investor-cube-head">
-                <h4>Score Nebula</h4>
-              </div>
-              <div id="arenaAxis3dStage" class="axis-3d-stage">
-                <canvas id="arenaAxis3dCanvas" width="560" height="360"></canvas>
-                <div id="arenaAxis3dHover" class="axis-3d-hover hidden"></div>
-              </div>
-            </div>
-          </div>
-        </section>
-        <div id="arenaInsights" class="decision-arena-insights"></div>
-        <div class="decision-arena-result-grid">
-          <section class="decision-arena-result-card">
-            <h4>How You Decide</h4>
-            <ul id="arenaBehaviorList" class="investor-list"></ul>
-          </section>
-          <section class="decision-arena-result-card">
-            <h4>Strength Signals</h4>
-            <ul id="arenaStrengthList" class="investor-list"></ul>
-          </section>
-          <section class="decision-arena-result-card">
-            <h4>Risk Signals</h4>
-            <ul id="arenaRiskList" class="investor-list"></ul>
-          </section>
-          <section class="decision-arena-result-card">
-            <h4>Action Plan</h4>
-            <ul id="arenaPlanList" class="investor-list"></ul>
-          </section>
-        </div>
-        <div id="arenaRoundLog" class="decision-arena-log"></div>
-
-        <div class="decision-arena-result-actions">
-          <button id="arenaRestartBtn" type="button" class="ghost">Play Again</button>
-          <a class="cta-link" href="./investotype-portfolio.html">Open Tailored Portfolio</a>
-        </div>
-      </div>
     </section>
   </main>
 
   <footer>
-    <a class="footer-contact-btn" href="mailto:tgrkhwang@gmail.com" aria-label="Contact by email">Contact</a>
     Copyright (c) 2026 InvestoLab. All rights reserved.
   </footer>
 
-  <script src="investotype-lab.js?v=20260305v2" defer></script>
+  <script src="investotype-share.js?v=20260329b" defer></script>
+  <script src="investotype-lab.js?v=20260329d" defer></script>
 </body>
 </html>
 
