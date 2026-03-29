@@ -911,7 +911,7 @@ function ensureSharePreviewModal() {
       </div>
       <div class="share-preview-mode-row">
         <button type="button" class="ghost share-preview-mode-btn active" data-share-mode="square" aria-pressed="true">1:1</button>
-        <button type="button" class="ghost share-preview-mode-btn" data-share-mode="portrait" aria-pressed="false">9:18</button>
+        <button type="button" class="ghost share-preview-mode-btn" data-share-mode="portrait" aria-pressed="false">9:16</button>
       </div>
       <p class="share-preview-ratio" data-share-ratio>Aspect ratio: 1:1</p>
       <div class="share-preview-frame">
@@ -973,14 +973,14 @@ function renderSharePreview(mode = 'square') {
   });
   const canvas = buildResultShareCanvas(sharePreviewMode);
   sharePreviewDataUrl = canvas.toDataURL('image/png');
-  const suffix = sharePreviewMode === 'portrait' ? '9x18' : '1x1';
+  const suffix = sharePreviewMode === 'portrait' ? '9x16' : '1x1';
   sharePreviewFileName = `investolab-result-${suffix}.png`;
   if (sharePreviewImage) sharePreviewImage.src = sharePreviewDataUrl;
   if (sharePreviewRatio) {
-    sharePreviewRatio.textContent = sharePreviewMode === 'portrait' ? 'Aspect ratio: 9:18' : 'Aspect ratio: 1:1';
+    sharePreviewRatio.textContent = sharePreviewMode === 'portrait' ? 'Aspect ratio: 9:16' : 'Aspect ratio: 1:1';
   }
   if (sharePreviewDownloadBtn) {
-    sharePreviewDownloadBtn.textContent = sharePreviewMode === 'portrait' ? 'Download 9:18 Image' : 'Download 1:1 Image';
+    sharePreviewDownloadBtn.textContent = sharePreviewMode === 'portrait' ? 'Download 9:16 Image' : 'Download 1:1 Image';
   }
 }
 
@@ -1075,7 +1075,7 @@ function buildResultShareCanvas(mode = 'square') {
 function downloadResultShareImage(mode = 'square') {
   const canvas = buildResultShareCanvas(mode);
   const link = document.createElement('a');
-  const suffix = mode === 'portrait' ? '9x18' : '1x1';
+  const suffix = mode === 'portrait' ? '9x16' : '1x1';
   link.download = `investolab-result-${suffix}.png`;
   link.href = canvas.toDataURL('image/png');
   link.click();
